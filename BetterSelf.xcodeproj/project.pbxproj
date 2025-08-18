@@ -256,6 +256,9 @@
 				DEVELOPMENT_TEAM = BQ5Q73876K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "BetterSelf needs camera access to record video reminders that help you remember important ideas and insights.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BetterSelf needs microphone access to record audio with your video reminders for a complete recording experience.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need to be able to add to Photos Library to enable the Quick Add Feature.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your Photos to play videos and show images.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -285,6 +288,9 @@
 				DEVELOPMENT_TEAM = BQ5Q73876K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "BetterSelf needs camera access to record video reminders that help you remember important ideas and insights.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BetterSelf needs microphone access to record audio with your video reminders for a complete recording experience.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need to be able to add to Photos Library to enable the Quick Add Feature.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your Photos to play videos and show images.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

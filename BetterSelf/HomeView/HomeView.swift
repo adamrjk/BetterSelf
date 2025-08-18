@@ -18,6 +18,7 @@ struct HomeView: View {
     @State private var showingSheet = false
     @State private var selectedReminder: Reminder?
     @State private var newReminder: Reminder?
+    @State private var showingVideoRecorderSheet = false
 
     var body: some View {
         NavigationStack {
@@ -113,6 +114,10 @@ struct HomeView: View {
                 }
             }
             .toolbar {
+
+                Button("Quick Add", systemImage: "camera.fill"){
+                    showingVideoRecorderSheet.toggle()
+                }
                 Button("Add Reminder", systemImage: "plus"){
                     let reminder = Reminder(title: "", text: "", link: "")
                     modelContext.insert(reminder)
@@ -125,12 +130,16 @@ struct HomeView: View {
                 .background(Color.creamyYellowGradient)
                 .clipShape(.capsule)
 
+
                 //                #warning("Quick Add functionnality where you just record a video, AI fills in Title and Description and Thumbnail")
             }
             .sheet(isPresented: $showingSheet){
                 if let reminder = newReminder {
                     AddReminderView(reminder: reminder)
                 }
+            }
+            .sheet(isPresented: $showingVideoRecorderSheet) {
+                VideoRecorderView()
             }
             .navigationTitle("BetterSelf")
             .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
