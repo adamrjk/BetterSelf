@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 import AVKit
 
 struct ReminderView: View {
@@ -172,12 +173,7 @@ struct ReminderView: View {
         }
         .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
         .sheet(isPresented: $videoSheet) {
-            VideoPlayer(player: AVPlayer(url: reminder.videoURL!))
-                .scaledToFit()
-                .frame(width: UIScreen.main.bounds.width, height: 300)  // Adjust size
-                .aspectRatio(contentMode: .fit)  // Keeps the aspect ratio intact
-                .cornerRadius(10)
-                .shadow(radius: 10)
+            FullScreenVideoPlayer(videoURL: reminder.videoURL!)
         }
         .sheet(isPresented: $edit){
             AddReminderView(reminder: reminder)
@@ -202,6 +198,8 @@ struct ReminderView: View {
 
 
 }
+
+
 
 #Preview {
     ReminderView(reminder: .example)
