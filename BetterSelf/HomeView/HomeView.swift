@@ -58,8 +58,6 @@ struct HomeView: View {
                                                         .stroke(Color.white.opacity(0.3), lineWidth: 1)
                                                 )
                                                 .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-                                        } else if let url = reminder.videoURL {
-                                            AsyncThumbnailView(videoURL: url)
                                         } else if let firebaseURL = reminder.firebaseVideoURL, let url = URL(string: firebaseURL) {
                                             AsyncThumbnailView(videoURL: url)
                                         }
@@ -84,7 +82,7 @@ struct HomeView: View {
                                         VStack(spacing: 4) {
                                             if !reminder.text.isEmpty { ElementIndicatorView(systemName: "text.quote")}
                                             if reminder.photo != nil { ElementIndicatorView(systemName: "photo.fill") }
-                                            if reminder.videoURL != nil || reminder.firebaseVideoURL != nil { ElementIndicatorView(systemName: "video.fill")}
+                                            if reminder.firebaseVideoURL != nil { ElementIndicatorView(systemName: "video.fill")}
                                             if !reminder.link.isEmpty { ElementIndicatorView(systemName: "link.circle.fill")}
                                         }
 

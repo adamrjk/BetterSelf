@@ -57,7 +57,7 @@ struct AddReminderView: View {
 
                         TabView {
                             Tab {
-                                AddingVideoView(videoURL: $reminder.videoURL, firebaseVideoURL: $reminder.firebaseVideoURL)
+                                AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL)
 
                             }
 

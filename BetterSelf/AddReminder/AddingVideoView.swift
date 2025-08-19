@@ -14,7 +14,6 @@ struct AddingVideoView: View {
     @State private var loadState = LoadState.unknown
     @State private var uploadProgress: Double = 0
 
-    @Binding private var videoURL: URL?
     @Binding private var firebaseVideoURL: String?
 
     var body: some View {
@@ -84,8 +83,8 @@ struct AddingVideoView: View {
 
     }
     func videoEditing() {
-        if let url = videoURL{
-            loadState = .loaded(Movie(url: url))
+        if let url = firebaseVideoURL{
+            loadState = .loaded(Movie(url: URL(string: url)!))
         }
     }
 
@@ -95,8 +94,6 @@ struct AddingVideoView: View {
                 loadState = .loading
 
                 if let movie = try await selectedItem?.loadTransferable(type: Movie.self) {
-                    videoURL = movie.url
-                    
                     // Upload to Firebase Storage
                     await uploadVideoToFirebase(videoURL: movie.url)
                 } else {
@@ -127,8 +124,7 @@ struct AddingVideoView: View {
             }
         }
     }
-    init(videoURL: Binding<URL?>, firebaseVideoURL: Binding<String?>) {
-        _videoURL = videoURL
+    init(firebaseVideoURL: Binding<String?>) {
         _firebaseVideoURL = firebaseVideoURL
     }
 
@@ -160,5 +156,5 @@ struct AddingVideoView: View {
 
 
 #Preview {
-    AddingVideoView(videoURL: .constant(nil), firebaseVideoURL: .constant(nil))
+    AddingVideoView(firebaseVideoURL: .constant(nil))
 }
