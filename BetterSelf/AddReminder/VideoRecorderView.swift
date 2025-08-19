@@ -1,12 +1,20 @@
 import SwiftUI
 import UIKit
 import Photos
+import AVKit
 
 struct VideoRecorderView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.modelContext) var modelContext
+
+
     @State private var showingImagePicker = false
     @State private var recordedVideoURL: URL?
-    
+    @State private var firebaseURL = ""
+    @State private var title = ""
+    @State private var loadingVideo = false
+    @State private var videoRecorded = false
+
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
@@ -15,11 +23,11 @@ struct VideoRecorderView: View {
                     Image(systemName: "video.circle.fill")
                         .font(.system(size: 60))
                         .foregroundStyle(Color.purpleMainGradient)
-                    
+
                     Text("Record Video Reminder")
                         .font(.title2)
                         .fontWeight(.semibold)
-                    
+
                     Text("Tap the button below to open the camera and record your video reminder")
                         .font(.body)
                         .foregroundColor(.secondary)
@@ -27,9 +35,9 @@ struct VideoRecorderView: View {
                         .padding(.horizontal)
                 }
                 .padding(.top, 40)
-                
+
                 Spacer()
-                
+
                 // Record button
                 Button(action: {
                     showingImagePicker = true
@@ -47,15 +55,15 @@ struct VideoRecorderView: View {
                     .cornerRadius(25)
                     .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
                 }
-                
+
                 Spacer()
-                
+
                 // Instructions
                 VStack(spacing: 8) {
                     Text("How it works:")
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    
+
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Image(systemName: "1.circle.fill")
@@ -88,16 +96,112 @@ struct VideoRecorderView: View {
                     }
                 }
             }
+
+            .sheet(isPresented: $showingImagePicker) {
+                ImagePicker(sourceType: .camera, mediaTypes: ["public.movie"], onVideoRecorded: { url in
+                    recordedVideoURL = url
+                    videoRecorded.toggle()
+                })
+            }
+            .sheet(isPresented: $videoRecorded){
+                NavigationView {
+                    VStack(spacing: 20){
+                        Text("Add a Title to this Reminder")
+                            .font(.title)
+                            .bold()
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            CleanText("Title")
+                                .foregroundColor(.primary)
+                            TextField("Enter title...", text: $title)
+                                .padding(12)
+                                .foregroundColor(.black)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.whiteFieldGradient)
+                                        .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.yellow.opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(Color.creamyYellowGradient)
+                                .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+                        )
+                        .padding(.horizontal, 16)
+
+                        Spacer()
+                    }
+                    .padding(.top, 20)
+                    .navigationTitle("Quick Add")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button{
+                                loadingVideo.toggle()
+                            } label: {
+                                if loadingVideo {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Text("Add")
+                                }
+                            }
+                            .disabled(loadingVideo || title.isEmpty)
+                        }
+                    }
+                }
+                .presentationDetents([.medium])
+            }
         }
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(sourceType: .camera, mediaTypes: ["public.movie"], onVideoRecorded: { url in
-                recordedVideoURL = url
-                // Here you would typically save the video URL to your reminder
-                // For now, we'll just dismiss the recorder
-                dismiss()
-            })
+        .onChange(of: loadingVideo, loadVideo)
+    }
+
+    func loadVideo() {
+        Task {
+            if let url = recordedVideoURL {
+                await uploadVideoToFirebase(videoURL: url)
+            }
         }
     }
+
+
+    func uploadVideoToFirebase(videoURL: URL) async {
+        FirebaseStorageService.shared.uploadVideo(videoURL: videoURL) { result in
+            Task { @MainActor in
+                switch result {
+                case .success(let firebaseURL):
+                    self.firebaseURL = firebaseURL
+                    // Create and save the reminder
+                    await self.createReminder(firebaseURL: firebaseURL)
+                case .failure(let error):
+                    print("Firebase upload failed: \(error)")
+                }
+            }
+        }
+    }
+    
+    func createReminder(firebaseURL: String) async {
+        let reminder = Reminder(
+            title: title,
+            text: "",
+            firebaseVideoURL: firebaseURL,
+            link: ""
+        )
+        
+        modelContext.insert(reminder)
+        
+        // Dismiss the view and return to HomeView
+        await MainActor.run {
+            dismiss()
+        }
+    }
+
 }
 
 // UIImagePickerController wrapper for SwiftUI
@@ -113,6 +217,13 @@ struct ImagePicker: UIViewControllerRepresentable {
         picker.videoQuality = .typeHigh
         picker.allowsEditing = false
         picker.delegate = context.coordinator
+        
+        // Default to front camera (selfie mode)
+        picker.cameraDevice = .front
+        
+        // Respect user camera settings (don't override mirroring, etc.)
+        picker.cameraCaptureMode = .video
+        
         return picker
     }
     
@@ -139,6 +250,12 @@ struct ImagePicker: UIViewControllerRepresentable {
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             picker.dismiss(animated: true)
+        }
+        
+        // Allow camera switching during recording
+        func imagePickerController(_ picker: UIImagePickerController, didChangeCameraDevice cameraDevice: UIImagePickerController.CameraDevice) {
+            // This method is called when user switches between front/back camera
+            // The picker automatically handles the switch, we just let it happen
         }
     }
 }
