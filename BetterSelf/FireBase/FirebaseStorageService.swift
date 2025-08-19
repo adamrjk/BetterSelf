@@ -45,6 +45,7 @@ class FirebaseStorageService: ObservableObject {
         } catch {
             completion(.failure(error))
         }
+
     }
     
     // Download video from Firebase Storage
@@ -79,3 +80,4 @@ class FirebaseStorageService: ObservableObject {
         }
     }
 }
+

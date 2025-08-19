@@ -175,6 +175,7 @@ struct ReminderView: View {
         .sheet(isPresented: $videoSheet) {
             if let firebaseURL = reminder.firebaseVideoURL, let url = URL(string: firebaseURL) {
                 FullScreenVideoPlayer(videoURL: url)
+                    .ignoresSafeArea()
             }
         }
         .sheet(isPresented: $edit){

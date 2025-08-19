@@ -158,3 +158,5 @@ struct AddingVideoView: View {
 #Preview {
     AddingVideoView(firebaseVideoURL: .constant(nil))
 }
+
+
