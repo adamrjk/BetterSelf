@@ -1,18 +1,21 @@
 import AVKit
 import PhotosUI
 import SwiftUI
+import FirebaseStorage
 
 
 
 struct AddingVideoView: View {
     enum LoadState {
-        case unknown, loading, loaded(Movie), failed
+        case unknown, loading, loaded(Movie), failed, uploading
     }
 
     @State private var selectedItem: PhotosPickerItem?
     @State private var loadState = LoadState.unknown
+    @State private var uploadProgress: Double = 0
 
     @Binding private var videoURL: URL?
+    @Binding private var firebaseVideoURL: String?
 
     var body: some View {
         VStack {
@@ -34,6 +37,21 @@ struct AddingVideoView: View {
                         .fill(Color.creamyYellowGradient)
                     
                     VideoLoadingView(progress: true)
+                    
+                case .uploading:
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.creamyYellowGradient)
+                    
+                    VStack(spacing: 12) {
+                        ProgressView()
+                            .scaleEffect(1.2)
+                        Text("Uploading to Firebase...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        ProgressView(value: uploadProgress, total: 1.0)
+                            .progressViewStyle(LinearProgressViewStyle())
+                            .padding(.horizontal)
+                    }
 
                 case .loaded(let movie):
                     VideoPlayer(player: AVPlayer(url: movie.url))
@@ -78,7 +96,9 @@ struct AddingVideoView: View {
 
                 if let movie = try await selectedItem?.loadTransferable(type: Movie.self) {
                     videoURL = movie.url
-                    loadState = .loaded(movie)
+                    
+                    // Upload to Firebase Storage
+                    await uploadVideoToFirebase(videoURL: movie.url)
                 } else {
                     loadState = .failed
                 }
@@ -86,10 +106,30 @@ struct AddingVideoView: View {
                 loadState = .failed
             }
         }
-
     }
-    init(videoURL: Binding<URL?>) {
+    
+    func uploadVideoToFirebase(videoURL: URL) async {
+        await MainActor.run {
+            loadState = .uploading
+            uploadProgress = 0
+        }
+        
+        FirebaseStorageService.shared.uploadVideo(videoURL: videoURL) { result in
+            Task { @MainActor in
+                switch result {
+                case .success(let firebaseURL):
+                    self.firebaseVideoURL = firebaseURL
+                    self.loadState = .loaded(Movie(url: videoURL))
+                case .failure(let error):
+                    print("Firebase upload failed: \(error)")
+                    self.loadState = .failed
+                }
+            }
+        }
+    }
+    init(videoURL: Binding<URL?>, firebaseVideoURL: Binding<String?>) {
         _videoURL = videoURL
+        _firebaseVideoURL = firebaseVideoURL
     }
 
     struct VideoLoadingView: View {
@@ -120,5 +160,5 @@ struct AddingVideoView: View {
 
 
 #Preview {
-    AddingVideoView(videoURL: .constant(nil))
+    AddingVideoView(videoURL: .constant(nil), firebaseVideoURL: .constant(nil))
 }

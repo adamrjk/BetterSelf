@@ -142,7 +142,7 @@ struct ReminderView: View {
 
 
             ToolbarItem(placement: .topBarTrailing){
-                if reminder.videoURL != nil {
+                if reminder.videoURL != nil || reminder.firebaseVideoURL != nil {
                     Button("Video", systemImage: "video.fill"){
                         videoSheet.toggle()
                     }
@@ -173,7 +173,11 @@ struct ReminderView: View {
         }
         .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
         .sheet(isPresented: $videoSheet) {
-            FullScreenVideoPlayer(videoURL: reminder.videoURL!)
+            if let firebaseURL = reminder.firebaseVideoURL, let url = URL(string: firebaseURL) {
+                FullScreenVideoPlayer(videoURL: url)
+            } else if let localURL = reminder.videoURL {
+                FullScreenVideoPlayer(videoURL: localURL)
+            }
         }
         .sheet(isPresented: $edit){
             AddReminderView(reminder: reminder)

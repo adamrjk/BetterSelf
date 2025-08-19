@@ -60,6 +60,8 @@ struct HomeView: View {
                                                 .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
                                         } else if let url = reminder.videoURL {
                                             AsyncThumbnailView(videoURL: url)
+                                        } else if let firebaseURL = reminder.firebaseVideoURL, let url = URL(string: firebaseURL) {
+                                            AsyncThumbnailView(videoURL: url)
                                         }
                                         // Content section with improved typography
                                         VStack(alignment: .leading, spacing: 6) {
@@ -82,7 +84,7 @@ struct HomeView: View {
                                         VStack(spacing: 4) {
                                             if !reminder.text.isEmpty { ElementIndicatorView(systemName: "text.quote")}
                                             if reminder.photo != nil { ElementIndicatorView(systemName: "photo.fill") }
-                                            if reminder.videoURL != nil { ElementIndicatorView(systemName: "video.fill")}
+                                            if reminder.videoURL != nil || reminder.firebaseVideoURL != nil { ElementIndicatorView(systemName: "video.fill")}
                                             if !reminder.link.isEmpty { ElementIndicatorView(systemName: "link.circle.fill")}
                                         }
 
@@ -114,21 +116,33 @@ struct HomeView: View {
                 }
             }
             .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add Reminder", systemImage: "plus"){
+                        let reminder = Reminder(title: "", text: "", link: "")
+                        modelContext.insert(reminder)
+                        newReminder = reminder
+                        showingSheet.toggle()
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.black)
+                    .padding(7)
+                    .background(Color.creamyYellowGradient)
+                    .clipShape(.capsule)
+                }
 
-                Button("Quick Add", systemImage: "camera.fill"){
-                    showingVideoRecorderSheet.toggle()
+
+                ToolbarItem(placement: .topBarLeading){
+                    Button("Quick Add", systemImage: "video.fill.badge.plus"){
+                        showingVideoRecorderSheet.toggle()
+                    }
+                    .font(.caption)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.black)
+                    .padding(8)
+                    .background(Color.creamyYellowGradient)
+                    .clipShape(.capsule)
                 }
-                Button("Add Reminder", systemImage: "plus"){
-                    let reminder = Reminder(title: "", text: "", link: "")
-                    modelContext.insert(reminder)
-                    newReminder = reminder
-                    showingSheet.toggle()
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.black)
-                .padding(7)
-                .background(Color.creamyYellowGradient)
-                .clipShape(.capsule)
+
 
 
                 //                #warning("Quick Add functionnality where you just record a video, AI fills in Title and Description and Thumbnail")

@@ -17,14 +17,16 @@ class Reminder {
     var text: String
     var photo: Data?
     var videoURL: URL?
+    var firebaseVideoURL: String? // Store Firebase Storage URL
     var link: String
     var date: Date
 
-    init(title: String, text: String, photo: Data? = nil, videoURL: URL? = nil, link: String) {
+    init(title: String, text: String, photo: Data? = nil, videoURL: URL? = nil, firebaseVideoURL: String? = nil, link: String) {
         self.title = title
         self.text = text
         self.photo = photo
         self.videoURL = videoURL
+        self.firebaseVideoURL = firebaseVideoURL
         self.link = link
 
         self.date = .now
