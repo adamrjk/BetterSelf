@@ -146,6 +146,12 @@ struct ReminderView: View {
                     Button("Video", systemImage: "video.fill"){
                         videoSheet.toggle()
                     }
+                    .font(.caption)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.black)
+                    .padding(8)
+                    .background(Color.creamyYellowGradient)
+                    .clipShape(.capsule)
                 }
             }
             ToolbarItem(placement: .bottomBar){
