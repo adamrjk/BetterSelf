@@ -8,11 +8,12 @@ struct VideoRecorderView: View {
     @Environment(\.modelContext) var modelContext
 
 
+    @StateObject private var uploadManager = UploadManager.shared
+
+
     @State private var showingImagePicker = false
     @State private var recordedVideoURL: URL?
-    @State private var firebaseURL = ""
     @State private var title = ""
-    @State private var loadingVideo = false
     @State private var videoRecorded = false
 
     var body: some View {
@@ -173,17 +174,22 @@ struct VideoRecorderView: View {
                         .toolbar {
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button{
-                                    loadingVideo.toggle()
+                                    let reminder = Reminder(
+                                        title: title,
+                                        text: "",
+                                        link: ""
+                                    )
+
+                                    modelContext.insert(reminder)
+
+                                    loadVideo(reminder)
+                                    dismiss()
                                 } label: {
-                                    if loadingVideo {
-                                        ProgressView()
-                                            .scaleEffect(0.8)
-                                    } else {
-                                        Text("Add")
-                                            .foregroundStyle(.black)
-                                    }
+                                    Text("Add")
+                                        .foregroundStyle(.black)
+
                                 }
-//                                .disabled(loadingVideo || title.isEmpty)
+                                .disabled(title.isEmpty)
                             }
                         }
                     }
@@ -191,46 +197,25 @@ struct VideoRecorderView: View {
                 .presentationDetents([.medium])
             }
         }
-        .onChange(of: loadingVideo, loadVideo)
     }
 
-    func loadVideo() {
+    func loadVideo(_ reminder: Reminder) {
         Task {
             if let url = recordedVideoURL {
-                await uploadVideoToFirebase(videoURL: url)
+                await uploadVideoToFirebase(videoURL: url, reminder: reminder)
             }
         }
     }
 
+    func uploadVideoToFirebase(videoURL: URL, reminder: Reminder) async {
+        uploadManager.startUpload(videoURL: videoURL){ result in
+            switch result {
+            case .success(let firebaseURL):
+                reminder.firebaseVideoURL = firebaseURL
 
-    func uploadVideoToFirebase(videoURL: URL) async {
-        FirebaseStorageService.shared.uploadVideo(videoURL: videoURL) { result in
-            Task { @MainActor in
-                switch result {
-                case .success(let firebaseURL):
-                    self.firebaseURL = firebaseURL
-                    // Create and save the reminder
-                    await self.createReminder(firebaseURL: firebaseURL)
-                case .failure(let error):
-                    print("Firebase upload failed: \(error)")
-                }
+            case .failure(let error):
+                print("Firebase upload failed: \(error.localizedDescription)")
             }
-        }
-    }
-    
-    func createReminder(firebaseURL: String) async {
-        let reminder = Reminder(
-            title: title,
-            text: "",
-            firebaseVideoURL: firebaseURL,
-            link: ""
-        )
-        
-        modelContext.insert(reminder)
-        
-        // Dismiss the view and return to HomeView
-        await MainActor.run {
-            dismiss()
         }
     }
 

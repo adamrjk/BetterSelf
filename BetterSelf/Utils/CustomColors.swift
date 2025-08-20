@@ -8,6 +8,7 @@
 import SwiftUI
 
 extension Color {
+
     static let purpleMainGradient = LinearGradient(
         colors: [
             Color.purple.opacity(0.3),
@@ -57,13 +58,20 @@ extension Color {
     )
     
     static let creamyYellow = Color(red: 1.0, green: 0.95, blue: 0.8)
-    
+
+
+
+
     static let creamyYellowGradient = LinearGradient(
-        colors: [
-            Color(red: 1.0, green: 0.95, blue: 0.8),
-            Color(red: 1.0, green: 0.93, blue: 0.75)
-        ],
-        startPoint: .top,
-        endPoint: .bottom
-    )
+            colors: [
+                Color("CreamyYellow1"),
+                Color("CreamyYellow2")
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+
+
+
 }
+

@@ -6,68 +6,46 @@ import FirebaseStorage
 
 
 struct AddingVideoView: View {
-    enum LoadState {
-        case unknown, loading, loaded(Movie), failed, uploading
+    @StateObject private var uploadManager = UploadManager.shared
+
+    enum ViewState {
+        case idle, showingThumbnail
     }
 
+    @State private var viewState = ViewState.idle
+//    @Binding private var thumbnail: Data?
     @State private var selectedItem: PhotosPickerItem?
-    @State private var loadState = LoadState.unknown
-    @State private var uploadProgress: Double = 0
+
+//    @State private var thumbnailImage: Image?
 
     @Binding private var firebaseVideoURL: String?
 
     var body: some View {
         VStack {
-
             ZStack {
-                switch loadState {
-                case .unknown:
+                switch viewState {
+                case .idle:
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(Color.creamyYellowGradient)
-                    
+
                     PhotosPicker(selection: $selectedItem, matching: .videos){
                         VideoLoadingView(progress: false)
                     }
                     .buttonStyle(.plain)
                     .padding()
-
-                case .loading:
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color.creamyYellowGradient)
-                    
-                    VideoLoadingView(progress: true)
-                    
-                case .uploading:
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color.creamyYellowGradient)
-                    
-                    VStack(spacing: 12) {
-                        ProgressView()
-                            .scaleEffect(1.2)
-                        Text("Uploading to Firebase...")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        ProgressView(value: uploadProgress, total: 1.0)
-                            .progressViewStyle(LinearProgressViewStyle())
-                            .padding(.horizontal)
-                    }
-
-                case .loaded(let movie):
-                    VideoPlayer(player: AVPlayer(url: movie.url))
-                        .scaledToFit()
-                        .clipped()
-                        .cornerRadius(14)
-                        .padding(15)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color.creamyYellowGradient)
-                        )
-
-                case .failed:
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color.creamyYellowGradient)
-                    
-                    Text("Import failed")
+                case .showingThumbnail:
+                    Text("Video Loaded")
+                    /*if let image = thumbnailImage {
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .cornerRadius(14)
+                            .padding(15)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(Color.creamyYellowGradient)
+                                )
+                    }*/
                 }
             }
             .frame(minHeight: 300)
@@ -76,58 +54,117 @@ struct AddingVideoView: View {
 
         }
         .padding(.horizontal, 20)
-        .onAppear(perform: videoEditing)
         .onChange(of: selectedItem, loadVideo)
-        
+        .onAppear(perform: videoEditing)
+
 
 
     }
     func videoEditing() {
-        if let url = firebaseVideoURL{
-            loadState = .loaded(Movie(url: URL(string: url)!))
-        }
+//        if thumbnail != nil {
+//            viewState = .showingThumbnail
+//        }
     }
+    struct Video {
+        var thumbnailImage: UIImage?
+        var asset: AVAsset?
+    }
+
 
     func loadVideo() {
         Task {
             do {
-                loadState = .loading
+                //Make Thumbnail
+                /*let imageManager = PHImageManager.default()
+
+                let fetchOptions = PHFetchOptions()
+                let imageRequestOptions = PHImageRequestOptions()
+
+                let fetchResult = PHAsset.fetchAssets(with: .video, options: fetchOptions)
+                fetchResult.enumerateObjects { (phAsset, _, _) in
+                    var video = Video()
+                    imageManager.requestAVAsset(forVideo: phAsset, options: nil) { (avAsset, _, _) in
+                        if avAsset != nil {
+                            video.asset = avAsset!
+                        }
+                        imageManager.requestImage(for: phAsset, targetSize: CGSize(width: 200, height: 200), contentMode: .aspectFit, options: imageRequestOptions) { (uiImage, _) in
+                            video.thumbnailImage = uiImage!
+//                            self.videos.append(video)
+                        }
+                    }
+                }
+
+                if let data = try await selectedItem?.loadTransferable(type: Data.self) {
+                    //                thumbnail = data
+                    print(data.count)
+                    print("Getting the Image")
+//                    thumbnailImage = image
+
+                }*/
+
+
 
                 if let movie = try await selectedItem?.loadTransferable(type: Movie.self) {
                     // Upload to Firebase Storage
+                    viewState = .showingThumbnail
                     await uploadVideoToFirebase(videoURL: movie.url)
+
+
                 } else {
-                    loadState = .failed
+                    print("Loading Failed")
                 }
             } catch {
-                loadState = .failed
+                print("Loading Failed \(error.localizedDescription)")
             }
         }
     }
+
     
     func uploadVideoToFirebase(videoURL: URL) async {
-        await MainActor.run {
-            loadState = .uploading
-            uploadProgress = 0
-        }
-        
-        FirebaseStorageService.shared.uploadVideo(videoURL: videoURL) { result in
-            Task { @MainActor in
-                switch result {
-                case .success(let firebaseURL):
-                    self.firebaseVideoURL = firebaseURL
-                    self.loadState = .loaded(Movie(url: videoURL))
-                case .failure(let error):
-                    print("Firebase upload failed: \(error)")
-                    self.loadState = .failed
-                }
+        uploadManager.startUpload(videoURL: videoURL){ result in
+            switch result {
+            case .success(let firebaseURL):
+                self.firebaseVideoURL = firebaseURL
+
+            case .failure(let error):
+                print("Firebase upload failed: \(error.localizedDescription)")
             }
         }
+
+
+
+
     }
     init(firebaseVideoURL: Binding<String?>) {
         _firebaseVideoURL = firebaseVideoURL
     }
 
+
+    private func generateThumbnail(from videoURL: URL, atTime time: CMTime = CMTimeMake(value: 1, timescale: 1)) async -> UIImage? {
+        // Create an AVAsset from the video URL
+        let asset = AVURLAsset(url: videoURL)
+
+        // Create an AVAssetImageGenerator
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.requestedTimeToleranceBefore = .zero
+        generator.requestedTimeToleranceAfter = CMTime(seconds: 3, preferredTimescale: 600)
+
+        do {
+            let videoDuration = try await asset.load(.duration)
+            let thumbnail = try await generator.image(at: videoDuration).image
+            return UIImage(cgImage: thumbnail)
+        } catch {
+            debugPrint("Error generating thumbnail: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+
+
+
+
+    
     struct VideoLoadingView: View {
         @State var progress: Bool
         var body: some View {

@@ -47,7 +47,7 @@ struct HomeView: View {
                                 } label: {
                                     HStack(spacing: 16) {
                                         // Left thumbnail with improved design
-                                        if let image = loadImage(reminder.photo) {
+                                        if let image = loadImage(reminder) {
                                             image
                                                 .resizable()
                                                 .scaledToFill()
@@ -58,8 +58,6 @@ struct HomeView: View {
                                                         .stroke(Color.white.opacity(0.3), lineWidth: 1)
                                                 )
                                                 .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-                                        } else if let firebaseURL = reminder.firebaseVideoURL, let url = URL(string: firebaseURL) {
-                                            AsyncThumbnailView(videoURL: url)
                                         }
                                         // Content section with improved typography
                                         VStack(alignment: .leading, spacing: 6) {
@@ -171,9 +169,11 @@ struct HomeView: View {
             modelContext.delete(reminder)
         }
     }
-    func loadImage(_ data: Data?) -> Image? {
-        guard let data,
-              let uiImage = UIImage(data: data) else {
+    func loadImage(_ reminder: Reminder) -> Image? {
+//        guard let data = reminder.photo != nil ? reminder.photo : reminder.thumbnail
+
+
+        guard let data = reminder.photo, let uiImage = UIImage(data: data) else {
             return nil
         }
         return Image(uiImage: uiImage)

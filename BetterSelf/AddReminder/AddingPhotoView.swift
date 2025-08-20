@@ -70,7 +70,6 @@ struct AddingPhotoView: View {
 
     func loadImage() {
         Task {
-//            #warning("Work on handling Videos too")
             guard let data = try await selectedPhoto?.loadTransferable(type: Data.self) else { return }
             photo = data
             image = Image(uiImage: UIImage(data: data)!)
