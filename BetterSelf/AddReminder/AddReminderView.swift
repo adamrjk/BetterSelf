@@ -16,6 +16,8 @@ struct AddReminderView: View {
 
     @Bindable var reminder: Reminder
 
+    @State private var refuseSaving = false
+
 
     var body: some View {
         NavigationStack {
@@ -136,7 +138,12 @@ struct AddReminderView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
-                        dismiss()
+                        if reminder.isEmpty {
+                            refuseSaving.toggle()
+                        }
+                        else {
+                            dismiss()
+                        }
                     } label: {
                         HStack {
                             Text("Save")
@@ -150,6 +157,11 @@ struct AddReminderView: View {
                     }
                 }
             }
+            .sheet(isPresented: $refuseSaving){
+                RefuseSavingView()
+                    .presentationDetents([.height(300)])
+            }
+
 
         }
 

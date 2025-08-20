@@ -22,46 +22,50 @@ struct TimeLessLetterView: View {
                 .ignoresSafeArea()
 
             ScrollView {
-                GeometryReader { proxy in
-                    VStack(spacing: 16) {
-                        if !reminder.text.isEmpty {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Description")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
 
-                                Text(reminder.text)
-                                    .font(.subheadline)
-                                    .multilineTextAlignment(.leading)
+                VStack(spacing: 16) {
+                    if !reminder.text.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Description")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
 
-                            }
-                            .padding()
-                            .frame(width: proxy.size.width)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Color.creamyYellowGradient)
-                            )
-                            .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
+                            Text(reminder.text)
+                                .font(.subheadline)
+                                .multilineTextAlignment(.leading)
+
                         }
-                        else {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("No Description Yet")
-                                    .font(.headline)
+                        .padding()
+                        .frame(minWidth: 350)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(Color.creamyYellowGradient)
 
-                            }
-                            .padding()
-                            .frame(width: proxy.size.width)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Color.creamyYellowGradient)
-                            )
-                            .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
-                        }
-
-
+                        )
+                        .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
                     }
-                    .padding(.horizontal)
+                    else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("No Description Yet")
+                                .font(.headline)
+
+                        }
+                        .padding()
+                        .frame(minWidth: 350)
+
+
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(Color.creamyYellowGradient)
+
+                        )
+                        .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
+                    }
+
+
                 }
+                .padding(.horizontal)
+
             }
             .defaultScrollAnchor(.center)
             .toolbar{

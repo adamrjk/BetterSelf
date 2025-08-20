@@ -13,7 +13,9 @@ import SwiftData
 
 struct HomeView: View {
     @Environment(\.modelContext) var modelContext
-    @Query(sort: \Reminder.date) var reminders: [Reminder]
+    @Query(filter: #Predicate<Reminder> { reminder in
+        reminder.isChecked == true
+    }, sort: \Reminder.date) var reminders: [Reminder]
 
     @State private var showingSheet = false
     @State private var selectedReminder: Reminder?
@@ -143,7 +145,7 @@ struct HomeView: View {
 
                 //                #warning("Quick Add functionnality where you just record a video, AI fills in Title and Description and Thumbnail")
             }
-            .sheet(isPresented: $showingSheet){
+            .sheet(isPresented: $showingSheet, onDismiss: deleteEmptyReminder){
                 if let reminder = newReminder {
                     AddReminderView(reminder: reminder)
                 }
@@ -156,6 +158,16 @@ struct HomeView: View {
             .navigationDestination(item: $selectedReminder) { reminder in
                 ReminderView(reminder: reminder)
             }
+        }
+
+    }
+    func deleteEmptyReminder() {
+        if let reminder = newReminder{
+            if reminder.isEmpty {
+                modelContext.delete(reminder)
+            }
+
+            reminder.isChecked = true
         }
 
     }

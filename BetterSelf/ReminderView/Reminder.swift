@@ -20,6 +20,7 @@ class Reminder {
     var firebaseVideoURL: String? // Store Firebase Storage URL
     var link: String
     var date: Date
+    var isChecked: Bool
 
 
     init(title: String, type: ReminderType = .InstantInsight,  text: String, photo: Data? = nil, firebaseVideoURL: String? = nil, link: String) {
@@ -29,11 +30,17 @@ class Reminder {
         self.photo = photo
         self.firebaseVideoURL = firebaseVideoURL
         self.link = link
+        self.isChecked = false
 
         self.date = .now
     }
 
     static let example =  Reminder(title: "The One Thing", text: "You can only pursue one goal at a time", firebaseVideoURL: "https://firebasestorage.googleapis.com:443/v0/b/betterself-29f7e.firebasestorage.app/o/videos%2FAABD7649-771B-46E2-8218-6438F558283D.mov?alt=media&token=eaf00810-84cb-46e8-aada-6045ba3eab02", link: "https://")
+
+    var isEmpty: Bool {
+        text.isEmpty && photo == nil && firebaseVideoURL == nil && link.isEmpty
+
+    }
 
 
 }

@@ -18,7 +18,6 @@ struct EchoSnapView: View {
                 Color.purpleOverlayGradient
                     .ignoresSafeArea()
                 ScrollView {
-                    GeometryReader { proxy in
                         VStack(spacing: 16) {
 
 
@@ -54,7 +53,7 @@ struct EchoSnapView: View {
 
                                 }
                                 .padding()
-                                .frame(width: proxy.size.width)
+                                .frame(minWidth: 350)
                                 .background(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                                         .fill(Color.creamyYellowGradient)
@@ -84,7 +83,7 @@ struct EchoSnapView: View {
                             }
                         }
                         .padding(.horizontal)
-                    }
+                    
                 }
                 .defaultScrollAnchor(.center)
 
