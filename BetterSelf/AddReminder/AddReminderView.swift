@@ -16,6 +16,7 @@ struct AddReminderView: View {
 
     @Bindable var reminder: Reminder
 
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -55,27 +56,49 @@ struct AddReminderView: View {
                         )
                         .padding(.horizontal, 16)
 
+                        VStack(alignment: .leading, spacing: 12) {
+                            CleanText("Choose a Reminder type")
+                                .padding(.horizontal, 20)
+
+                            Picker("Reminder Type", selection: $reminder.type){
+                                ForEach(ReminderType.allCases, id: \.self) { type in
+                                    Text(type.rawValue)
+                                        .tag(type)
+                                }
+                            }
+                            .padding(12)
+                            .pickerStyle(.segmented)
+
+                        }
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(Color.creamyYellowGradient)
+                                .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+                        )
+                        .padding(.horizontal, 16)
+                         
                         TabView {
-                            Tab {
-                                AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL)
-                                
-
-                            }
-
-                            Tab {
-                                AddingPhotoView(photo: $reminder.photo)
-                            }
-
                             Tab{
-                                AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
+                                switch reminder.type {
+                                case .InstantInsight:
+                                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL)
+                                case .EchoSnap:
+                                    AddingPhotoView(photo: $reminder.photo)
+                                default:
+                                    AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
+                                }
                             }
+                            if reminder.type != .TimeLessLetter {
+                                Tab {
+                                    AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
+                                }
 
-
+                            }
 
                         }
                         .tabViewStyle(.page)
                         .frame(height: 300)
-
 
 
                         VStack(alignment: .leading, spacing: 12) {
@@ -108,6 +131,7 @@ struct AddReminderView: View {
                     .padding(.top, 20)
                 }
             }
+            .animation(.smooth, value: reminder.type)
             .navigationTitle("New Reminder")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){

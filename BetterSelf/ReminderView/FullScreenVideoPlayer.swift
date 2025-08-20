@@ -16,15 +16,14 @@ struct FullScreenVideoPlayer: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                Color.purpleMainGradient
-                    .ignoresSafeArea()
+                Color.black.ignoresSafeArea()
 
                 // Video player
                 if let player = player {
                     VideoPlayer(player: player)
                         .clipped()
-                        .frame(width: proxy.size.width, height: proxy.size.height)
-                        .scaledToFit()
+
+
 
                 }
 
@@ -48,6 +47,6 @@ struct FullScreenVideoPlayer: View {
         player = nil
     }
 }
-//#Preview {
-//    FullScreenVideoPlayer(videoURL: <#T##URL#>)
-//}
+#Preview {
+    FullScreenVideoPlayer(videoURL: URL(string: Reminder.example.firebaseVideoURL!)! )
+}

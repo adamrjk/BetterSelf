@@ -16,7 +16,7 @@ struct ContentView: View {
                 .tabItem{
                     Label("Reminders", systemImage: "list.bullet")
                 }
-                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
+//                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
 
 
             ProblemSolverView()
