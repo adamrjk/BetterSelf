@@ -17,10 +17,12 @@ struct HomeView: View {
         reminder.isChecked == true
     }, sort: \Reminder.date) var reminders: [Reminder]
 
-    @State private var showingSheet = false
+    @State private var addReminder = false
     @State private var selectedReminder: Reminder?
     @State private var newReminder: Reminder?
-    @State private var showingVideoRecorderSheet = false
+    @State private var videoRecorder = false
+    @State private var refuseLoading = false
+
 
     var body: some View {
         NavigationStack {
@@ -45,7 +47,12 @@ struct HomeView: View {
                         List {
                             ForEach(reminders){ reminder in
                                 Button {
-                                    selectedReminder = reminder
+                                    if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
+                                        refuseLoading.toggle()
+                                    }
+                                    else {
+                                        selectedReminder = reminder
+                                    }
                                 } label: {
                                     HStack(spacing: 16) {
                                         // Left thumbnail with improved design
@@ -119,7 +126,7 @@ struct HomeView: View {
                         let reminder = Reminder(title: "", text: "", link: "")
                         modelContext.insert(reminder)
                         newReminder = reminder
-                        showingSheet.toggle()
+                        addReminder.toggle()
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(.black)
@@ -131,7 +138,7 @@ struct HomeView: View {
 
                 ToolbarItem(placement: .topBarLeading){
                     Button("Quick Add", systemImage: "video.fill.badge.plus"){
-                        showingVideoRecorderSheet.toggle()
+                        videoRecorder.toggle()
                     }
                     .font(.caption)
                     .buttonStyle(.plain)
@@ -145,12 +152,17 @@ struct HomeView: View {
 
                 //                #warning("Quick Add functionnality where you just record a video, AI fills in Title and Description and Thumbnail")
             }
-            .sheet(isPresented: $showingSheet, onDismiss: deleteEmptyReminder){
+            .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
                 if let reminder = newReminder {
                     AddReminderView(reminder: reminder)
                 }
             }
-            .sheet(isPresented: $showingVideoRecorderSheet) {
+            .sheet(isPresented: $refuseLoading){
+                RefuseLoadingView()
+                    .presentationDetents([.height(300)])
+            }
+
+            .sheet(isPresented: $videoRecorder) {
                 VideoRecorderView()
             }
             .navigationTitle("BetterSelf")
@@ -163,6 +175,8 @@ struct HomeView: View {
     }
     func deleteEmptyReminder() {
         if let reminder = newReminder{
+            guard reminder.isChecked == false else { return }
+
             if reminder.isEmpty {
                 modelContext.delete(reminder)
             }

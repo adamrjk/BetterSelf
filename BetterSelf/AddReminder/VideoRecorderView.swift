@@ -170,7 +170,7 @@ struct VideoRecorderView: View {
 
                         }
                         .padding(.top, 20)
-                        .navigationTitle("Quick Add")
+                        .navigationTitle("Add a Title")
                         .toolbar {
                             ToolbarItem(placement: .navigationBarTrailing) {
                                 Button{
@@ -179,13 +179,13 @@ struct VideoRecorderView: View {
                                         text: "",
                                         link: ""
                                     )
-
+                                    reminder.isChecked = true
                                     modelContext.insert(reminder)
-
+                                    
                                     loadVideo(reminder)
                                     dismiss()
                                 } label: {
-                                    Text("Add")
+                                    Text("Save")
                                         .foregroundStyle(.black)
 
                                 }
