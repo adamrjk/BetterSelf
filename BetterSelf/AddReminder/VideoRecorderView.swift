@@ -224,8 +224,32 @@ struct VideoRecorderView: View {
     func loadVideo(_ reminder: Reminder) {
         Task {
             if let url = recordedVideoURL {
+                // Generate thumbnail immediately
+                if let thumbnail = await generateThumbnail(from: url) {
+                    reminder.photo = thumbnail.jpegData(compressionQuality: 0.8)
+                }
+                
+                // Upload video in background
                 await uploadVideoToFirebase(videoURL: url, reminder: reminder)
             }
+        }
+    }
+    
+    // Generate thumbnail from video URL
+    private func generateThumbnail(from videoURL: URL) async -> UIImage? {
+        let asset = AVURLAsset(url: videoURL)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        
+        // Get thumbnail at 0.1 seconds (very fast)
+        let time = CMTime(seconds: 0.1, preferredTimescale: 600)
+        
+        do {
+            let cgImage = try await generator.image(at: time).image
+            return UIImage(cgImage: cgImage)
+        } catch {
+            print("Thumbnail generation error: \(error)")
+            return nil
         }
     }
 
