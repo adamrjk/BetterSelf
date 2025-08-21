@@ -40,8 +40,18 @@ struct AddingDescriptionView: View {
                     }
                     .focused($keyboard)
                     .frame(minHeight: 120, alignment: .topLeading)
+                    .frame(maxHeight: .infinity)
                     .padding(12)
-                    .background(Color.clear)
+                    .foregroundStyle(.primary)
+                    .background(
+                           RoundedRectangle(cornerRadius: 12)
+                               .fill(Color(.systemGray6)) // Automatically adapts
+                               .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
+                       )
+                       .overlay(
+                           RoundedRectangle(cornerRadius: 12)
+                               .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                       )
                     .scrollContentBackground(.hidden)
             }
 
@@ -50,7 +60,7 @@ struct AddingDescriptionView: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.creamyYellowGradient)
+                .fill(Color.cardBackground)
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
         )
         .padding(.horizontal, 16)

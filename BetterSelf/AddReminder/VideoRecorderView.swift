@@ -7,6 +7,26 @@ struct VideoRecorderView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
 
+    @Environment(\.colorScheme) var colorScheme
+
+    var itemColor: LinearGradient {
+        colorScheme == .light
+        ? Color.purpleMainGradient
+        : Color.creamyYellowGradient
+    }
+
+    var bulletPointColor: Color {
+        colorScheme == .light
+        ? .blue
+        : .creamyYellow
+    }
+
+    var buttonTextColor: Color {
+        colorScheme == .light
+        ? .black
+        : .creamyYellow
+    }
+
 
     @StateObject private var uploadManager = UploadManager.shared
 
@@ -30,7 +50,7 @@ struct VideoRecorderView: View {
                     VStack(spacing: 12) {
                         Image(systemName: "video.circle.fill")
                             .font(.system(size: 60))
-                            .foregroundStyle(Color.purpleMainGradient)
+                            .foregroundStyle(itemColor)
 
                         Text("Record Video Reminder")
                             .font(.title2)
@@ -45,13 +65,14 @@ struct VideoRecorderView: View {
                     .padding(20)
                     .background(
                         RoundedRectangle(cornerRadius: 14)
-                            .fill(Color.creamyYellowGradient)
+                            .fill(Color.cardBackground)
 
                     )
                     .padding(.top, 40)
 
 
                     Spacer()
+                        .frame(height: 60)
 
                     // Record button
                     Button(action: {
@@ -63,15 +84,18 @@ struct VideoRecorderView: View {
                             Text("Start Recording")
                                 .font(.headline)
                         }
-                        .foregroundStyle(.black)
+                        .foregroundStyle(buttonTextColor)
+
                         .padding(.horizontal, 30)
                         .padding(.vertical, 16)
-                        .background(Color.creamyYellowGradient)
+                        .background(Color.cardBackground)
                         .cornerRadius(25)
                         .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
                     }
+                    .buttonStyle(.plain)
 
                     Spacer()
+                        .frame(height: 60)
 
                     // Instructions
                     VStack(spacing: 8) {
@@ -82,27 +106,27 @@ struct VideoRecorderView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Image(systemName: "1.circle.fill")
-                                    .foregroundColor(.blue)
+                                    .foregroundStyle(bulletPointColor)
                                 Text("Tap 'Start Recording' to open camera")
                             }
                             HStack {
                                 Image(systemName: "2.circle.fill")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(bulletPointColor)
                                 Text("Record your video reminder")
                             }
                             HStack {
                                 Image(systemName: "3.circle.fill")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(bulletPointColor)
                                 Text("Save the video to your library")
                             }
                         }
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     }
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 14)
-                            .fill(Color.creamyYellowGradient)
+                            .fill(Color.cardBackground)
 
                     )
                     .padding(.bottom, 40)
@@ -117,7 +141,7 @@ struct VideoRecorderView: View {
                         dismiss()
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.primary)
                 }
             }
 
@@ -143,25 +167,23 @@ struct VideoRecorderView: View {
                             VStack(alignment: .leading, spacing: 12) {
 
                                 CleanText("Title")
-                                    .foregroundColor(.primary)
                                 TextField("Enter title...", text: $title)
                                     .padding(12)
-                                    .foregroundColor(.black)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.whiteFieldGradient)
-                                            .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
-                                    )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.yellow.opacity(0.3), lineWidth: 1)
-                                    )
+                                           RoundedRectangle(cornerRadius: 12)
+                                               .fill(Color(.systemGray6)) // Automatically adapts
+                                               .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
+                                       )
+                                       .overlay(
+                                           RoundedRectangle(cornerRadius: 12)
+                                               .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                                       )
                             }
                             .padding(.horizontal, 20)
                             .padding(.vertical, 16)
                             .background(
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(Color.creamyYellowGradient)
+                                    .fill(Color.cardBackground)
                                     .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                             )
                             .padding(.horizontal, 16)
@@ -186,10 +208,10 @@ struct VideoRecorderView: View {
                                     dismiss()
                                 } label: {
                                     Text("Save")
-                                        .foregroundStyle(.black)
+                                        .foregroundStyle(.primary)
 
                                 }
-                                .disabled(title.isEmpty)
+                                .buttonStyle(.plain)
                             }
                         }
                     }

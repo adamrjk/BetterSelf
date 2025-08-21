@@ -32,7 +32,7 @@ struct RefuseSavingView: View {
                 .padding()
                 .buttonStyle(.borderedProminent)
                 .frame(width: 100)
-                .background(Color.creamyYellowGradient)
+                .background(Color.cardBackground)
                 .clipShape(
                     RoundedRectangle(cornerRadius: 14)
 

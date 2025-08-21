@@ -35,7 +35,7 @@ struct EchoSnapView: View {
                                 .padding()
                                 .background(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .fill(Color.creamyYellowGradient)
+                                        .fill(Color.cardBackground)
                                 )
                                 .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
                             }
@@ -56,7 +56,7 @@ struct EchoSnapView: View {
                                 .frame(minWidth: 350)
                                 .background(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .fill(Color.creamyYellowGradient)
+                                        .fill(Color.cardBackground)
 
                                 )
                                 .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
@@ -76,7 +76,7 @@ struct EchoSnapView: View {
                                         .bold()
                                         .foregroundStyle(.secondary)
                                         .padding()
-                                        .background(Color.creamyYellowGradient)
+                                        .background(Color.cardBackground)
                                         .clipShape(.rect(cornerRadius: 14))
                                 }
                                 .buttonStyle(.plain)

@@ -9,6 +9,13 @@ import SwiftUI
 
 struct TimeLessLetterView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+
+    var calendarCardText: Color {
+        colorScheme == .light
+        ? .purple.opacity(0.7)
+        : .creamyYellow
+    }
 
     @State var isSheet = false
 
@@ -39,7 +46,7 @@ struct TimeLessLetterView: View {
                         .frame(minWidth: 350)
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color.creamyYellowGradient)
+                                .fill(Color.cardBackground)
 
                         )
                         .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
@@ -56,7 +63,7 @@ struct TimeLessLetterView: View {
 
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color.creamyYellowGradient)
+                                .fill(Color.cardBackground)
 
                         )
                         .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
@@ -86,15 +93,15 @@ struct TimeLessLetterView: View {
                             HStack {
                                 Image(systemName: "calendar")
                                     .font(.caption)
-                                    .foregroundStyle(.purple.opacity(0.7))
+                                    .foregroundStyle(calendarCardText)
 
                                 Text(reminder.date, style: .date)
                                     .font(.caption)
-                                    .foregroundStyle(.purple.opacity(0.7))
-                                    .padding(.trailing)
+                                    .foregroundStyle(calendarCardText)
+
                             }
                             .padding(3)
-                            .background(Color.creamyYellowGradient)
+                            .background(Color.cardBackground)
                             .clipShape(.capsule)
                         }
 

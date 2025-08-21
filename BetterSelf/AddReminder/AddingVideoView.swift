@@ -2,6 +2,7 @@ import AVKit
 import PhotosUI
 import SwiftUI
 import FirebaseStorage
+import Photos
 
 
 
@@ -13,12 +14,11 @@ struct AddingVideoView: View {
     }
 
     @State private var viewState = ViewState.idle
-//    @Binding private var thumbnail: Data?
+    @State private var thumbnailImage: Image?
     @State private var selectedItem: PhotosPickerItem?
 
-//    @State private var thumbnailImage: Image?
-
     @Binding private var firebaseVideoURL: String?
+    @Binding private var thumbnail: Data?  // ✅ NEW: Binding to reminder.photo
 
     var body: some View {
         VStack {
@@ -26,16 +26,15 @@ struct AddingVideoView: View {
                 switch viewState {
                 case .idle:
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color.creamyYellowGradient)
+                        .fill(Color.cardBackground)
 
                     PhotosPicker(selection: $selectedItem, matching: .videos){
-                        VideoLoadingView(progress: false)
+                        VideoLoadingView()
                     }
                     .buttonStyle(.plain)
                     .padding()
                 case .showingThumbnail:
-                    Text("Video Loaded")
-                    /*if let image = thumbnailImage {
+                    if let image = thumbnailImage {
                         image
                             .resizable()
                             .scaledToFit()
@@ -43,27 +42,25 @@ struct AddingVideoView: View {
                             .padding(15)
                             .background(
                                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Color.creamyYellowGradient)
-                                )
-                    }*/
+                                    .fill(Color.cardBackground)
+                            )
+                    }
                 }
             }
             .frame(minHeight: 300)
             .shadow(color: .black.opacity(0.15), radius: 10, y: 5)
-
-
         }
         .padding(.horizontal, 20)
         .onChange(of: selectedItem, loadVideo)
         .onAppear(perform: videoEditing)
-
-
-
     }
+
     func videoEditing() {
-//        if thumbnail != nil {
-//            viewState = .showingThumbnail
-//        }
+        print(thumbnail == nil)
+        if let data = thumbnail {
+            viewState = .showingThumbnail
+            thumbnailImage = Image(uiImage: UIImage(data: data)!)
+        }
     }
     struct Video {
         var thumbnailImage: UIImage?
@@ -74,111 +71,78 @@ struct AddingVideoView: View {
     func loadVideo() {
         Task {
             do {
-                //Make Thumbnail
-                /*let imageManager = PHImageManager.default()
-
-                let fetchOptions = PHFetchOptions()
-                let imageRequestOptions = PHImageRequestOptions()
-
-                let fetchResult = PHAsset.fetchAssets(with: .video, options: fetchOptions)
-                fetchResult.enumerateObjects { (phAsset, _, _) in
-                    var video = Video()
-                    imageManager.requestAVAsset(forVideo: phAsset, options: nil) { (avAsset, _, _) in
-                        if avAsset != nil {
-                            video.asset = avAsset!
+                // 🚀 FAST: Get video data and show thumbnail instantly
+                if let movie = try await selectedItem?.loadTransferable(type: Movie.self) {
+                    // Show thumbnail immediately (Movie should have thumbnail)
+                    if let uiImage = movie.thumbnail {
+                        await MainActor.run {
+                            self.thumbnailImage = Image(uiImage: uiImage)
+                            self.viewState = .showingThumbnail
+                            
+                            // 🎯 STORE THUMBNAIL IN REMINDER.PHOTO
+                            self.thumbnail = uiImage.jpegData(compressionQuality: 0.8)
                         }
-                        imageManager.requestImage(for: phAsset, targetSize: CGSize(width: 200, height: 200), contentMode: .aspectFit, options: imageRequestOptions) { (uiImage, _) in
-                            video.thumbnailImage = uiImage!
-//                            self.videos.append(video)
+                    } else {
+                        // Fallback: show "Video Loaded" text
+                        await MainActor.run {
+                            self.viewState = .showingThumbnail
                         }
                     }
-                }
-
-                if let data = try await selectedItem?.loadTransferable(type: Data.self) {
-                    //                thumbnail = data
-                    print(data.count)
-                    print("Getting the Image")
-//                    thumbnailImage = image
-
-                }*/
-
-
-
-                if let movie = try await selectedItem?.loadTransferable(type: Movie.self) {
-                    // Upload to Firebase Storage
-                    viewState = .showingThumbnail
+                    
+                    // 🔄 SLOW: Upload to Firebase in background
                     await uploadVideoToFirebase(videoURL: movie.url)
-
-
                 } else {
-                    print("Loading Failed")
+                    print("Video loading failed")
                 }
             } catch {
                 print("Loading Failed \(error.localizedDescription)")
             }
         }
     }
+    
+    // Remove the complex thumbnail generation method - not needed
 
     
     func uploadVideoToFirebase(videoURL: URL) async {
-        uploadManager.startUpload(videoURL: videoURL){ result in
-            switch result {
-            case .success(let firebaseURL):
-                self.firebaseVideoURL = firebaseURL
+        uploadManager.startUpload(videoURL: videoURL) { result in
+            Task { @MainActor in
+                switch result {
+                case .success(let firebaseURL):
+                    self.firebaseVideoURL = firebaseURL
 
-            case .failure(let error):
-                print("Firebase upload failed: \(error.localizedDescription)")
+                case .failure(let error):
+                    print("Firebase upload failed: \(error.localizedDescription)")
+                }
             }
         }
-
-
-
-
     }
-    init(firebaseVideoURL: Binding<String?>) {
+    init(firebaseVideoURL: Binding<String?>, thumbnail: Binding<Data?>) {  // ✅ UPDATED: Added thumbnail parameter
         _firebaseVideoURL = firebaseVideoURL
+        _thumbnail = thumbnail  // ✅ NEW: Store thumbnail binding
     }
-
-
-    private func generateThumbnail(from videoURL: URL, atTime time: CMTime = CMTimeMake(value: 1, timescale: 1)) async -> UIImage? {
-        // Create an AVAsset from the video URL
-        let asset = AVURLAsset(url: videoURL)
-
-        // Create an AVAssetImageGenerator
-        let generator = AVAssetImageGenerator(asset: asset)
-        generator.appliesPreferredTrackTransform = true
-        generator.requestedTimeToleranceBefore = .zero
-        generator.requestedTimeToleranceAfter = CMTime(seconds: 3, preferredTimescale: 600)
-
-        do {
-            let videoDuration = try await asset.load(.duration)
-            let thumbnail = try await generator.image(at: videoDuration).image
-            return UIImage(cgImage: thumbnail)
-        } catch {
-            debugPrint("Error generating thumbnail: \(error.localizedDescription)")
-            return nil
-        }
-    }
-
-
-
-
 
     
     struct VideoLoadingView: View {
-        @State var progress: Bool
+
+        @Environment(\.colorScheme) var colorScheme
+
+        var itemColor: LinearGradient {
+            colorScheme == .light
+            ? Color.purpleMainGradient
+            : Color.creamyYellowGradient
+        }
         var body: some View {
             VStack(alignment: .center, spacing: 8) {
                 Image(systemName: "video.fill.badge.plus")
                     .font(.system(size: 40, weight: .semibold))
-                    .foregroundStyle(Color.purpleMainGradient)
+                    .foregroundStyle(itemColor)
+
+
+
                 Text("Video Reminder")
                     .font(.headline)
                 CleanText("Add a Video that reminds you of this idea")
                     .multilineTextAlignment(.center)
-                if progress {
-                    ProgressView()
-                }
             }
             .shadow(color: .black.opacity(0.15), radius: 10, y: 5)
             .padding(.horizontal, 20)
@@ -193,7 +157,7 @@ struct AddingVideoView: View {
 
 
 #Preview {
-    AddingVideoView(firebaseVideoURL: .constant(nil))
+    AddingVideoView(firebaseVideoURL: .constant(nil), thumbnail: .constant(nil))
 }
 
 

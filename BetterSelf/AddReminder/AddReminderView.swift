@@ -38,22 +38,23 @@ struct AddReminderView: View {
                             TextField("Enter title...", text: $reminder.title)
                                 .padding(12)
                                 .focused($keyboard)
-                                .foregroundColor(.black)
+                                .foregroundStyle(.primary)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.whiteFieldGradient)
-                                        .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.yellow.opacity(0.3), lineWidth: 1)
-                                )
+                                       RoundedRectangle(cornerRadius: 12)
+                                           .fill(Color(.systemGray6)) // Automatically adapts
+                                           .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
+                                   )
+                                   .overlay(
+                                       RoundedRectangle(cornerRadius: 12)
+                                           .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                                   )
+
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.creamyYellowGradient)
+                                .fill(Color.cardBackground)
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -75,7 +76,7 @@ struct AddReminderView: View {
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.creamyYellowGradient)
+                                .fill(Color.cardBackground)
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -84,7 +85,7 @@ struct AddReminderView: View {
                             Tab{
                                 switch reminder.type {
                                 case .InstantInsight:
-                                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL)
+                                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo)
                                 case .EchoSnap:
                                     AddingPhotoView(photo: $reminder.photo)
                                 default:
@@ -108,22 +109,22 @@ struct AddReminderView: View {
                             TextField("Link", text: $reminder.link)
                                 .padding(12)
                                 .focused($keyboard)
-                                .foregroundColor(.black)
+                                .foregroundStyle(.primary)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.whiteFieldGradient)
-                                        .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.yellow.opacity(0.3), lineWidth: 1)
-                                )
+                                       RoundedRectangle(cornerRadius: 12)
+                                           .fill(Color(.systemGray6)) // Automatically adapts
+                                           .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
+                                   )
+                                   .overlay(
+                                       RoundedRectangle(cornerRadius: 12)
+                                           .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                                   )
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.creamyYellowGradient)
+                                .fill(Color.cardBackground)
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -149,12 +150,13 @@ struct AddReminderView: View {
                             Text("Save")
                                 .frame(width: 50)
                                 .font(.headline)
-                                .foregroundStyle(.black)
+                                .foregroundStyle(.primary)
                                 .padding(7)
-                                .background(Color.creamyYellowGradient)
+                                .background(Color.cardBackground)
                                 .clipShape(.capsule)
                         }
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .sheet(isPresented: $refuseSaving){

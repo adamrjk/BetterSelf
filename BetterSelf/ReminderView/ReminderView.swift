@@ -13,6 +13,16 @@ struct ReminderView: View {
 
     @Environment(\.dismiss) var dismiss
 
+    @Environment(\.colorScheme) var colorScheme
+
+    var calendarCardText: Color {
+        colorScheme == .light
+        ? .purple.opacity(0.7)
+        : .creamyYellow
+    }
+
+
+
     @State private var edit = false
     @State private var detailSheet = false
     @State var reminder: Reminder
@@ -20,7 +30,7 @@ struct ReminderView: View {
     private var primaryColor: Color {
         reminder.type == .InstantInsight
         ? .white
-        : .black
+        : .primary
 
     }
 
@@ -73,15 +83,14 @@ struct ReminderView: View {
                         HStack {
                             Image(systemName: "calendar")
                                 .font(.caption)
-                                .foregroundStyle(.purple.opacity(0.7))
+                                .foregroundStyle(calendarCardText)
 
                             Text(reminder.date, style: .date)
                                 .font(.caption)
-                                .foregroundStyle(.purple.opacity(0.7))
-                                .padding(.trailing)
+                                .foregroundStyle(calendarCardText)
                         }
                         .padding(3)
-                        .background(Color.creamyYellowGradient)
+                        .background(Color.cardBackground)
                         .clipShape(.capsule)
                     }
 
@@ -121,6 +130,7 @@ struct ReminderView: View {
 
 
     }
+
 
 
 

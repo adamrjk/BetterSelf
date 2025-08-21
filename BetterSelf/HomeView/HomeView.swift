@@ -22,6 +22,14 @@ struct HomeView: View {
     @State private var newReminder: Reminder?
     @State private var videoRecorder = false
     @State private var refuseLoading = false
+    @Environment(\.colorScheme) var colorScheme
+
+    var itemColor: LinearGradient {
+        colorScheme == .light
+        ? LinearGradient(colors: [.black], startPoint: .top, endPoint: .bottom)
+        : Color.creamyYellowGradient
+    }
+
 
 
     var body: some View {
@@ -129,9 +137,9 @@ struct HomeView: View {
                         addReminder.toggle()
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(itemColor)
                     .padding(7)
-                    .background(Color.creamyYellowGradient)
+                    .background(Color.cardBackground)
                     .clipShape(.capsule)
                 }
 
@@ -142,9 +150,9 @@ struct HomeView: View {
                     }
                     .font(.caption)
                     .buttonStyle(.plain)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(itemColor)
                     .padding(8)
-                    .background(Color.creamyYellowGradient)
+                    .background(Color.cardBackground)
                     .clipShape(.capsule)
                 }
 

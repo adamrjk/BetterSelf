@@ -10,6 +10,14 @@ import PhotosUI
 import SwiftUI
 
 struct AddingPhotoView: View {
+    @Environment(\.colorScheme) var colorScheme
+
+    var itemColor: LinearGradient {
+        colorScheme == .light
+        ? Color.purpleMainGradient
+        : Color.creamyYellowGradient
+    }
+
     @State private var image: Image?
     @Binding private var photo: Data?
 
@@ -27,17 +35,17 @@ struct AddingPhotoView: View {
                             .padding(15)
                             .background(
                                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Color.creamyYellowGradient)
+                                    .fill(Color.cardBackground)
                             )
                     } else {
                         // Default state with fixed background
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(Color.creamyYellowGradient)
+                            .fill(Color.cardBackground)
 
                         VStack(alignment: .center, spacing: 8) {
                             Image(systemName: "photo.badge.plus")
                                 .font(.system(size: 40, weight: .semibold))
-                                .foregroundStyle(Color.purpleMainGradient)
+                                .foregroundStyle(itemColor)
                             Text("Photo Reminder")
                                 .font(.headline)
 
