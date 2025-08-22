@@ -12,11 +12,13 @@ import SwiftUI
 
 struct AddReminderView: View {
     @Environment(\.dismiss) var dismiss
-    @FocusState private var keyboard: Bool
+    @FocusState var keyboard: Bool
 
     @Bindable var reminder: Reminder
 
     @State private var refuseSaving = false
+
+    @Environment(\.colorScheme) var colorScheme
 
 
     var body: some View {
@@ -43,11 +45,11 @@ struct AddReminderView: View {
                                        RoundedRectangle(cornerRadius: 12)
                                            .fill(Color(.systemGray6)) // Automatically adapts
                                            .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
-                                   )
-                                   .overlay(
+                                )
+                                .overlay(
                                        RoundedRectangle(cornerRadius: 12)
                                            .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                                   )
+                                )
 
                         }
                         .padding(.horizontal, 20)
@@ -134,7 +136,8 @@ struct AddReminderView: View {
                     .padding(.top, 20)
                 }
             }
-            .animation(.smooth, value: reminder.type)
+            .animation(.smooth, value: keyboard)
+//            .animation(.smooth, value: reminder.type)
             .navigationTitle("New Reminder")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
@@ -159,6 +162,33 @@ struct AddReminderView: View {
                     .buttonStyle(.plain)
                 }
             }
+            .overlay(
+                VStack {
+                    Spacer()  // ← This pushes the button to the bottom of the screen
+                    if keyboard {
+                        HStack {
+                            Spacer()
+                            Button{
+                                keyboard = false
+                            } label: {
+                                Image(systemName: "arrow.down")
+                                    .foregroundStyle(.primary)
+                                    .padding()
+                                    .background(
+                                        colorScheme == .light
+                                        ? .white
+                                        : Color( red: 0.318, green: 0.318, blue: 0.318)
+
+                                    )
+                                    .clipShape(.circle)
+                                    .padding(.trailing)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.bottom, 8)  // ← This adds 8 points of space below the button
+                    }
+                }
+            )
             .sheet(isPresented: $refuseSaving){
                 RefuseSavingView()
                     .presentationDetents([.height(300)])

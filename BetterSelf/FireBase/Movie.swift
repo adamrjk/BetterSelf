@@ -22,20 +22,11 @@ struct Movie: Transferable {
         FileRepresentation(contentType: .movie) { movie in
             SentTransferredFile(movie.url)
         } importing: { received in
-
-            let copy = URL.documentsDirectory.appending(path: "movie.mp4")
-
-            if FileManager.default.fileExists(atPath: copy.path()) {
-                try FileManager.default.removeItem(at: copy)
-            }
-
-            try FileManager.default.copyItem(at: received.file, to: copy)
-
             // 🚀 Generate thumbnail from received data (NO local storage!)
             let thumbnail = await generateThumbnail(from: received.file)
             
             // ✅ Return Movie with original URL and thumbnail (no copy!)
-            return Self.init(url: copy, thumbnail: thumbnail)
+            return Self.init(url: received.file, thumbnail: thumbnail)
         }
     }
     

@@ -29,15 +29,6 @@ struct AddingDescriptionView: View {
                     )
 
                 TextEditor(text: $text)
-
-                    .toolbar{
-                        ToolbarItemGroup(placement: .keyboard) {
-                            Spacer()
-                            Button("Done"){
-                                keyboard = false
-                            }
-                        }
-                    }
                     .focused($keyboard)
                     .frame(minHeight: 120, alignment: .topLeading)
                     .frame(maxHeight: .infinity)

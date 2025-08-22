@@ -22,7 +22,7 @@ class FirebaseStorageService: ObservableObject {
             let metadata = StorageMetadata()
             metadata.contentType = "video/quicktime"
             
-            videoRef.putData(videoData, metadata: metadata) { metadata, error in
+            videoRef.putData(videoData, metadata: nil) { _, error in
                 if let error = error {
                     completion(.failure(error))
                     return
@@ -68,15 +68,22 @@ class FirebaseStorageService: ObservableObject {
         }
         
         // Extract the path from the Firebase URL
-        let path = url.pathComponents.dropFirst(2).joined(separator: "/")
-        let videoRef = storage.reference().child(path)
-        
-        videoRef.delete { error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                completion(.success(()))
+        // Firebase URL structure: https://firebasestorage.googleapis.com:443/v0/b/bucket-name/o/path/to/file
+        // We need to extract just the path part after /o/
+        let pathComponents = url.pathComponents
+        if let oIndex = pathComponents.firstIndex(of: "o"), oIndex + 1 < pathComponents.count {
+            let path = pathComponents[(oIndex + 1)...].joined(separator: "/")
+            let videoRef = storage.reference().child(path)
+            
+            videoRef.delete { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(()))
+                }
             }
+        } else {
+            completion(.failure(NSError(domain: "FirebaseStorage", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid Firebase Storage URL format"])))
         }
     }
 }

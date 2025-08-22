@@ -7,6 +7,7 @@ import Photos
 
 
 struct AddingVideoView: View {
+    @Environment(\.colorScheme) var colorScheme
     @StateObject private var uploadManager = UploadManager.shared
 
     enum ViewState {
@@ -35,15 +36,53 @@ struct AddingVideoView: View {
                     .padding()
                 case .showingThumbnail:
                     if let image = thumbnailImage {
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .cornerRadius(14)
-                            .padding(15)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Color.cardBackground)
-                            )
+                        ZStack(alignment: .topTrailing){
+                            ZStack {
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .cornerRadius(14)
+                                    .padding(15)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .fill(Color.cardBackground)
+                                    )
+
+                                // Video play indicator
+                                  Image(systemName: "play.circle.fill")
+                                      .font(.system(size: 40))
+                                      .foregroundColor(.white)
+                                      .shadow(color: .black.opacity(0.3), radius: 2)
+                            }
+                            Button{
+                                thumbnailImage = nil
+                                selectedItem = nil
+                                //delete video
+                                firebaseVideoURL = nil
+                                thumbnail = nil
+
+                                viewState = .idle
+
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .foregroundStyle(
+                                        colorScheme == .light
+                                        ? .white
+                                        : .black
+                                    )
+                                    .padding(5)
+                                    .background(.red)
+                                    .clipShape(.circle)
+                            }
+                            .buttonStyle(.plain)
+                            .offset(x: 10)
+
+
+
+
+
+
+                        }
                     }
                 }
             }
@@ -56,7 +95,6 @@ struct AddingVideoView: View {
     }
 
     func videoEditing() {
-        print(thumbnail == nil)
         if let data = thumbnail {
             viewState = .showingThumbnail
             thumbnailImage = Image(uiImage: UIImage(data: data)!)

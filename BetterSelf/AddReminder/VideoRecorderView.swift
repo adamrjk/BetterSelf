@@ -7,6 +7,7 @@ struct VideoRecorderView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
 
+    @StateObject private var uploadManager = UploadManager.shared
     @Environment(\.colorScheme) var colorScheme
 
     var itemColor: LinearGradient {
@@ -28,13 +29,12 @@ struct VideoRecorderView: View {
     }
 
 
-    @StateObject private var uploadManager = UploadManager.shared
 
 
     @State private var showingImagePicker = false
     @State private var recordedVideoURL: URL?
-    @State private var title = ""
     @State private var videoRecorded = false
+    @State private var title = ""
 
     var body: some View {
         NavigationView {
@@ -150,76 +150,27 @@ struct VideoRecorderView: View {
                     recordedVideoURL = url
                     videoRecorded.toggle()
                 })
-//                .ignoresSafeArea()
             }
-            .sheet(isPresented: $videoRecorded){
-                NavigationView {
-                    ZStack {
-                        Color.purpleMainGradient
-                            .ignoresSafeArea()
-                        Color.purpleOverlayGradient
-                            .ignoresSafeArea()
-
-
-                        VStack(spacing: 20){
-                            Spacer()
-
-                            VStack(alignment: .leading, spacing: 12) {
-
-                                CleanText("Title")
-                                TextField("Enter title...", text: $title)
-                                    .padding(12)
-                                    .background(
-                                           RoundedRectangle(cornerRadius: 12)
-                                               .fill(Color(.systemGray6)) // Automatically adapts
-                                               .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
-                                       )
-                                       .overlay(
-                                           RoundedRectangle(cornerRadius: 12)
-                                               .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                                       )
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(Color.cardBackground)
-                                    .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-                            )
-                            .padding(.horizontal, 16)
-                            Spacer()
-                            Spacer()
-
-                        }
-                        .padding(.top, 20)
-                        .navigationTitle("Add a Title")
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                Button{
-                                    let reminder = Reminder(
-                                        title: title,
-                                        text: "",
-                                        link: ""
-                                    )
-                                    reminder.isChecked = true
-                                    modelContext.insert(reminder)
-                                    
-                                    loadVideo(reminder)
-                                    dismiss()
-                                } label: {
-                                    Text("Save")
-                                        .foregroundStyle(.primary)
-
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                    }
-                }
-                .presentationDetents([.medium])
+            .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
+                AddTitleSheet(title: $title)
             }
+
         }
     }
+    func saveReminder() {
+        let reminder = Reminder(
+            title: title,
+            text: "",
+            link: ""
+        )
+        reminder.isChecked = true
+        modelContext.insert(reminder)
+
+        loadVideo(reminder)
+
+        dismiss()
+    }
+
 
     func loadVideo(_ reminder: Reminder) {
         Task {
@@ -228,22 +179,22 @@ struct VideoRecorderView: View {
                 if let thumbnail = await generateThumbnail(from: url) {
                     reminder.photo = thumbnail.jpegData(compressionQuality: 0.8)
                 }
-                
+
                 // Upload video in background
                 await uploadVideoToFirebase(videoURL: url, reminder: reminder)
             }
         }
     }
-    
+
     // Generate thumbnail from video URL
     private func generateThumbnail(from videoURL: URL) async -> UIImage? {
         let asset = AVURLAsset(url: videoURL)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
-        
+
         // Get thumbnail at 0.1 seconds (very fast)
         let time = CMTime(seconds: 0.1, preferredTimescale: 600)
-        
+
         do {
             let cgImage = try await generator.image(at: time).image
             return UIImage(cgImage: cgImage)
@@ -264,11 +215,14 @@ struct VideoRecorderView: View {
             }
         }
     }
+    
 
 }
 
 // UIImagePickerController wrapper for SwiftUI
 struct ImagePicker: UIViewControllerRepresentable {
+    @Environment(\.dismiss) var dismiss
+
     let sourceType: UIImagePickerController.SourceType
     let mediaTypes: [String]
     let onVideoRecorded: (URL) -> Void
@@ -295,7 +249,10 @@ struct ImagePicker: UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+    func dimissImagePicker(){
+        dismiss()
+    }
+
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         let parent: ImagePicker
         
@@ -307,6 +264,8 @@ struct ImagePicker: UIViewControllerRepresentable {
             if let videoURL = info[.mediaURL] as? URL {
                 // Video was recorded, call the callback
                 parent.onVideoRecorded(videoURL)
+                parent.dismiss()
+
             }
             picker.dismiss(animated: true)
         }

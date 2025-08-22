@@ -17,6 +17,9 @@ struct HomeView: View {
         reminder.isChecked == true
     }, sort: \Reminder.date) var reminders: [Reminder]
 
+    @StateObject private var uploadManager = UploadManager.shared
+
+    @State private var searchText = ""
     @State private var addReminder = false
     @State private var selectedReminder: Reminder?
     @State private var newReminder: Reminder?
@@ -29,6 +32,17 @@ struct HomeView: View {
         ? LinearGradient(colors: [.black], startPoint: .top, endPoint: .bottom)
         : Color.creamyYellowGradient
     }
+
+    var filteredReminders: [Reminder] {
+        if searchText.isEmpty {
+           reminders
+        } else {
+            reminders.filter { $0.title.localizedStandardContains(searchText) }
+        }
+    }
+
+    //Add Sorting if you want to
+
 
 
 
@@ -53,7 +67,7 @@ struct HomeView: View {
                     }
                     else {
                         List {
-                            ForEach(reminders){ reminder in
+                            ForEach(filteredReminders){ reminder in
                                 Button {
                                     if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
                                         refuseLoading.toggle()
@@ -96,8 +110,10 @@ struct HomeView: View {
                                         Spacer()
                                         VStack(spacing: 4) {
                                             if !reminder.text.isEmpty { ElementIndicatorView(systemName: "text.quote")}
-                                            if reminder.photo != nil { ElementIndicatorView(systemName: "photo.fill") }
+                                            
                                             if reminder.firebaseVideoURL != nil { ElementIndicatorView(systemName: "video.fill")}
+                                            else if reminder.type == .EchoSnap && reminder.photo != nil { ElementIndicatorView(systemName: "photo.fill") }
+
                                             if !reminder.link.isEmpty { ElementIndicatorView(systemName: "link.circle.fill")}
                                         }
 
@@ -123,8 +139,11 @@ struct HomeView: View {
                             }
                             .onDelete(perform: deletePerson)
                         }
+
                         .listStyle(PlainListStyle())
+                        .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search for a Reminder")
                         .padding(0)
+
                     }
                 }
             }
@@ -155,9 +174,6 @@ struct HomeView: View {
                     .background(Color.cardBackground)
                     .clipShape(.capsule)
                 }
-
-
-
                 //                #warning("Quick Add functionnality where you just record a video, AI fills in Title and Description and Thumbnail")
             }
             .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
@@ -174,6 +190,7 @@ struct HomeView: View {
                 VideoRecorderView()
             }
             .navigationTitle("BetterSelf")
+
             .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
             .navigationDestination(item: $selectedReminder) { reminder in
                 ReminderView(reminder: reminder)
@@ -184,11 +201,12 @@ struct HomeView: View {
     func deleteEmptyReminder() {
         if let reminder = newReminder{
             guard reminder.isChecked == false else { return }
-
             if reminder.isEmpty {
                 modelContext.delete(reminder)
             }
-
+            if (reminder.type != .TimeLessLetter && reminder.photo == nil) {
+                reminder.type = .TimeLessLetter
+            }
             reminder.isChecked = true
         }
 
@@ -200,9 +218,28 @@ struct HomeView: View {
     func deletePerson(at offsets: IndexSet) {
         for offset in offsets {
             let reminder = reminders[offset]
+
+            if let url = reminder.firebaseVideoURL {
+                Task {
+                    await deleteVideo(url)
+                }
+            }
+
             modelContext.delete(reminder)
         }
     }
+
+    func deleteVideo(_ url: String) async {
+        FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { result in
+            switch result {
+            case .success:
+                print("Video deleted successfully from Firebase Storage")
+            case .failure(let error):
+                print("Failed to delete video from Firebase: \(error.localizedDescription)")
+            }
+        }
+    }
+
     func loadImage(_ reminder: Reminder) -> Image? {
 //        guard let data = reminder.photo != nil ? reminder.photo : reminder.thumbnail
 

@@ -22,7 +22,6 @@ struct ReminderView: View {
     }
 
 
-
     @State private var edit = false
     @State private var detailSheet = false
     @State var reminder: Reminder
@@ -49,6 +48,8 @@ struct ReminderView: View {
         .navigationBarBackButtonHidden()
         .navigationTitle(reminder.title)
         .toolbar {
+
+
             ToolbarItem(placement: .topBarLeading) {
                 Button{
                     dismiss()
