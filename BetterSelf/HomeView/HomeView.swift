@@ -204,9 +204,9 @@ struct HomeView: View {
             if reminder.isEmpty {
                 modelContext.delete(reminder)
             }
-//            if (reminder.type != .TimeLessLetter && reminder.photo == nil) {
-//                reminder.type = .TimeLessLetter
-//            }
+            if (reminder.type != .TimeLessLetter && reminder.photo == nil) {
+                reminder.type = .TimeLessLetter
+            }
             reminder.isChecked = true
         }
 
@@ -230,19 +230,10 @@ struct HomeView: View {
     }
 
     func deleteVideo(_ url: String) async {
-        FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { result in
-            switch result {
-            case .success:
-                print("Video deleted successfully from Firebase Storage")
-            case .failure(let error):
-                print("Failed to delete video from Firebase: \(error.localizedDescription)")
-            }
-        }
+        FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { _ in }
     }
 
     func loadImage(_ reminder: Reminder) -> Image? {
-//        guard let data = reminder.photo != nil ? reminder.photo : reminder.thumbnail
-
 
         guard let data = reminder.photo, let uiImage = UIImage(data: data) else {
             return nil

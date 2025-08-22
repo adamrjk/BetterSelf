@@ -8,12 +8,41 @@
 import AVKit
 import SwiftUI
 
+
+
+struct CustomVideoPlayer: UIViewControllerRepresentable {
+    let player: AVPlayer
+
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let controller = AVPlayerViewController()
+        controller.player = player
+
+        // Disable AirPlay
+//        controller.allowsPictureInPicturePlayback = false
+        // Hide AirPlay button
+        controller.showsPlaybackControls = true
+//        controller.contentOverlayView?.isHidden = false
+
+        return controller
+
+    }
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
+
+}
+
+
+
+
+
 struct FullScreenVideoPlayer: View {
     let videoURL: URL
     @Environment(\.dismiss) var dismiss
     @State private var player: AVPlayer?
     @State private var isLoading = true
     @State private var loadError = false
+
+
+
 
     var body: some View {
         GeometryReader { proxy in
@@ -28,8 +57,6 @@ struct FullScreenVideoPlayer: View {
                             .font(.headline)
                             .padding(.top)
                         ProgressView()
-
-
                     }
                 } else if loadError {
                     // Error state
@@ -43,8 +70,12 @@ struct FullScreenVideoPlayer: View {
                     }
                 } else if let player = player {
                     // Video player
-                    VideoPlayer(player: player)
+                    CustomVideoPlayer(player: player)
                         .clipped()
+//                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                        .ignoresSafeArea()
+
+
                 }
             }
             .onAppear {
@@ -61,7 +92,7 @@ struct FullScreenVideoPlayer: View {
             do {
                 // Create asset asynchronously
                 let asset = AVURLAsset(url: videoURL)
-                
+
                 // Wait for asset to be ready (this prevents main thread blocking)
                 let isPlayable = try await asset.load(.isPlayable)
 
@@ -90,7 +121,13 @@ struct FullScreenVideoPlayer: View {
         player?.pause()
         player = nil
     }
+
 }
+
+
+
+
+
 
 #Preview {
     FullScreenVideoPlayer(videoURL: URL(string: Reminder.example.firebaseVideoURL!)! )

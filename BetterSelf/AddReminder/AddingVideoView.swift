@@ -169,7 +169,6 @@ struct AddingVideoView: View {
             Task { @MainActor in
                 switch result {
                 case .success(let firebaseURL):
-                    print(firebaseURL)
                     self.firebaseVideoURL = firebaseURL
 
                 case .failure(let error):
