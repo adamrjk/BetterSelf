@@ -109,26 +109,16 @@ struct AddingVideoView: View {
     func loadVideo() {
         Task {
             do {
-                // 🚀 FAST: Get video data and show thumbnail instantly
-                if let movie = try await selectedItem?.loadTransferable(type: Movie.self) {
-                    // Show thumbnail immediately (Movie should have thumbnail)
-                    if let uiImage = movie.thumbnail {
-                        await MainActor.run {
-                            self.thumbnailImage = Image(uiImage: uiImage)
-                            self.viewState = .showingThumbnail
-                            
-                            // 🎯 STORE THUMBNAIL IN REMINDER.PHOTO
-                            self.thumbnail = uiImage.jpegData(compressionQuality: 0.8)
-                        }
-                    } else {
-                        // Fallback: show "Video Loaded" text
-                        await MainActor.run {
-                            self.viewState = .showingThumbnail
-                        }
+                if let videoData = try await selectedItem?.loadTransferable(type: Data.self) {
+                    if let uIImage = await generateThumbnail(from: videoData) {
+                        thumbnail = uIImage.jpegData(compressionQuality: 0.8)
+                        self.thumbnailImage = Image(uiImage: uIImage)
+                        self.viewState = .showingThumbnail
                     }
-                    
-                    // 🔄 SLOW: Upload to Firebase in background
-                    await uploadVideoToFirebase(videoURL: movie.url)
+
+
+                    // Upload video in background
+                    await uploadVideoToFirebase(videoData: videoData)
                 } else {
                     print("Video loading failed")
                 }
@@ -137,15 +127,49 @@ struct AddingVideoView: View {
             }
         }
     }
-    
+
+    func generateThumbnail(from videoData: Data) async -> UIImage? {
+        // Create a temporary URL for the data
+        let tempURL = FileManager.default.temporaryDirectory.appending(path: "\(UUID().uuidString).mov")
+
+        do {
+            // Write data to temp file temporarily
+            try videoData.write(to: tempURL)
+
+            // Generate thumbnail from the temp file
+            let asset = AVURLAsset(url: tempURL)
+            let generator = AVAssetImageGenerator(asset: asset)
+            generator.appliesPreferredTrackTransform = true
+
+            // Get thumbnail at 0.1 seconds (very fast)
+            let time = CMTime(seconds: 0.1, preferredTimescale: 600)
+
+            let cgImage = try await generator.image(at: time).image
+            let thumbnail = UIImage(cgImage: cgImage)
+
+            // DELETE THE TEMP FILE IMMEDIATELY after thumbnail generation
+            try FileManager.default.removeItem(at: tempURL)
+
+            return thumbnail
+        } catch {
+            print("Thumbnail generation error: \(error)")
+            // Also clean up temp file if thumbnail generation failed
+            if FileManager.default.fileExists(atPath: tempURL.path) {
+                try? FileManager.default.removeItem(at: tempURL)
+            }
+            return nil
+        }
+    }
+
     // Remove the complex thumbnail generation method - not needed
 
     
-    func uploadVideoToFirebase(videoURL: URL) async {
-        uploadManager.startUpload(videoURL: videoURL) { result in
+    func uploadVideoToFirebase(videoData: Data) async {
+        uploadManager.startUpload(videoData: videoData) { result in
             Task { @MainActor in
                 switch result {
                 case .success(let firebaseURL):
+                    print(firebaseURL)
                     self.firebaseVideoURL = firebaseURL
 
                 case .failure(let error):

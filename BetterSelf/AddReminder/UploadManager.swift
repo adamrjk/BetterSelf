@@ -41,8 +41,6 @@ class UploadManager: ObservableObject {
                 case .success(let firebaseURL):
                     self.activeUploads[uploadID]?.status = .completed
                     self.activeUploads[uploadID]?.firebaseURL = firebaseURL
-//                    reminder.firebaseVideoURL = firebaseURL
-
                     completion(.success(firebaseURL))
 
                 case .failure(let error):
@@ -58,6 +56,46 @@ class UploadManager: ObservableObject {
             }
         }
     }
+
+    func startUpload(
+        videoData: Data,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) -> Void {
+        let uploadID = UUID().uuidString
+
+        // Create upload status
+        let status = UploadStatus(
+            id: uploadID,
+            progress: 0.0,
+            status: .uploading
+        )
+
+        activeUploads[uploadID] = status
+
+        // Start upload in background
+        FirebaseStorageService.shared.uploadVideo(
+            videoData: videoData){ result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let firebaseURL):
+                    self.activeUploads[uploadID]?.status = .completed
+                    self.activeUploads[uploadID]?.firebaseURL = firebaseURL
+                    completion(.success(firebaseURL))
+
+                case .failure(let error):
+                    self.activeUploads[uploadID]?.status = .failed
+                    self.activeUploads[uploadID]?.error = error
+                    completion(.failure(error))
+                }
+
+                // Clean up after a delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                    self.activeUploads.removeValue(forKey: uploadID)
+                }
+            }
+        }
+    }
+
 
     func getUploadStatus(for id: String) -> UploadStatus? {
         return activeUploads[id]
