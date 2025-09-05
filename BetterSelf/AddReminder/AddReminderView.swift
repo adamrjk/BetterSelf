@@ -203,4 +203,5 @@ struct AddReminderView: View {
 
 #Preview {
     AddReminderView(reminder: .example)
+        .modelContainer(for: Reminder.self)
 }

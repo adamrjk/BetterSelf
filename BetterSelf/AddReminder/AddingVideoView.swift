@@ -170,6 +170,7 @@ struct AddingVideoView: View {
                 switch result {
                 case .success(let firebaseURL):
                     self.firebaseVideoURL = firebaseURL
+                    print(firebaseVideoURL ?? "")
 
                 case .failure(let error):
                     print("Firebase upload failed: \(error.localizedDescription)")

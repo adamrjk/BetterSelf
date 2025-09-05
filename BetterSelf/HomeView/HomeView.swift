@@ -12,10 +12,13 @@ import SwiftData
 
 
 struct HomeView: View {
+    @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
-    @Query(filter: #Predicate<Reminder> { reminder in
-        reminder.isChecked == true
-    }, sort: \Reminder.date) var reminders: [Reminder]
+
+
+    let folder: Folder?
+
+    @Query var reminders: [Reminder]
 
     @StateObject private var uploadManager = UploadManager.shared
 
@@ -25,6 +28,7 @@ struct HomeView: View {
     @State private var newReminder: Reminder?
     @State private var videoRecorder = false
     @State private var refuseLoading = false
+    @State private var moveToFolder = false
     @Environment(\.colorScheme) var colorScheme
 
     var itemColor: LinearGradient {
@@ -125,10 +129,10 @@ struct HomeView: View {
                                     .background(
                                         RoundedRectangle(cornerRadius: 16)
                                             .fill(Color.white.opacity(0.1))
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 16)
-                                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                            )
+//                                            .overlay(
+//                                                RoundedRectangle(cornerRadius: 16)
+//                                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+//                                            )
                                     )
                                     .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
                                 }
@@ -137,14 +141,22 @@ struct HomeView: View {
                                 .listRowSeparator(.hidden)
                                 .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                             }
-                            .onDelete(perform: deletePerson)
+                            .onDelete(perform: deleteReminder)
                         }
+                        .swipeActions{
+                            Button("Move", systemImage: "folder.fill"){
+                                moveToFolder = true
 
+                            }
+                            .tint(.creamyYellow)
+
+                        }
                         .listStyle(PlainListStyle())
                         .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search for a Reminder")
                         .padding(0)
 
                     }
+                    //
                 }
             }
             .toolbar {
@@ -162,6 +174,20 @@ struct HomeView: View {
                     .clipShape(.capsule)
                 }
 
+                ToolbarItem(placement: .topBarLeading){
+                    Button("Go Back", systemImage: "chevron.left"){
+                        dismiss()
+
+                    }
+                    .padding(.trailing)
+                    .font(.headline)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.primary)
+
+
+
+
+                }
 
                 ToolbarItem(placement: .topBarLeading){
                     Button("Quick Add", systemImage: "video.fill.badge.plus"){
@@ -174,7 +200,10 @@ struct HomeView: View {
                     .background(Color.cardBackground)
                     .clipShape(.capsule)
                 }
-                //                #warning("Quick Add functionnality where you just record a video, AI fills in Title and Description and Thumbnail")
+
+
+
+
             }
             .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
                 if let reminder = newReminder {
@@ -189,12 +218,14 @@ struct HomeView: View {
             .sheet(isPresented: $videoRecorder) {
                 VideoRecorderView()
             }
-            .navigationTitle("BetterSelf")
+            .navigationTitle(folder?.name ?? "All Reminders")
 
             .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
             .navigationDestination(item: $selectedReminder) { reminder in
                 ReminderView(reminder: reminder)
             }
+            .navigationBarBackButtonHidden()
+
         }
 
     }
@@ -215,7 +246,7 @@ struct HomeView: View {
 
 
 
-    func deletePerson(at offsets: IndexSet) {
+    func deleteReminder(at offsets: IndexSet) {
         for offset in offsets {
             let reminder = reminders[offset]
 
@@ -241,9 +272,26 @@ struct HomeView: View {
         return Image(uiImage: uiImage)
     }
 
+    init(folder: Folder? = nil) {
+        self.folder = folder
+        if let folder = folder {
+            // Filter reminders for this folder
+            let id = folder.persistentModelID
+
+            _reminders = Query(filter: #Predicate<Reminder> {
+                $0.folder?.persistentModelID == id
+            }, sort: \Reminder.date)
+        } else {
+            // All reminders (no folder)
+            _reminders =  Query(filter: #Predicate<Reminder> { $0.isChecked == true
+                }, sort: \Reminder.date)
+        }
+    }
+
 
 }
 
 #Preview {
-    HomeView()
+    HomeView(folder: .example)
+        .modelContainer(for: Reminder.self)
 }

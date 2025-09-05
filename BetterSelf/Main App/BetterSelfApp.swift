@@ -28,6 +28,6 @@ struct BetterSelfApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: Reminder.self)
+        .modelContainer(for: [Reminder.self, Folder.self])
     }
 }

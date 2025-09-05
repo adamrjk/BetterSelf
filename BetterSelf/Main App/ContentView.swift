@@ -12,7 +12,7 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
-            HomeView()
+            FolderView()
                 .tabItem{
                     Label("Reminders", systemImage: "list.bullet")
                 }
