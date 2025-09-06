@@ -20,6 +20,18 @@ struct AddReminderView: View {
 
     @Environment(\.colorScheme) var colorScheme
 
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+
 
     var body: some View {
         NavigationStack {
@@ -56,7 +68,7 @@ struct AddReminderView: View {
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.cardBackground)
+                                .fill(newCardBackground)
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -78,7 +90,7 @@ struct AddReminderView: View {
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.cardBackground)
+                                .fill(newCardBackground)
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -126,7 +138,7 @@ struct AddReminderView: View {
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.cardBackground)
+                                .fill(newCardBackground)
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -155,7 +167,7 @@ struct AddReminderView: View {
                                 .font(.headline)
                                 .foregroundStyle(.primary)
                                 .padding(7)
-                                .background(Color.cardBackground)
+                                .background(newCardBackground)
                                 .clipShape(.capsule)
                         }
                     }
@@ -190,7 +202,7 @@ struct AddReminderView: View {
                 }
             )
             .sheet(isPresented: $refuseSaving){
-                RefuseSavingView()
+                RefuseSavingView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
                     .presentationDetents([.height(300)])
             }
 

@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct RefuseSavingView: View {
+
     @Environment(\.dismiss) var dismiss
+
+    let title: String
+    let description: String
+
     var body: some View {
         ZStack {
             Color.purpleMainGradient
@@ -17,10 +22,10 @@ struct RefuseSavingView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 40) {
-                Text("Your Reminder is empty")
+                Text(title)
                     .font(.headline)
 
-                Text("Add a Description, a Photo, a Video or a Link to create your Reminder")
+                Text(description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -46,5 +51,5 @@ struct RefuseSavingView: View {
 }
 
 #Preview {
-    RefuseSavingView()
+    RefuseSavingView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
 }

@@ -21,13 +21,25 @@ struct AddingVideoView: View {
     @Binding private var firebaseVideoURL: String?
     @Binding private var thumbnail: Data?  // ✅ NEW: Binding to reminder.photo
 
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+
     var body: some View {
         VStack {
             ZStack {
                 switch viewState {
                 case .idle:
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color.cardBackground)
+                        .fill(newCardBackground)
 
                     PhotosPicker(selection: $selectedItem, matching: .videos){
                         VideoLoadingView()
@@ -45,7 +57,7 @@ struct AddingVideoView: View {
                                     .padding(15)
                                     .background(
                                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                            .fill(Color.cardBackground)
+                                            .fill(newCardBackground)
                                     )
 
                                 // Video play indicator

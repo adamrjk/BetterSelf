@@ -15,13 +15,16 @@ struct ContentView: View {
             FolderView()
                 .tabItem{
                     Label("Reminders", systemImage: "list.bullet")
+
                 }
-//                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
+                .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar)
 
 
             ProblemSolverView()
                 .tabItem{
-                    Label("ProblemSolver", systemImage: "lightbulb.min.badge.exclamationmark.fill")
+                    Label("ProblemSolver", systemImage: "lightbulb.fill")
+                        .imageScale(.small)
+
                 }
                 .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
 
@@ -37,7 +40,8 @@ struct ContentView: View {
                 }
                 .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
         }
-        
+
+
 
 
 

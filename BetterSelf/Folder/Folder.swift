@@ -17,6 +17,7 @@ class Folder: Equatable {
     var date: Date
 
     var sorting: Sorting
+    var isChecked: Bool
 
     // Relationship to reminders
     @Relationship(deleteRule: .cascade) var reminders: [Reminder]
@@ -27,6 +28,7 @@ class Folder: Equatable {
         self.faceID = false
         self.sorting = .date
         self.date = .now
+        self.isChecked = false
     }
 
 
@@ -35,7 +37,7 @@ class Folder: Equatable {
 
     }
 
-    static let example = Folder(name: "Example", reminders: [.example])
+    static let example = Folder(name: "Example")
 
     
 }

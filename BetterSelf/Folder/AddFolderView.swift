@@ -5,12 +5,18 @@
 //  Created by Adam Damou on 05/09/2025.
 //
 
+import SwiftData
 import SwiftUI
 
 struct AddFolderView: View {
+
+    @Query var folders: [Folder]
     @Environment(\.dismiss) var dismiss
     @Bindable var folder: Folder
     @FocusState private var keyboard: Bool
+    @State private var refuseSaving = false
+
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack{
@@ -74,15 +80,52 @@ struct AddFolderView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
+                        let nameIsNotValid = folders.contains { $0.name.lowercased() == folder.name.lowercased() }
+                        if folder.name.isEmpty || nameIsNotValid {
+                            refuseSaving.toggle()
 
-                        #warning("Add Check that name is valid and message")
-                        dismiss()
+                        }
+                        else{
+                            folder.isChecked = true
+                            dismiss()
+                        }
                     } label: {
                         Text("Save")
                     }
                     .buttonStyle(.plain)
                 }
             }
+            .sheet(isPresented: $refuseSaving){
+                RefuseSavingView(title: "This Folder name is not valid", description: "The name cannot be empty nor identical to another folder")
+                    .presentationDetents([.height(300)])
+            }
+            .overlay(
+                VStack {
+                    Spacer()  // ← This pushes the button to the bottom of the screen
+                    if keyboard {
+                        HStack {
+                            Spacer()
+                            Button{
+                                keyboard = false
+                            } label: {
+                                Image(systemName: "arrow.down")
+                                    .foregroundStyle(.primary)
+                                    .padding()
+                                    .background(
+                                        colorScheme == .light
+                                        ? .white
+                                        : Color( red: 0.318, green: 0.318, blue: 0.318)
+
+                                    )
+                                    .clipShape(.circle)
+                                    .padding(.trailing)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.bottom, 8)  // ← This adds 8 points of space below the button
+                    }
+                }
+            )
 
         }
 

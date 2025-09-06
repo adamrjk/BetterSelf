@@ -14,6 +14,20 @@ struct AddingDescriptionView: View {
     @Binding var text: String
     @FocusState.Binding var keyboard: Bool
 
+    @Environment(\.colorScheme) var colorScheme
+
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -51,7 +65,7 @@ struct AddingDescriptionView: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.cardBackground)
+                .fill(newCardBackground)
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
         )
         .padding(.horizontal, 16)

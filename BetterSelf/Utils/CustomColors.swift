@@ -28,7 +28,17 @@ extension Color {
         startRadius: 0,
         endRadius: 400
     )
-    
+
+    static let tabViewGradient = LinearGradient(
+        colors: [
+            Color(red: 80/255, green: 60/255, blue: 100/255, opacity: 0.6),  // darker muted purple
+            Color(red: 70/255, green: 55/255, blue: 90/255, opacity: 0.5),
+            Color(red: 60/255, green: 50/255, blue: 80/255, opacity: 0.4)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
     static let whiteCardGradient = LinearGradient(
         colors: [
             Color.white,
@@ -70,6 +80,8 @@ extension Color {
             startPoint: .top,
             endPoint: .bottom
         )
+
+    static let darkNavy = Color(red: 10/255, green: 31/255, blue: 68/255)
 
 
     static let creamyYellowGradient = LinearGradient(

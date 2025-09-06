@@ -23,6 +23,19 @@ struct AddingPhotoView: View {
 
     @State private var selectedPhoto: PhotosPickerItem?
 
+
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+
     var body: some View {
         VStack{
             PhotosPicker(selection: $selectedPhoto) {
@@ -35,12 +48,12 @@ struct AddingPhotoView: View {
                             .padding(15)
                             .background(
                                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Color.cardBackground)
+                                    .fill(newCardBackground)
                             )
                     } else {
                         // Default state with fixed background
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(Color.cardBackground)
+                            .fill(newCardBackground)
 
                         VStack(alignment: .center, spacing: 8) {
                             Image(systemName: "photo.badge.plus")
