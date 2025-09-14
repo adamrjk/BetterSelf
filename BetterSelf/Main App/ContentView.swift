@@ -9,10 +9,12 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var notificationManager: NotificationManager
+    @State private var notifReminder: Reminder?
 
     var body: some View {
         TabView {
-            FolderView()
+            FolderView(notifReminder: $notifReminder)
                 .tabItem{
                     Label("Reminders", systemImage: "list.bullet")
 
@@ -40,13 +42,12 @@ struct ContentView: View {
                 }
                 .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
         }
-
-
-
-
-
-
-
+        .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
+                   if shouldNavigate, let reminder = notificationManager.reminder {
+                       notifReminder = reminder
+                       notificationManager.shouldNavigateToReminder = false
+                   }
+        }
     }
 }
 

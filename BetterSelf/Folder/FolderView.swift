@@ -16,12 +16,14 @@ struct FolderView: View {
 
     @Environment(\.scenePhase) var scenePhase
 
+    @State private var scheduledNotif = false
     @State private var newFolder: Folder?
     @State private var searchText = ""
     @State private var showAlert = false
 
     @State private var selectedReminder: Reminder?
     @State private var selectedFolder: Folder?
+    @Binding var notifReminder: Reminder?
 
     var body: some View {
         NavigationStack {
@@ -72,12 +74,22 @@ struct FolderView: View {
             .navigationDestination(item: $selectedReminder) { reminder in
                 ReminderView(reminder: reminder)
             }
+            .navigationDestination(item: $notifReminder){ reminder in
+                ReminderView(reminder: reminder)
+
+            }
             .navigationDestination(item: $selectedFolder) { folder in
                 if folder.name.isEmpty {
                     HomeView()
                 }
                 else {
                     HomeView(folder: folder)
+                }
+            }
+            .onAppear{
+                if !scheduledNotif {
+                    NotificationManager.shared.addNotification()
+                    scheduledNotif = true
                 }
             }
             .alert("Failed Authentication", isPresented: $showAlert){
@@ -100,13 +112,16 @@ struct FolderView: View {
         }
 
     }
+    init(notifReminder: Binding<Reminder?>){
+        _notifReminder = notifReminder
+    }
 
 
 
 }
 
 #Preview {
-    FolderView()
+    FolderView(notifReminder: .constant(nil))
 }
 
 

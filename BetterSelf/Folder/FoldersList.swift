@@ -8,6 +8,7 @@
 import LocalAuthentication
 import SwiftData
 import SwiftUI
+import UserNotifications
 
 struct FoldersList: View {
     @Environment(\.modelContext) var modelContext
@@ -49,10 +50,6 @@ struct FoldersList: View {
             }
         }
         return pinned
-
-
-
-
     }
 
     var body: some View {
@@ -199,13 +196,30 @@ struct FoldersList: View {
             
         }
         .animation(.smooth, value: pinned)
+        .onChange(of: pinned){
+            if let last = pinned.last{
+                addNotification(for: last)
+            }
+        }
     }
 
     func deleteFolder(at offsets: IndexSet) {
         for offset in offsets {
             let folder = folders[offset]
+            // Extract URLs before deletion
+            let videoURLs = folder.reminders.compactMap { $0.firebaseVideoURL }
             modelContext.delete(folder)
+
+            Task {
+                for url in videoURLs {
+                    await deleteVideo(url)
+                }
+            }
         }
+    }
+
+    func deleteVideo(_ url: String) async {
+        FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { _ in }
     }
 
     func authenticate(_ folder: Folder) {
@@ -232,6 +246,11 @@ struct FoldersList: View {
             showAlert = true
         }
     }
+
+    func addNotification(for reminder: Reminder) {
+     
+    }
+
 
 }
 #Preview {
