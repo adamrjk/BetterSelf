@@ -38,6 +38,7 @@ struct HomeView: View {
         : Color.creamyYellowGradient
     }
 
+
     var filteredReminders: [Reminder] {
         if searchText.isEmpty {
             reminders
@@ -45,6 +46,22 @@ struct HomeView: View {
             reminders.filter { $0.title.localizedStandardContains(searchText) }
         }
     }
+
+    var sortedReminders: [Reminder]{
+        switch sorting {
+        case .dateOld:
+            filteredReminders.sorted{ $0.date < $1.date}
+        case .dateNew:
+            filteredReminders.sorted{ $0.date > $1.date}
+        case .name:
+            filteredReminders.sorted{ $0.title < $1.title}
+        }
+    }
+
+
+
+
+
 
     var newCardBackground: LinearGradient {
          LinearGradient(
@@ -56,8 +73,7 @@ struct HomeView: View {
             endPoint: .bottom
         )
     }
-
-    //Add Sorting if you want to
+    @State private var sorting: Sorting
 
 
 
@@ -83,7 +99,7 @@ struct HomeView: View {
                 }
                 else {
                     List {
-                        ForEach(filteredReminders){ reminder in
+                        ForEach(sortedReminders){ reminder in
                             Button {
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
                                     refuseLoading.toggle()
@@ -131,7 +147,6 @@ struct HomeView: View {
                     .padding(0)
 
                 }
-                //
             }
         }
         .toolbar {
@@ -147,6 +162,21 @@ struct HomeView: View {
                 .padding(7)
                 .background(newCardBackground)
                 .clipShape(.capsule)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                    Picker("Sort", selection: $sorting) {
+                        Text("Newest First")
+                            .tag( Sorting.dateNew)
+
+                        Text("Oldest First")
+                            .tag(Sorting.dateOld)
+                        Text("Title")
+                            .tag(Sorting.name)
+
+                    }
+
+                }
             }
 
             ToolbarItem(placement: .topBarLeading){
@@ -176,6 +206,20 @@ struct HomeView: View {
                 .clipShape(.capsule)
             }
 
+
+
+
+        }
+        .onChange(of: sorting){ oldSorting, newSorting in
+            if let folder = folder {
+                folder.sorting = newSorting
+            }
+            else {
+                saveData(newSorting)
+            }
+        }
+        .onAppear{
+            sorting = folder?.sorting ?? loadData()
 
 
 
@@ -266,17 +310,43 @@ struct HomeView: View {
 
     init(folder: Folder? = nil) {
         self.folder = folder
+
+        var AllRemindersSorting = Sorting.dateOld
+        if self.folder == nil {
+            if let data = UserDefaults.standard.data(forKey: "AllRemindersSorting") {
+                if let decoded = try? JSONDecoder().decode(Sorting.self, from: data) {
+                    AllRemindersSorting = decoded
+                }
+            }
+        }
+
+        _sorting = State(initialValue: folder?.sorting ?? AllRemindersSorting)
+
         if let folder = folder {
             // Filter reminders for this folder
             let id = folder.persistentModelID
 
             _reminders = Query(filter: #Predicate<Reminder> {
                 $0.folder?.persistentModelID == id
-            }, sort: \Reminder.date)
+            })
         } else {
             // All reminders (no folder)
             _reminders =  Query(filter: #Predicate<Reminder> { $0.isChecked == true
-            }, sort: \Reminder.date)
+            })
+        }
+    }
+
+    func loadData() -> Sorting {
+        if let data = UserDefaults.standard.data(forKey: "AllRemindersSorting") {
+            if let decoded = try? JSONDecoder().decode(Sorting.self, from: data) {
+                return decoded
+            }
+        }
+        return .dateOld
+    }
+    func saveData(_ newSorting: Sorting) {
+        if let data = try? JSONEncoder().encode(newSorting) {
+            UserDefaults.standard.set(data, forKey: "AllRemindersSorting")
         }
     }
 

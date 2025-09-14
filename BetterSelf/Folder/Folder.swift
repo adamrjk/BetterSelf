@@ -27,7 +27,7 @@ class Folder: Equatable {
         self.name = name
         self.reminders = reminders
         self.faceID = false
-        self.sorting = .date
+        self.sorting = .dateOld
         self.date = .now
         self.isChecked = false
         self.isLocked = true
@@ -41,13 +41,5 @@ class Folder: Equatable {
 
     static let example = Folder(name: "Example")
 
-    
 }
 
-enum Sorting: String, Codable, CaseIterable {
-    case date = "By Date"
-    case name = "By Name"
-
-
-    
-}

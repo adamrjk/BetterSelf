@@ -40,51 +40,51 @@ struct FoldersList: View {
 
     var body: some View {
 
-            Group{
+            Group {
 
-                if isSearching || !searchText.isEmpty {
-                    List{
-                        ForEach(filteredReminders){ reminder in
-                            Button {
-                                // if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
-                                //refuseLoading.toggle()
-                                //}
-                                //else {
-                                selectedReminder = reminder
-                                //                                }
-                            } label: {
-                                ReminderRowView(reminder: reminder, isPreview: true)
-
-                            }
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                            .listRowSeparator(.hidden)
-                            .buttonStyle(PlainButtonStyle())
-                        }
-                    }
-                    .listStyle(PlainListStyle())
-                }
-                else {
-                    VStack(alignment: .leading, spacing: 0){
-                        Text("Pinned")
-                            .font(.title3)
-                            .bold()
-                        Text("Choose up to 3 Reminders for Quick Access")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-
-                    }
-                    .padding([.top, .bottom], 10)
-
-
-
-                    VStack(alignment: .leading, spacing: 10){
-                            Text("Folders")
-                                .font(.title3)
-                                .bold()
-                                .multilineTextAlignment(.leading)
-                    }
-                    Divider()
+//                if isSearching || !searchText.isEmpty {
+//                    List{
+//                        ForEach(filteredReminders){ reminder in
+//                            Button {
+//                                // if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
+//                                //refuseLoading.toggle()
+//                                //}
+//                                //else {
+//                                selectedReminder = reminder
+//                                //                                }
+//                            } label: {
+//                                ReminderRowView(reminder: reminder, isPreview: true)
+//
+//                            }
+//                            .listRowBackground(Color.clear)
+//                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+//                            .listRowSeparator(.hidden)
+//                            .buttonStyle(PlainButtonStyle())
+//                        }
+//                    }
+//                    .listStyle(PlainListStyle())
+//                }
+//                else {
+//                    VStack(alignment: .leading, spacing: 0){
+//                        Text("Pinned")
+//                            .font(.title3)
+//                            .bold()
+//                        Text("Choose up to 3 Reminders for Quick Access")
+//                            .font(.subheadline)
+//                            .foregroundStyle(.secondary)
+//
+//                    }
+//                    .padding([.top, .bottom], 10)
+//
+//
+//
+//                    VStack(alignment: .leading, spacing: 10){
+//                            Text("Folders")
+//                                .font(.title3)
+//                                .bold()
+//                                .multilineTextAlignment(.leading)
+//                    }
+//                    Divider()
                     List{
 
 
@@ -129,7 +129,7 @@ struct FoldersList: View {
                     .listStyle(PlainListStyle())
                 }
 
-            }
+//            }
 
         }
 
