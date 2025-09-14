@@ -33,6 +33,17 @@ struct ReminderView: View {
 
     }
 
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
     var body: some View {
         Group {
             switch reminder.type {
@@ -91,7 +102,7 @@ struct ReminderView: View {
                                 .foregroundStyle(calendarCardText)
                         }
                         .padding(3)
-                        .background(Color.cardBackground)
+                        .background(newCardBackground)
                         .clipShape(.capsule)
                     }
 

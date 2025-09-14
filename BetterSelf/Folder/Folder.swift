@@ -18,9 +18,10 @@ class Folder: Equatable {
 
     var sorting: Sorting
     var isChecked: Bool
+    var isLocked: Bool
 
     // Relationship to reminders
-    @Relationship(deleteRule: .cascade) var reminders: [Reminder]
+    @Relationship(deleteRule: .cascade, inverse: \Reminder.folder) var reminders: [Reminder]
 
     init(name: String, reminders: [Reminder] = []) {
         self.name = name
@@ -29,6 +30,7 @@ class Folder: Equatable {
         self.sorting = .date
         self.date = .now
         self.isChecked = false
+        self.isLocked = true
     }
 
 

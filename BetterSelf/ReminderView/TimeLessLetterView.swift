@@ -17,6 +17,17 @@ struct TimeLessLetterView: View {
         : .creamyYellow
     }
 
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
     @State var isSheet = false
 
     @State var reminder: Reminder
@@ -46,7 +57,7 @@ struct TimeLessLetterView: View {
                         .frame(minWidth: 350)
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color.cardBackground)
+                                .fill(newCardBackground)
 
                         )
                         .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
@@ -63,7 +74,7 @@ struct TimeLessLetterView: View {
 
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color.cardBackground)
+                                .fill(newCardBackground)
 
                         )
                         .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
@@ -101,7 +112,7 @@ struct TimeLessLetterView: View {
 
                             }
                             .padding(3)
-                            .background(Color.cardBackground)
+                            .background(newCardBackground)
                             .clipShape(.capsule)
                         }
 

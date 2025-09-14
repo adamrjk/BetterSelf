@@ -34,9 +34,6 @@ struct MoveToFolder: View {
 
                     ForEach(folders){ folder in
                         Button{
-                            #warning("remove reminder from the older folder")
-                            folder.reminders.append(reminder)
-
                             reminder.folder = folder
                             dismiss()
                         } label: {

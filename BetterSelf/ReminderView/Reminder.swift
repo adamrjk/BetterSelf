@@ -22,7 +22,7 @@ class Reminder {
     var date: Date
     var isChecked: Bool
 
-    @Relationship(inverse: \Folder.reminders) var folder: Folder?
+    var folder: Folder?
 
 
 

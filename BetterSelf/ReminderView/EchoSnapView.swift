@@ -9,6 +9,20 @@ import SwiftUI
 
 struct EchoSnapView: View {
     @State var reminder: Reminder
+
+    @Environment(\.colorScheme) var colorScheme
+
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
     var body: some View {
 
             ZStack {
@@ -35,7 +49,7 @@ struct EchoSnapView: View {
                                 .padding()
                                 .background(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .fill(Color.cardBackground)
+                                        .fill(newCardBackground)
                                 )
                                 .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
                             }
@@ -56,7 +70,7 @@ struct EchoSnapView: View {
                                 .frame(minWidth: 350)
                                 .background(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .fill(Color.cardBackground)
+                                        .fill(newCardBackground)
 
                                 )
                                 .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
@@ -76,7 +90,7 @@ struct EchoSnapView: View {
                                         .bold()
                                         .foregroundStyle(.secondary)
                                         .padding()
-                                        .background(Color.cardBackground)
+                                        .background(newCardBackground)
                                         .clipShape(.rect(cornerRadius: 14))
                                 }
                                 .buttonStyle(.plain)

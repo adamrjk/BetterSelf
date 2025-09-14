@@ -10,7 +10,7 @@ import SwiftUI
 
 struct AddFolderView: View {
 
-    @Query var folders: [Folder]
+    @Query(filter: #Predicate<Folder> { $0.isChecked == true}) var folders: [Folder]
     @Environment(\.dismiss) var dismiss
     @Bindable var folder: Folder
     @FocusState private var keyboard: Bool

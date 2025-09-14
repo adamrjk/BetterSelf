@@ -28,6 +28,18 @@ struct VideoRecorderView: View {
         : .creamyYellow
     }
 
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+
 
 
 
@@ -65,7 +77,7 @@ struct VideoRecorderView: View {
                     .padding(20)
                     .background(
                         RoundedRectangle(cornerRadius: 14)
-                            .fill(Color.cardBackground)
+                            .fill(newCardBackground)
 
                     )
                     .padding(.top, 40)
@@ -88,7 +100,7 @@ struct VideoRecorderView: View {
 
                         .padding(.horizontal, 30)
                         .padding(.vertical, 16)
-                        .background(Color.cardBackground)
+                        .background(newCardBackground)
                         .cornerRadius(25)
                         .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
                     }
@@ -126,7 +138,7 @@ struct VideoRecorderView: View {
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 14)
-                            .fill(Color.cardBackground)
+                            .fill(newCardBackground)
 
                     )
                     .padding(.bottom, 40)

@@ -46,6 +46,17 @@ struct HomeView: View {
         }
     }
 
+    var newCardBackground: LinearGradient {
+         LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
     //Add Sorting if you want to
 
 
@@ -126,7 +137,7 @@ struct HomeView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Add Reminder", systemImage: "plus"){
-                    let reminder = Reminder(title: "", text: "", link: "")
+                    let reminder = Reminder(title: "", text: "", link: "", folder: folder)
                     modelContext.insert(reminder)
                     newReminder = reminder
                     addReminder.toggle()
@@ -134,7 +145,7 @@ struct HomeView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(itemColor)
                 .padding(7)
-                .background(Color.cardBackground)
+                .background(newCardBackground)
                 .clipShape(.capsule)
             }
 
@@ -161,7 +172,7 @@ struct HomeView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(itemColor)
                 .padding(8)
-                .background(Color.cardBackground)
+                .background(newCardBackground)
                 .clipShape(.capsule)
             }
 
