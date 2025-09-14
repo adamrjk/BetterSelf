@@ -12,6 +12,9 @@ struct ReminderRowView: View {
 
     @State var isPreview: Bool
     var body: some View {
+
+
+
         HStack(spacing: 16) {
             // Left thumbnail with improved design
             if let image = loadImage(reminder) {
@@ -46,6 +49,15 @@ struct ReminderRowView: View {
             Spacer()
             if !isPreview {
                 VStack(spacing: 4) {
+                    if reminder.pinned {
+                        Image(systemName: "pin.fill")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                            .fontWeight(.medium)
+                            .padding(1)
+                    }
+
+
                     if !reminder.text.isEmpty { ElementIndicatorView(systemName: "text.quote")}
 
                     if reminder.firebaseVideoURL != nil { ElementIndicatorView(systemName: "video.fill")}
@@ -63,12 +75,9 @@ struct ReminderRowView: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.white.opacity(0.1))
-//                                            .overlay(
-//                                                RoundedRectangle(cornerRadius: 16)
-//                                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-//                                            )
         )
         .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
+
 
     }
 

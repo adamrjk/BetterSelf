@@ -26,8 +26,8 @@ struct FoldersList: View {
     @Binding var showAlert: Bool
 
     var unlockedReminders: [Reminder]{
-        reminders.filter{ reminder in
-            reminder.isLocked == false
+        reminders.filter{
+            $0.isLocked == false
         }
     }
     var filteredReminders: [Reminder] {
@@ -38,100 +38,173 @@ struct FoldersList: View {
         }
     }
 
-    var body: some View {
+    var pinned: [Reminder] {
+        var pinned = unlockedReminders.filter{ $0.pinned}
+        pinned = pinned.sorted{ $0.datePinned < $1.datePinned }
+        while pinned.count > 3 {
+            if let first = pinned.first {
+                first.pinned = false
 
-            Group {
-
-//                if isSearching || !searchText.isEmpty {
-//                    List{
-//                        ForEach(filteredReminders){ reminder in
-//                            Button {
-//                                // if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
-//                                //refuseLoading.toggle()
-//                                //}
-//                                //else {
-//                                selectedReminder = reminder
-//                                //                                }
-//                            } label: {
-//                                ReminderRowView(reminder: reminder, isPreview: true)
-//
-//                            }
-//                            .listRowBackground(Color.clear)
-//                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-//                            .listRowSeparator(.hidden)
-//                            .buttonStyle(PlainButtonStyle())
-//                        }
-//                    }
-//                    .listStyle(PlainListStyle())
-//                }
-//                else {
-//                    VStack(alignment: .leading, spacing: 0){
-//                        Text("Pinned")
-//                            .font(.title3)
-//                            .bold()
-//                        Text("Choose up to 3 Reminders for Quick Access")
-//                            .font(.subheadline)
-//                            .foregroundStyle(.secondary)
-//
-//                    }
-//                    .padding([.top, .bottom], 10)
-//
-//
-//
-//                    VStack(alignment: .leading, spacing: 10){
-//                            Text("Folders")
-//                                .font(.title3)
-//                                .bold()
-//                                .multilineTextAlignment(.leading)
-//                    }
-//                    Divider()
-                    List{
-
-
-                        NavigationLink{
-                            HomeView()
-                        } label: {
-                            HStack {
-                                FolderRowView(folder: nil)
-
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-
-                        ForEach(folders){ folder in
-                            if folder.faceID && folder.isLocked {
-                                Button{
-                                    authenticate(folder)
-                                }label: {
-                                    FolderRowView(folder: folder)
-                                }
-                            }
-                            else {
-                                NavigationLink{
-                                    HomeView(folder: folder)
-                                } label: {
-                                    FolderRowView(folder: folder)
-
-                                }
-                            }
-
-                        }
-                        .onDelete(perform: deleteFolder)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
-
-
-
-
-                    }
-                    .listStyle(PlainListStyle())
-                }
-
-//            }
-
+                pinned.removeFirst()
+            }
         }
+        return pinned
+
+
+
+
+    }
+
+    var body: some View {
+        
+        ScrollView {
+            
+            if isSearching || !searchText.isEmpty {
+
+                    ForEach(filteredReminders){ reminder in
+                        Button {
+                            // if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
+                            //refuseLoading.toggle()
+                            //}
+                            //else {
+                            selectedReminder = reminder
+                            //                                }
+                        } label: {
+                            ReminderRowView(reminder: reminder, isPreview: true)
+                            
+                        }
+                        .padding(.horizontal, 16)
+                        .buttonStyle(PlainButtonStyle())
+                    }
+            }
+            else {
+                // Pinned Section with Card Design
+                VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Pinned")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 16)
+                        
+                        if pinned.isEmpty {
+                            VStack(spacing: 8) {
+                                Text("Choose up to 3 Reminders for Quick Access")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.horizontal, 20)
+                                    .padding(.top, 16)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 20)
+                        } else {
+                            ForEach(pinned) { reminder in
+                                Button {
+                                    selectedReminder = reminder
+                                } label: {
+                                    ReminderRowView(reminder: reminder, isPreview: true)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .padding(.horizontal, 16)
+                            }
+                        }
+                    }
+                    .padding(.bottom, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.purple.opacity(0.2), lineWidth: 1)
+                    )
+                    .shadow(color: .purple.opacity(0.15), radius: 8, x: 0, y: 4)
+                    .shadow(color: .purple.opacity(0.1), radius: 16, x: 0, y: 8)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 5)
+
+                
+                
+                
+                
+                ZStack {
+                    // Folders Section with Card Design
+                    VStack(alignment: .leading, spacing: 0) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("Folders")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 16)
+                                .padding(.bottom, 12)
+                            
+                            VStack(spacing: 0) {
+                                // All Reminders folder
+                                NavigationLink {
+                                    HomeView()
+                                } label: {
+                                    FolderRowView(folder: nil)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 12)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                if !folders.isEmpty {
+                                    Divider()
+                                }
+                                
+                                // Individual folders
+                                ForEach(folders) { folder in
+                                    if folder.faceID && folder.isLocked {
+                                        Button {
+                                            authenticate(folder)
+                                        } label: {
+                                            FolderRowView(folder: folder)
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 12)
+                                        }
+                                        .buttonStyle(.plain)
+                                    } else {
+                                        NavigationLink {
+                                            HomeView(folder: folder)
+                                        } label: {
+                                            FolderRowView(folder: folder)
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 12)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                    if folder != folders.last {
+                                        Divider()
+                                    }
+                                }
+                                .onDelete(perform: deleteFolder)
+                            }
+                        }
+                        
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.purple.opacity(0.2), lineWidth: 1)
+                        )
+                        .shadow(color: .purple.opacity(0.1), radius: 6, x: 0, y: 3)
+                        .shadow(color: .purple.opacity(0.05), radius: 12, x: 0, y: 6)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 10)
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                }
+                
+            }
+            
+        }
+        .animation(.smooth, value: pinned)
+    }
 
     func deleteFolder(at offsets: IndexSet) {
         for offset in offsets {

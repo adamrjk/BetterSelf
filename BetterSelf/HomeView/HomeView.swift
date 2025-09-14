@@ -38,12 +38,18 @@ struct HomeView: View {
         : Color.creamyYellowGradient
     }
 
+    var unlockedReminders: [Reminder]{
+        reminders.filter{
+            $0.isLocked == false
+        }
+    }
+
 
     var filteredReminders: [Reminder] {
         if searchText.isEmpty {
-            reminders
+            unlockedReminders
         } else {
-            reminders.filter { $0.title.localizedStandardContains(searchText) }
+            unlockedReminders.filter { $0.title.localizedStandardContains(searchText) }
         }
     }
 
@@ -129,6 +135,10 @@ struct HomeView: View {
                             .tag(reminder)
                             .swipeActions(edge: .leading){
                                 Button("", systemImage: "pin.fill"){
+                                    reminder.pinned.toggle()
+                                    if reminder.pinned {
+                                        reminder.datePinned = .now
+                                    }
 
                                 }
                                 .tint(.orange)
@@ -151,20 +161,8 @@ struct HomeView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Add Reminder", systemImage: "plus"){
-                    let reminder = Reminder(title: "", text: "", link: "", folder: folder)
-                    modelContext.insert(reminder)
-                    newReminder = reminder
-                    addReminder.toggle()
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(itemColor)
-                .padding(7)
-                .background(newCardBackground)
-                .clipShape(.capsule)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu("Sort", systemImage: "arrow.up.arrow.down") {
+
+                Menu {
                     Picker("Sort", selection: $sorting) {
                         Text("Newest First")
                             .tag( Sorting.dateNew)
@@ -176,7 +174,32 @@ struct HomeView: View {
 
                     }
 
+                }label: {
+                    Image(systemName: "arrow.up.arrow.down")
+                        .font(.subheadline)
+                        .foregroundStyle(itemColor)
+                        .padding(7)
+                        .background(
+                            Circle()
+                                .fill(newCardBackground)
+                        )
                 }
+                .buttonStyle(.plain)
+            }
+            
+
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Add Reminder", systemImage: "plus"){
+                    let reminder = Reminder(title: "", text: "", link: "", folder: folder)
+                    modelContext.insert(reminder)
+                    newReminder = reminder
+                    addReminder.toggle()
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(itemColor)
+                .padding(7)
+                .background(newCardBackground)
+                .clipShape(.capsule)
             }
 
             ToolbarItem(placement: .topBarLeading){

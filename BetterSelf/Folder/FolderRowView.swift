@@ -10,11 +10,18 @@ import SwiftUI
 
 struct FolderRowView: View {
     @Query var reminders: [Reminder]
+
+    var unlockedReminders: [Reminder]{
+        reminders.filter{
+            $0.isLocked == false
+        }
+    }
+
     let folder: Folder?
     
     
     var count: Int {
-        folder?.reminders.count ?? reminders.count
+        folder?.reminders.count ?? unlockedReminders.count
     }
     
     var body: some View {
@@ -31,9 +38,6 @@ struct FolderRowView: View {
                     Image(systemName: "lock.fill")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .padding(.trailing, 15)
-
-
                 }
                 else {
                     Text("\(count)")
@@ -47,7 +51,13 @@ struct FolderRowView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            
+
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(.secondary)
+
+
             
             
         }
