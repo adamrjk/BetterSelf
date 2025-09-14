@@ -30,6 +30,9 @@ struct FolderRowView: View {
                     Image(systemName: "lock.fill")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .padding(.trailing, 15)
+
+
                 }
                 else {
                     Text("\(count)")

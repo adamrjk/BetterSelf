@@ -14,6 +14,8 @@ struct FolderView: View {
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
            sort: \Folder.date) var folders: [Folder]
 
+    @Environment(\.scenePhase) var scenePhase
+
     @State private var newFolder: Folder?
     @State private var searchText = ""
     @State private var showAlert = false
@@ -32,6 +34,14 @@ struct FolderView: View {
 
                 FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, showAlert: $showAlert)
                     .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
+                    .onChange(of: scenePhase){ oldPhase, newPhase in
+                        if newPhase == .background {
+                            // App is leaving → lock again
+                            folders.forEach { folder in
+                                folder.isLocked = true
+                            }
+                        }
+                    }
 
 
 
