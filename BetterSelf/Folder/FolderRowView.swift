@@ -20,6 +20,7 @@ struct FolderRowView: View {
     var body: some View {
         HStack {
             Image(systemName: "folder.fill")
+                .font(.title3)
             Text(folder?.name ?? "All Reminders")
             
             

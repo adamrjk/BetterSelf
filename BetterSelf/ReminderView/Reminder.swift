@@ -24,7 +24,7 @@ class Reminder {
 
     var folder: Folder?
 
-
+    
 
     init(title: String, type: ReminderType = .InstantInsight,  text: String, photo: Data? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
         self.title = title
@@ -42,6 +42,15 @@ class Reminder {
 
     var isEmpty: Bool {
         text.isEmpty && photo == nil && firebaseVideoURL == nil && link.isEmpty
+    }
+
+    var isLocked: Bool{
+        if let folder = folder {
+            folder.faceID && folder.isLocked
+        }
+        else {
+            false
+        }
 
     }
 

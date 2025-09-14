@@ -17,18 +17,24 @@ struct FoldersList: View {
     @Binding var searchText: String
 
 
-    @Query(filter: #Predicate<Reminder> { $0.isChecked == true
+    @Query(filter: #Predicate<Reminder> {
+        $0.isChecked == true
     }, sort: \Reminder.date) var reminders: [Reminder]
 
     @Binding var selectedReminder: Reminder?
 
     @Binding var showAlert: Bool
 
+    var unlockedReminders: [Reminder]{
+        reminders.filter{ reminder in
+            reminder.isLocked == false
+        }
+    }
     var filteredReminders: [Reminder] {
         if searchText.isEmpty {
-            reminders
+            unlockedReminders
         } else {
-            reminders.filter { $0.title.localizedStandardContains(searchText) }
+            unlockedReminders.filter { $0.title.localizedStandardContains(searchText) }
         }
     }
 
@@ -114,7 +120,7 @@ struct FoldersList: View {
                         }
                         .onDelete(perform: deleteFolder)
                         .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
 
 
 
