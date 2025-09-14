@@ -104,7 +104,7 @@ struct HomeView: View {
                     }
                 }
                 else {
-                    List {
+                    ScrollView {
                         ForEach(sortedReminders){ reminder in
                             Button {
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
@@ -117,7 +117,9 @@ struct HomeView: View {
                                 ReminderRowView(reminder: reminder, isPreview: false)
 
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 16)
+
                             .swipeActions{
 
                                 Button("", systemImage: "trash", role: .destructive){
@@ -147,12 +149,7 @@ struct HomeView: View {
 
                         }
                         .onDelete(perform: deleteReminder)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     }
-
-                    .listStyle(PlainListStyle())
                     .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search for a Reminder")
                     .padding(0)
 

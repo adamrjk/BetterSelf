@@ -21,6 +21,7 @@ struct FolderView: View {
     @State private var showAlert = false
 
     @State private var selectedReminder: Reminder?
+    @State private var selectedFolder: Folder?
 
     var body: some View {
         NavigationStack {
@@ -32,7 +33,7 @@ struct FolderView: View {
                 Color.purpleOverlayGradient
                     .ignoresSafeArea()
 
-                FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, showAlert: $showAlert)
+                FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert)
                     .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
                     .onChange(of: scenePhase){ oldPhase, newPhase in
                         if newPhase == .background {
@@ -70,6 +71,14 @@ struct FolderView: View {
             .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
             .navigationDestination(item: $selectedReminder) { reminder in
                 ReminderView(reminder: reminder)
+            }
+            .navigationDestination(item: $selectedFolder) { folder in
+                if folder.name.isEmpty {
+                    HomeView()
+                }
+                else {
+                    HomeView(folder: folder)
+                }
             }
             .alert("Failed Authentication", isPresented: $showAlert){
             }

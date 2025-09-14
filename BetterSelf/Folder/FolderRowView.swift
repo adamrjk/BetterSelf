@@ -27,9 +27,11 @@ struct FolderRowView: View {
     var body: some View {
         HStack {
             Image(systemName: "folder.fill")
+                .foregroundColor(.primary)
                 .font(.title3)
             Text(folder?.name ?? "All Reminders")
-            
+                .foregroundColor(.primary)
+
             
             Spacer()
             
@@ -37,25 +39,25 @@ struct FolderRowView: View {
                 if folder.faceID && folder.isLocked {
                     Image(systemName: "lock.fill")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                 }
                 else {
                     Text("\(count)")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                 }
             }
             
             else {
                 Text("\(count)")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.secondary)
             }
 
             Image(systemName: "chevron.right")
                 .font(.caption)
                 .fontWeight(.bold)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.secondary)
 
 
             

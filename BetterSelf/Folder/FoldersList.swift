@@ -22,7 +22,7 @@ struct FoldersList: View {
     }, sort: \Reminder.date) var reminders: [Reminder]
 
     @Binding var selectedReminder: Reminder?
-
+    @Binding var selectedFolder: Folder?
     @Binding var showAlert: Bool
 
     var unlockedReminders: [Reminder]{
@@ -74,7 +74,6 @@ struct FoldersList: View {
                             
                         }
                         .padding(.horizontal, 16)
-                        .buttonStyle(PlainButtonStyle())
                     }
             }
             else {
@@ -105,7 +104,6 @@ struct FoldersList: View {
                                 } label: {
                                     ReminderRowView(reminder: reminder, isPreview: true)
                                 }
-                                .buttonStyle(PlainButtonStyle())
                                 .padding(.horizontal, 16)
                             }
                         }
@@ -139,15 +137,14 @@ struct FoldersList: View {
                             
                             VStack(spacing: 0) {
                                 // All Reminders folder
-                                NavigationLink {
-                                    HomeView()
+                                Button {
+                                    selectedFolder = Folder(name: "")
                                 } label: {
                                     FolderRowView(folder: nil)
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
                                 }
-                                .buttonStyle(.plain)
-                                
+
                                 if !folders.isEmpty {
                                     Divider()
                                 }
@@ -162,16 +159,14 @@ struct FoldersList: View {
                                                 .padding(.horizontal, 16)
                                                 .padding(.vertical, 12)
                                         }
-                                        .buttonStyle(.plain)
                                     } else {
-                                        NavigationLink {
-                                            HomeView(folder: folder)
+                                        Button {
+                                            selectedFolder = folder
                                         } label: {
                                             FolderRowView(folder: folder)
                                                 .padding(.horizontal, 16)
                                                 .padding(.vertical, 12)
                                         }
-                                        .buttonStyle(.plain)
                                     }
                                     if folder != folders.last {
                                         Divider()
@@ -240,5 +235,5 @@ struct FoldersList: View {
 
 }
 #Preview {
-    FoldersList(searchText: .constant(""), selectedReminder: .constant(.example), showAlert: .constant(false))
+    FoldersList(searchText: .constant(""), selectedReminder: .constant(.example), selectedFolder: .constant(.example), showAlert: .constant(false))
 }
