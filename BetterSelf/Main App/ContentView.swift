@@ -11,6 +11,16 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var notificationManager: NotificationManager
     @State private var notifReminder: Reminder?
+    @AppStorage("lastScheduledNotificationDate") private var lastScheduledDate: Date = Date.distantPast
+
+    @Environment(\.modelContext) var modelContext
+    @Query(filter: #Predicate<Reminder> {
+        $0.isChecked == true
+    }, sort: \Reminder.date) var reminders: [Reminder]
+
+    var unlockedPinnedReminders: [Reminder]{
+        reminders.filter{ $0.pinned && ($0.isLocked == false) }
+    }
 
     var body: some View {
         TabView {
@@ -43,12 +53,39 @@ struct ContentView: View {
                 .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
         }
         .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
-                   if shouldNavigate, let reminder = notificationManager.reminder {
-                       notifReminder = reminder
-                       notificationManager.shouldNavigateToReminder = false
-                   }
+            if shouldNavigate, let reminder = notificationManager.reminder {
+                notifReminder = reminder
+                notificationManager.shouldNavigateToReminder = false
+            }
+        }
+        .onAppear {
+            checkAndScheduleDailyNotification()
         }
     }
+    private func checkAndScheduleDailyNotification() {
+        let today = Calendar.current.startOfDay(for: Date())
+        let lastScheduled = Calendar.current.startOfDay(for: lastScheduledDate)
+
+        // If we haven't scheduled today, schedule tomorrow's notification
+        if !Calendar.current.isDate(lastScheduled, inSameDayAs: today) {
+            NotificationManager.shared.addNotification(selectReminder())
+            lastScheduledDate = today
+        }
+    }
+    
+    func selectReminder() -> Reminder{
+        if let reminder = unlockedPinnedReminders.randomElement() {
+            return reminder
+
+
+        }
+        else {
+            return reminders.randomElement() ?? .example
+
+        }
+    }
+
+
 }
 
 #Preview {

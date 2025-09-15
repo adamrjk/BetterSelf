@@ -16,7 +16,6 @@ struct FolderView: View {
 
     @Environment(\.scenePhase) var scenePhase
 
-    @State private var scheduledNotif = false
     @State private var newFolder: Folder?
     @State private var searchText = ""
     @State private var showAlert = false
@@ -84,12 +83,6 @@ struct FolderView: View {
                 }
                 else {
                     HomeView(folder: folder)
-                }
-            }
-            .onAppear{
-                if !scheduledNotif {
-                    NotificationManager.shared.addNotification()
-                    scheduledNotif = true
                 }
             }
             .alert("Failed Authentication", isPresented: $showAlert){
