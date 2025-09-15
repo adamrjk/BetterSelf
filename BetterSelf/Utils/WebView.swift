@@ -81,5 +81,5 @@ struct WebView: UIViewRepresentable {
 #Preview {
 //    https:www.youtube.com/watch?v=mH3Kzzt1v0g&list=LL&index=24&ab_channel=ElevateStart
 //    https:www.youtube.com/embed/<enXA7xepu2U&t=1058s&ab_channel=ChrisWilliamson>
-    WebView(url: URL(string: "https:www.youtube.com/watch?v=mH3Kzzt1v0g&list=LL&index=24&ab_channel=ElevateStart")!, isFullscreen: .constant(false))
+    WebView(url: URL(string: "https:www.youtube.com/embed/<enXA7xepu2U&t=1058s&ab_channel=ChrisWilliamson>")!, isFullscreen: .constant(false))
 }

@@ -50,6 +50,11 @@ struct BetterSelfApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(NotificationManager.shared)
+                .onOpenURL { url in
+                    print("Shared from extension: \(url)")
+                    // Handle inside app (store in SwiftData, etc.)
+
+                }
         }
         .modelContainer(for: [Reminder.self, Folder.self])
     }

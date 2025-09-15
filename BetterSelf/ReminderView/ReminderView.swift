@@ -46,13 +46,19 @@ struct ReminderView: View {
 
     var body: some View {
         Group {
-            switch reminder.type {
-            case .InstantInsight:
-                InstantInsightView(reminder: reminder)
-            case .EchoSnap:
-                EchoSnapView(reminder: reminder)
-            default:
-                TimeLessLetterView(reminder: reminder)
+            if reminder.link.isEmpty {
+
+                switch reminder.type {
+                case .InstantInsight:
+                    InstantInsightView(reminder: reminder)
+                case .EchoSnap:
+                    EchoSnapView(reminder: reminder)
+                default:
+                    TimeLessLetterView(reminder: reminder)
+                }
+            }
+            else {
+                SharedLinkView(id: reminder.link)
             }
         }
     

@@ -7,24 +7,85 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		666EFD212E77D07600F853D3 /* BetterSelfSharing.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 666EFD172E77D07600F853D3 /* BetterSelfSharing.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68C2E5453DB00C80E8F /* FirebaseAnalytics */; };
 		6678C68F2E5454D200C80E8F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68E2E5454D200C80E8F /* FirebaseStorage */; };
 		6678C6992E545CDB00C80E8F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C6982E545CDB00C80E8F /* FirebaseCore */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		666EFD1F2E77D07600F853D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 666F96B82E4F775D007AE674 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 666EFD162E77D07600F853D3;
+			remoteInfo = BetterSelfSharing;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		666EFD222E77D07600F853D3 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				666EFD212E77D07600F853D3 /* BetterSelfSharing.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		666EFD172E77D07600F853D3 /* BetterSelfSharing.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BetterSelfSharing.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		666F96C02E4F775D007AE674 /* BetterSelf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BetterSelf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		666EFD252E77D07600F853D3 /* Exceptions for "BetterSelfSharing" folder in "BetterSelfSharing" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 666EFD162E77D07600F853D3 /* BetterSelfSharing */;
+		};
+		666EFD2E2E77D5F000F853D3 /* Exceptions for "BetterSelf" folder in "BetterSelf" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 666F96BF2E4F775D007AE674 /* BetterSelf */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		666EFD182E77D07600F853D3 /* BetterSelfSharing */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				666EFD252E77D07600F853D3 /* Exceptions for "BetterSelfSharing" folder in "BetterSelfSharing" target */,
+			);
+			path = BetterSelfSharing;
+			sourceTree = "<group>";
+		};
 		666F96C22E4F775D007AE674 /* BetterSelf */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				666EFD2E2E77D5F000F853D3 /* Exceptions for "BetterSelf" folder in "BetterSelf" target */,
+			);
 			path = BetterSelf;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		666EFD142E77D07600F853D3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		666F96BD2E4F775D007AE674 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				666F96C22E4F775D007AE674 /* BetterSelf */,
+				666EFD182E77D07600F853D3 /* BetterSelfSharing */,
 				666F96C12E4F775D007AE674 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				666F96C02E4F775D007AE674 /* BetterSelf.app */,
+				666EFD172E77D07600F853D3 /* BetterSelfSharing.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -57,6 +120,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		666EFD162E77D07600F853D3 /* BetterSelfSharing */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 666EFD262E77D07600F853D3 /* Build configuration list for PBXNativeTarget "BetterSelfSharing" */;
+			buildPhases = (
+				666EFD132E77D07600F853D3 /* Sources */,
+				666EFD142E77D07600F853D3 /* Frameworks */,
+				666EFD152E77D07600F853D3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				666EFD182E77D07600F853D3 /* BetterSelfSharing */,
+			);
+			name = BetterSelfSharing;
+			packageProductDependencies = (
+			);
+			productName = BetterSelfSharing;
+			productReference = 666EFD172E77D07600F853D3 /* BetterSelfSharing.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		666F96BF2E4F775D007AE674 /* BetterSelf */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 666F96CB2E4F775F007AE674 /* Build configuration list for PBXNativeTarget "BetterSelf" */;
@@ -64,10 +149,12 @@
 				666F96BC2E4F775D007AE674 /* Sources */,
 				666F96BD2E4F775D007AE674 /* Frameworks */,
 				666F96BE2E4F775D007AE674 /* Resources */,
+				666EFD222E77D07600F853D3 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				666EFD202E77D07600F853D3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				666F96C22E4F775D007AE674 /* BetterSelf */,
@@ -92,6 +179,9 @@
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					666EFD162E77D07600F853D3 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 					666F96BF2E4F775D007AE674 = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -115,11 +205,19 @@
 			projectRoot = "";
 			targets = (
 				666F96BF2E4F775D007AE674 /* BetterSelf */,
+				666EFD162E77D07600F853D3 /* BetterSelfSharing */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		666EFD152E77D07600F853D3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		666F96BE2E4F775D007AE674 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -130,6 +228,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		666EFD132E77D07600F853D3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		666F96BC2E4F775D007AE674 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -139,7 +244,65 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		666EFD202E77D07600F853D3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 666EFD162E77D07600F853D3 /* BetterSelfSharing */;
+			targetProxy = 666EFD1F2E77D07600F853D3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		666EFD232E77D07600F853D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BQ5Q73876K;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BetterSelfSharing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BetterSelfSharing;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Adam.BetterSelf.BetterSelfSharing;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		666EFD242E77D07600F853D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BQ5Q73876K;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BetterSelfSharing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BetterSelfSharing;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Adam.BetterSelf.BetterSelfSharing;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		666F96C92E4F775F007AE674 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -273,6 +436,7 @@
 				DEVELOPMENT_TEAM = BQ5Q73876K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BetterSelf/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "BetterSelf needs camera access to record video reminders that help you remember important ideas and insights.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Please authenticate yourself to unlock your reminders.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BetterSelf needs microphone access to record audio with your video reminders for a complete recording experience.";
@@ -306,6 +470,7 @@
 				DEVELOPMENT_TEAM = BQ5Q73876K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BetterSelf/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "BetterSelf needs camera access to record video reminders that help you remember important ideas and insights.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Please authenticate yourself to unlock your reminders.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BetterSelf needs microphone access to record audio with your video reminders for a complete recording experience.";
@@ -332,6 +497,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		666EFD262E77D07600F853D3 /* Build configuration list for PBXNativeTarget "BetterSelfSharing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				666EFD232E77D07600F853D3 /* Debug */,
+				666EFD242E77D07600F853D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		666F96BB2E4F775D007AE674 /* Build configuration list for PBXProject "BetterSelf" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

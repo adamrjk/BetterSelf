@@ -11,7 +11,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var notificationManager: NotificationManager
     @State private var notifReminder: Reminder?
-    @AppStorage("lastScheduledNotificationDate") private var lastScheduledDate: Date = Date.distantPast
+    @AppStorage("lastScheduled") private var lastScheduledDate: Date = Date.distantPast
 
     @Environment(\.modelContext) var modelContext
     @Query(filter: #Predicate<Reminder> {
@@ -76,16 +76,11 @@ struct ContentView: View {
     func selectReminder() -> Reminder{
         if let reminder = unlockedPinnedReminders.randomElement() {
             return reminder
-
-
         }
         else {
             return reminders.randomElement() ?? .example
-
         }
     }
-
-
 }
 
 #Preview {

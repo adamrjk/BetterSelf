@@ -34,10 +34,10 @@ class NotificationManager: ObservableObject {
 
             content.sound = UNNotificationSound.default
 
-//            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-            var dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: .now)
-            dateComponents.hour = Int.random(in: 7...8)
-            dateComponents.minute = Int.random(in: 0...10)
+            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+            var dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: tomorrow)
+            dateComponents.hour = Int.random(in: 7...21)
+            dateComponents.minute = Int.random(in: 0...59)
 
             let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
 
