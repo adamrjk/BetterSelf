@@ -10,10 +10,15 @@ import SwiftUI
 
 struct YouTubePlayerView: UIViewRepresentable {
     let videoID: String
+    @State var time: Int
     @State private var webView: WKWebView
+    @State var isPlayable: Bool
 
-    init(videoID: String, saveView: (WKWebView) -> Void) {
+    init(videoID: String, time: Int, isPlayable: Bool, saveView: (WKWebView) -> Void) {
         self.videoID = videoID
+        self.time = time
+        self.isPlayable = isPlayable
+
         let config = WKWebViewConfiguration()
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
@@ -22,6 +27,7 @@ struct YouTubePlayerView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> WKWebView {
+        webView.isUserInteractionEnabled = isPlayable
         webView.scrollView.isScrollEnabled = false
         webView.isOpaque = false
         webView.backgroundColor = .clear
@@ -48,7 +54,8 @@ struct YouTubePlayerView: UIViewRepresentable {
                      'playsinline': 1,
                      'modestbranding': 1,
                      'controls': 1,
-                     'rel': 0
+                     'rel': 0,
+                     'start': \(time)  
                      }
                 });
                 }
@@ -78,24 +85,30 @@ struct YouTubePlayerView: UIViewRepresentable {
 }
 
 struct YoutubeView: View {
+    @State var isPlayable: Bool
     @State private var webView = WKWebView()
     @State private var isFullscreen = false
-    let youtubeId: String
+
+    @State var youtubeId: String
+
+    @Binding var time: Int //in Seconds
 
 
     var body: some View {
         ZStack {
-            Color.purpleMainGradient
-                .ignoresSafeArea()
+            if isPlayable {
+                Color.purpleMainGradient
+                    .ignoresSafeArea()
 
-            Color.purpleOverlayGradient
-                .ignoresSafeArea()
+                Color.purpleOverlayGradient
+                    .ignoresSafeArea()
+            }
 
             GeometryReader { proxy in
                 VStack {
                     Spacer()
                     ZStack {
-                        YouTubePlayerView(videoID: youtubeId){ web in
+                        YouTubePlayerView(videoID: youtubeId, time: time, isPlayable: isPlayable){ web in
                             self.webView = web
                         }
                         .ignoresSafeArea(.all, edges: .top)
@@ -107,7 +120,6 @@ struct YoutubeView: View {
                         )
                         .shadow(color: .purple.opacity(0.15), radius: 8, x: 0, y: 4)
                         .shadow(color: .purple.opacity(0.1), radius: 16, x: 0, y: 8)
-                        .frame(width: proxy.size.width)
 
                         VStack {
                             Spacer()
@@ -152,6 +164,8 @@ struct YoutubeView: View {
          }
      }
 }
+
+
 struct FullscreenPlayerView: View {
     let webView: WKWebView
 
@@ -174,6 +188,6 @@ struct WebViewContainer: UIViewRepresentable {
 
 
 
-#Preview {
-    YoutubeView(youtubeId: "nQY3-VGTXpk")
-}
+//#Preview {
+//    YoutubeView(youtubeId: "nQY3-VGTXpk", time: 0)
+//}

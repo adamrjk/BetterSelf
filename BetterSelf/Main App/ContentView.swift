@@ -5,6 +5,8 @@
 //  Created by Adam Damou on 15/08/2025.
 //
 
+import FirebaseCore
+import FirebaseAuth
 import SwiftData
 import SwiftUI
 
@@ -59,6 +61,7 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            signInAnonymously()
             checkAndScheduleDailyNotification()
         }
     }
@@ -79,6 +82,16 @@ struct ContentView: View {
         }
         else {
             return reminders.randomElement() ?? .example
+        }
+    }
+    private func signInAnonymously() {
+
+        Auth.auth().signInAnonymously { result, error in
+            if let error = error {
+                print("Authentication failed: \(error.localizedDescription)")
+            } else if let user = result?.user {
+                print("Signed in successfully, uid: \(user.uid)")
+            }
         }
     }
 }

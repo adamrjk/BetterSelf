@@ -17,6 +17,8 @@ struct AddReminderView: View {
     @Bindable var reminder: Reminder
 
     @State private var refuseSaving = false
+    @State private var isYoutube = false
+    @State private var startTime = false
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -99,7 +101,12 @@ struct AddReminderView: View {
                             Tab{
                                 switch reminder.type {
                                 case .InstantInsight:
-                                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo)
+                                    if isYoutube {
+                                        YoutubeView(isPlayable: false, youtubeId: getId(reminder.link) ?? "", time: $reminder.time)
+                                    }
+                                    else {
+                                        AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo)
+                                    }
                                 case .EchoSnap:
                                     AddingPhotoView(photo: $reminder.photo)
                                 default:
@@ -201,13 +208,55 @@ struct AddReminderView: View {
                     }
                 }
             )
+            .sheet(isPresented: $startTime){
+                StartTimeView(time: $reminder.time)
+                    .presentationDetents([.height(300)])
+
+            }
             .sheet(isPresented: $refuseSaving){
                 RefuseSavingView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
                     .presentationDetents([.height(300)])
             }
+            .onChange(of: reminder.link){ oldV, newV in
+                checkIfYoutube(newV)
+
+            }
 
 
         }
+
+    }
+    func checkIfYoutube(_ link: String){
+        if link.localizedStandardContains("youtube.com") {
+            isYoutube = true
+            startTime = true
+
+        }
+        else {
+            isYoutube = false
+        }
+
+
+    }
+
+    func getId(_ link: String) -> String? {
+        let patterns = [
+              "youtube\\.com/watch\\?v=([a-zA-Z0-9_-]{11})",
+              "youtu\\.be/([a-zA-Z0-9_-]{11})",
+              "youtube\\.com/embed/([a-zA-Z0-9_-]{11})"
+          ]
+
+          for pattern in patterns {
+              if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                  let range = NSRange(link.startIndex..<link.endIndex, in: link)
+                  if let match = regex.firstMatch(in: link, options: [], range: range) {
+                      if let idRange = Range(match.range(at: 1), in: link) {
+                          return String(link[idRange])
+                      }
+                  }
+              }
+          }
+          return nil
 
     }
 

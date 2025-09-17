@@ -58,7 +58,7 @@ struct ReminderView: View {
                 }
             }
             else {
-                SharedLinkView(id: reminder.link)
+                SharedLinkView(link: reminder.link, time: $reminder.time)
             }
         }
     

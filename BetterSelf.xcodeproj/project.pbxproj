@@ -11,6 +11,7 @@
 		6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68C2E5453DB00C80E8F /* FirebaseAnalytics */; };
 		6678C68F2E5454D200C80E8F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68E2E5454D200C80E8F /* FirebaseStorage */; };
 		6678C6992E545CDB00C80E8F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C6982E545CDB00C80E8F /* FirebaseCore */; };
+		66A705112E79C5750007E1FE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 66A705102E79C5750007E1FE /* FirebaseAuth */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +51,7 @@
 			);
 			target = 666EFD162E77D07600F853D3 /* BetterSelfSharing */;
 		};
-		666EFD2E2E77D5F000F853D3 /* Exceptions for "BetterSelf" folder in "BetterSelf" target */ = {
+		667E327A2E78710C00D0E164 /* Exceptions for "BetterSelf" folder in "BetterSelf" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -71,7 +72,7 @@
 		666F96C22E4F775D007AE674 /* BetterSelf */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				666EFD2E2E77D5F000F853D3 /* Exceptions for "BetterSelf" folder in "BetterSelf" target */,
+				667E327A2E78710C00D0E164 /* Exceptions for "BetterSelf" folder in "BetterSelf" target */,
 			);
 			path = BetterSelf;
 			sourceTree = "<group>";
@@ -93,6 +94,7 @@
 				6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */,
 				6678C6992E545CDB00C80E8F /* FirebaseCore in Frameworks */,
 				6678C68F2E5454D200C80E8F /* FirebaseStorage in Frameworks */,
+				66A705112E79C5750007E1FE /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,6 +166,7 @@
 				6678C68C2E5453DB00C80E8F /* FirebaseAnalytics */,
 				6678C68E2E5454D200C80E8F /* FirebaseStorage */,
 				6678C6982E545CDB00C80E8F /* FirebaseCore */,
+				66A705102E79C5750007E1FE /* FirebaseAuth */,
 			);
 			productName = BetterSelf;
 			productReference = 666F96C02E4F775D007AE674 /* BetterSelf.app */;
@@ -256,6 +259,7 @@
 		666EFD232E77D07600F853D3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BetterSelfSharing/BetterSelfSharing.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = BQ5Q73876K;
@@ -281,6 +285,7 @@
 		666EFD242E77D07600F853D3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BetterSelfSharing/BetterSelfSharing.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = BQ5Q73876K;
@@ -431,6 +436,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = BetterSelf/BetterSelf.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = BQ5Q73876K;
@@ -465,6 +471,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = BetterSelf/BetterSelf.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = BQ5Q73876K;
@@ -552,6 +559,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
+		};
+		66A705102E79C5750007E1FE /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
