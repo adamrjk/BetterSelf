@@ -20,8 +20,12 @@ struct ContentView: View {
         $0.isChecked == true
     }, sort: \Reminder.date) var reminders: [Reminder]
 
+    var unlockedReminders: [Reminder] {
+        reminders.filter{ $0.isLocked == false}
+    }
+
     var unlockedPinnedReminders: [Reminder]{
-        reminders.filter{ $0.pinned && ($0.isLocked == false) }
+        unlockedReminders.filter{ $0.pinned }
     }
 
     var body: some View {
@@ -66,24 +70,28 @@ struct ContentView: View {
         }
     }
     private func checkAndScheduleDailyNotification() {
+        //Let's schedule notifications on each of the pinned reminders.
+
         let today = Calendar.current.startOfDay(for: Date())
         let lastScheduled = Calendar.current.startOfDay(for: lastScheduledDate)
 
         // If we haven't scheduled today, schedule tomorrow's notification
         if !Calendar.current.isDate(lastScheduled, inSameDayAs: today) {
-            NotificationManager.shared.addNotification(selectReminder())
+            if unlockedPinnedReminders.isEmpty {
+                if let randomReminder = unlockedReminders.randomElement() {
+                    NotificationManager.shared.addNotification(randomReminder)
+                }
+            }
+            else {
+                unlockedPinnedReminders.forEach{ reminder in
+                    NotificationManager.shared.addNotification(reminder)
+                }
+            }
+
             lastScheduledDate = today
         }
     }
     
-    func selectReminder() -> Reminder{
-        if let reminder = unlockedPinnedReminders.randomElement() {
-            return reminder
-        }
-        else {
-            return reminders.randomElement() ?? .example
-        }
-    }
     private func signInAnonymously() {
 
         Auth.auth().signInAnonymously { result, error in
