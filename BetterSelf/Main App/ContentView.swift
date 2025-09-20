@@ -94,11 +94,9 @@ struct ContentView: View {
     
     private func signInAnonymously() {
 
-        Auth.auth().signInAnonymously { result, error in
+        Auth.auth().signInAnonymously { _ , error in
             if let error = error {
                 print("Authentication failed: \(error.localizedDescription)")
-            } else if let user = result?.user {
-                print("Signed in successfully, uid: \(user.uid)")
             }
         }
     }

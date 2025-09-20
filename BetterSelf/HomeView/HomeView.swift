@@ -107,7 +107,7 @@ struct HomeView: View {
                     List {
                         ForEach(sortedReminders){ reminder in
                             Button {
-                                if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil {
+                                if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !checkIfYoutube(reminder.link)  {
                                     refuseLoading.toggle()
                                 }
                                 else {
@@ -322,7 +322,16 @@ struct HomeView: View {
 
 
 
+    func checkIfYoutube(_ link: String) -> Bool {
+        if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
+            return true
+        }
+        else {
+            return false
+        }
 
+
+    }
 
 
 

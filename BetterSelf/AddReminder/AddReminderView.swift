@@ -20,6 +20,9 @@ struct AddReminderView: View {
     @State private var isYoutube = false
     @State private var startTime = false
 
+    enum AddReminderPage: Hashable { case main, description }
+    @State private var selectedPage: AddReminderPage = .main
+
     @Environment(\.colorScheme) var colorScheme
 
     var newCardBackground: LinearGradient {
@@ -97,29 +100,14 @@ struct AddReminderView: View {
                         )
                         .padding(.horizontal, 16)
                          
-                        TabView {
-                            Tab{
-                                switch reminder.type {
-                                case .InstantInsight:
-                                    if isYoutube {
-                                        YoutubeView(isPlayable: false, youtubeId: getId(reminder.link) ?? "", time: $reminder.time)
-                                    }
-                                    else {
-                                        AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo)
-                                    }
-                                case .EchoSnap:
-                                    AddingPhotoView(photo: $reminder.photo)
-                                default:
-                                    AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
-                                }
-                            }
+                        TabView(selection: $selectedPage) {
+
+                            MainTabContent(reminder: reminder, keyboard: $keyboard, isYoutube: $isYoutube)
+                                    .tag(AddReminderPage.main)
                             if reminder.type != .TimeLessLetter {
-                                Tab {
-                                    AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
-                                }
-
+                                AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
+                                    .tag(AddReminderPage.description)
                             }
-
                         }
                         .tabViewStyle(.page)
                         .frame(height: 300)
@@ -221,15 +209,72 @@ struct AddReminderView: View {
                 checkIfYoutube(newV)
 
             }
+            .onChange(of: reminder.type) { _, newType in
+                if newType == .TimeLessLetter && selectedPage == .description {
+                    selectedPage = .main
+                }
+            }
 
 
         }
 
     }
+
+    struct MainTabContent: View {
+        @Bindable var reminder: Reminder
+        @FocusState.Binding var keyboard: Bool
+        @Binding var isYoutube: Bool
+        var body: some View {
+            switch reminder.type {
+                  case .InstantInsight:
+                        if isYoutube {
+                            YoutubeView(isPlayable: false, youtubeId: getId(reminder.link) ?? "", time: $reminder.time)
+
+                      } else {
+                          AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo)
+          
+                      }
+                  case .EchoSnap:
+                       AddingPhotoView(photo: $reminder.photo)
+                  default:
+                      AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
+                  }
+
+        }
+        func getId(_ link: String) -> String? {
+            let patterns = [
+                  "youtube\\.com/watch\\?v=([a-zA-Z0-9_-]{11})",
+                  "youtu\\.be/([a-zA-Z0-9_-]{11})",
+                  "youtube\\.com/embed/([a-zA-Z0-9_-]{11})"
+              ]
+
+              for pattern in patterns {
+                  if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                      let range = NSRange(link.startIndex..<link.endIndex, in: link)
+                      if let match = regex.firstMatch(in: link, options: [], range: range) {
+                          if let idRange = Range(match.range(at: 1), in: link) {
+                              return String(link[idRange])
+                          }
+                      }
+                  }
+              }
+              return nil
+
+        }
+    }
+
+
+
+
+
+
     func checkIfYoutube(_ link: String){
-        if link.localizedStandardContains("youtube.com") {
+        if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
             isYoutube = true
             startTime = true
+            reminder.type = .InstantInsight
+            selectedPage = .main
+
 
         }
         else {
@@ -239,30 +284,11 @@ struct AddReminderView: View {
 
     }
 
-    func getId(_ link: String) -> String? {
-        let patterns = [
-              "youtube\\.com/watch\\?v=([a-zA-Z0-9_-]{11})",
-              "youtu\\.be/([a-zA-Z0-9_-]{11})",
-              "youtube\\.com/embed/([a-zA-Z0-9_-]{11})"
-          ]
-
-          for pattern in patterns {
-              if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-                  let range = NSRange(link.startIndex..<link.endIndex, in: link)
-                  if let match = regex.firstMatch(in: link, options: [], range: range) {
-                      if let idRange = Range(match.range(at: 1), in: link) {
-                          return String(link[idRange])
-                      }
-                  }
-              }
-          }
-          return nil
-
-    }
 
 }
 
 #Preview {
-    AddReminderView(reminder: .example)
+    AddReminderView(reminder: Reminder(title: "", text: "", link: ""))
         .modelContainer(for: Reminder.self)
 }
+

@@ -79,22 +79,22 @@ struct EchoSnapView: View {
 
                             }
 
-                            if !reminder.link.isEmpty {
-                                Spacer()
-                                    .frame(height: 30)
-                                Button {
-                                    launchLink()
-                                } label: {
-                                    Text("Access Link")
-                                        .font(.subheadline)
-                                        .bold()
-                                        .foregroundStyle(.secondary)
-                                        .padding()
-                                        .background(newCardBackground)
-                                        .clipShape(.rect(cornerRadius: 14))
-                                }
-                                .buttonStyle(.plain)
-                            }
+//                            if !reminder.link.isEmpty {
+//                                Spacer()
+//                                    .frame(height: 30)
+//                                Button {
+//                                    launchLink()
+//                                } label: {
+//                                    Text("Access Link")
+//                                        .font(.subheadline)
+//                                        .bold()
+//                                        .foregroundStyle(.secondary)
+//                                        .padding()
+//                                        .background(newCardBackground)
+//                                        .clipShape(.rect(cornerRadius: 14))
+//                                }
+//                                .buttonStyle(.plain)
+//                            }
                         }
                         .padding(.horizontal)
                     

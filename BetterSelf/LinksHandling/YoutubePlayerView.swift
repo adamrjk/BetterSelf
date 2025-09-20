@@ -10,13 +10,68 @@ import SwiftUI
 
 struct YouTubePlayerView: UIViewRepresentable {
     let videoID: String
-    @State var time: Int
+    @Binding var time: Int
     @State private var webView: WKWebView
     @State var isPlayable: Bool
 
-    init(videoID: String, time: Int, isPlayable: Bool, saveView: (WKWebView) -> Void) {
+    class Coordinator {
+        var lastLoadedTime: Int?
+        let videoID: String
+        let isPlayable: Bool
+        init(videoID: String, isPlayable: Bool) {
+            self.videoID = videoID
+            self.isPlayable = isPlayable
+        }
+        func html(for time: Int) -> String {
+            return """
+             <!DOCTYPE html>
+             <html style=\"margin:0; padding:0; height:100%;\">
+                 <body style=\"margin:0; padding:0; height:100%;\">
+                 <div id=\"player\"></div>
+                 <script>
+                     var tag = document.createElement('script');
+                     tag.src = \"https://www.youtube.com/iframe_api\";
+                     var firstScriptTag = document.getElementsByTagName('script')[0];
+                     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+                     var player;
+                     function onYouTubeIframeAPIReady() {
+                     player = new YT.Player('player', {
+                         height: '100%',
+                         width: '100%',
+                         videoId: '\(videoID)',
+                         playerVars: {
+                         'playsinline': 1,
+                         'modestbranding': 1,
+                         'controls': 1,
+                         'rel': 0,
+                         'start': \(time)
+                         }
+                    });
+                    }
+
+                    function getCurrentTime() {
+                    return player.getCurrentTime();
+                    }
+                    function seekTo(time) {
+                    player.seekTo(time, true);
+                    }
+                    function playVideo() {
+                    player.playVideo();
+                    }
+                    function pauseVideo() {
+                    player.pauseVideo();
+                    }
+                </script>
+                </body>
+            </html>
+            """
+        }
+    }
+
+    init(videoID: String, time: Binding<Int>, isPlayable: Bool, saveView: (WKWebView) -> Void) {
         self.videoID = videoID
-        self.time = time
+        _time = time
         self.isPlayable = isPlayable
 
         let config = WKWebViewConfiguration()
@@ -26,71 +81,46 @@ struct YouTubePlayerView: UIViewRepresentable {
 
     }
 
+    func makeCoordinator() -> Coordinator {
+        Coordinator(videoID: videoID, isPlayable: isPlayable)
+    }
+
     func makeUIView(context: Context) -> WKWebView {
         webView.isUserInteractionEnabled = isPlayable
         webView.scrollView.isScrollEnabled = false
         webView.isOpaque = false
         webView.backgroundColor = .clear
 
-        // Embed YouTube IFrame with inline playback and full controls
-        let html = """
-         <!DOCTYPE html>
-         <html style="margin:0; padding:0; height:100%;">
-             <body style="margin:0; padding:0; height:100%;">
-             <div id="player"></div>
-             <script>
-                 var tag = document.createElement('script');
-                 tag.src = "https://www.youtube.com/iframe_api";
-                 var firstScriptTag = document.getElementsByTagName('script')[0];
-                 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-                 var player;
-                 function onYouTubeIframeAPIReady() {
-                 player = new YT.Player('player', {
-                     height: '100%',
-                     width: '100%',
-                     videoId: '\(videoID)',
-                     playerVars: {
-                     'playsinline': 1,
-                     'modestbranding': 1,
-                     'controls': 1,
-                     'rel': 0,
-                     'start': \(time)  
-                     }
-                });
-                }
-
-                function getCurrentTime() {
-                return player.getCurrentTime();
-                }
-                function seekTo(time) {
-                player.seekTo(time, true);
-                }
-                function playVideo() {
-                player.playVideo();
-                }
-                function pauseVideo() {
-                player.pauseVideo();
-                }
-            </script>
-            </body>
-        </html>
-        """
+        let html = context.coordinator.html(for: time)
 
         webView.loadHTMLString(html, baseURL: nil)
+        context.coordinator.lastLoadedTime = time
         return webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        // If the bound `time` changed, rebuild and reload the HTML so the player starts from the new time
+        if context.coordinator.lastLoadedTime != time {
+            let html = context.coordinator.html(for: time)
+            uiView.loadHTMLString(html, baseURL: nil)
+            context.coordinator.lastLoadedTime = time
+        }
+        // Also keep interaction flags in sync
+        uiView.isUserInteractionEnabled = isPlayable
+        uiView.scrollView.isScrollEnabled = false
+        uiView.isOpaque = false
+        uiView.backgroundColor = .clear
+    }
 }
 
 struct YoutubeView: View {
     @State var isPlayable: Bool
     @State private var webView = WKWebView()
     @State private var isFullscreen = false
+    @State private var startTime = false
+
 
     @State var youtubeId: String
-
     @Binding var time: Int //in Seconds
 
 
@@ -108,7 +138,7 @@ struct YoutubeView: View {
                 VStack {
                     Spacer()
                     ZStack {
-                        YouTubePlayerView(videoID: youtubeId, time: time, isPlayable: isPlayable){ web in
+                        YouTubePlayerView(videoID: youtubeId, time: $time, isPlayable: isPlayable){ web in
                             self.webView = web
                         }
                         .ignoresSafeArea(.all, edges: .top)
@@ -126,9 +156,10 @@ struct YoutubeView: View {
                             HStack {
                                 Spacer()
                                 Button {
-                                    goFullscreen()
+                                    startTime.toggle()
                                 } label: {
-                                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+//                                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                    Image(systemName: "timer")
                                         .foregroundColor(.white)
                                         .padding()
                                         .background(.black.opacity(0.7))
@@ -137,11 +168,7 @@ struct YoutubeView: View {
                                 .padding()
                             }
                         }
-
-
                     }
-
-
                     Spacer()
                 }
 
@@ -151,6 +178,10 @@ struct YoutubeView: View {
            FullscreenPlayerView(webView: webView)
                .ignoresSafeArea()
 
+       }
+       .sheet(isPresented: $startTime){
+           StartTimeView(time: $time)
+               .presentationDetents([.height(300)])
        }
     }
     func goFullscreen() {
@@ -191,3 +222,4 @@ struct WebViewContainer: UIViewRepresentable {
 //#Preview {
 //    YoutubeView(youtubeId: "nQY3-VGTXpk", time: 0)
 //}
+

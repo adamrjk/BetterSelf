@@ -18,14 +18,22 @@ struct ArticleWebView: UIViewRepresentable {
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
         uiView.load(URLRequest(url: url))
+
     }
 }
 
 struct ArticleView: View {
     @State var link: String
     var body: some View {
-        ArticleWebView(url: URL(string: link)!)
-            .edgesIgnoringSafeArea(.all) // make it fullscreen
+        if let url = URL(string: link) {
+            ArticleWebView(url: url)
+                .edgesIgnoringSafeArea(.all) // make it fullscreen
+        }
+        else {
+            Text("Failed to load URL")
+                .font(.headline)
+
+        }
     }
 }
 

@@ -11,9 +11,9 @@ struct StartTimeView: View {
     @Environment(\.dismiss) var dismiss
 
     @Binding var time: Int
-    @State private var seconds = 0
-    @State private var minutes = 0
-    @State private var hours = 0
+    @State private var seconds: Int
+    @State private var minutes: Int
+    @State private var hours: Int
     @Environment(\.colorScheme) var colorScheme
     var body: some View {
         NavigationStack {
@@ -94,6 +94,16 @@ struct StartTimeView: View {
                 }
             }
         }
+    }
+    init(time: Binding<Int>) {
+        _time = time
+        let seconds = time.wrappedValue
+        hours = seconds / 3600
+        minutes = ( seconds % 3600 ) / 60
+        self.seconds = seconds % 60
+
+
+
     }
 }
 

@@ -60,6 +60,10 @@ class Reminder {
 
     }
 
+    var onlyLink: Bool {
+        text.isEmpty && photo == nil && firebaseVideoURL == nil
+    }
+
 
 }
 

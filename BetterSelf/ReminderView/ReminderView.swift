@@ -25,6 +25,7 @@ struct ReminderView: View {
     @State private var edit = false
     @State private var detailSheet = false
     @State var reminder: Reminder
+    @State private var isYoutube = false
 
     private var primaryColor: Color {
         reminder.type == .InstantInsight
@@ -46,8 +47,13 @@ struct ReminderView: View {
 
     var body: some View {
         Group {
-            if reminder.link.isEmpty {
-
+            if checkIfYoutube(reminder.link) {
+                SharedLinkView(link: reminder.link, time: $reminder.time)
+            }
+            else if reminder.onlyLink {
+                SharedLinkView(link: reminder.link, time: $reminder.time)
+            }
+            else {
                 switch reminder.type {
                 case .InstantInsight:
                     InstantInsightView(reminder: reminder)
@@ -56,9 +62,6 @@ struct ReminderView: View {
                 default:
                     TimeLessLetterView(reminder: reminder)
                 }
-            }
-            else {
-                SharedLinkView(link: reminder.link, time: $reminder.time)
             }
         }
     
@@ -113,6 +116,19 @@ struct ReminderView: View {
                     }
 
                 }
+                if !reminder.link.isEmpty && !checkIfYoutube(reminder.link) && !reminder.onlyLink{
+                    ToolbarItem(placement: .topBarTrailing){
+                        Button("Access Link", systemImage: "link.circle.fill"){
+                            detailSheet.toggle()
+                        }
+                        .font(.headline)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.white)
+                        .padding(8)
+                    }
+                }
+
+
             }
             else {
                 ToolbarItem(placement: .topBarTrailing){
@@ -134,17 +150,32 @@ struct ReminderView: View {
             AddReminderView(reminder: reminder)
         }
         .sheet(isPresented: $detailSheet){
-            NavigationView{
-                TimeLessLetterView(isSheet: true, reminder: reminder)
-                    .navigationTitle(reminder.title)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
+            if reminder.type == .InstantInsight {
+                NavigationView{
+                    TimeLessLetterView(isSheet: true, reminder: reminder)
+                        .navigationTitle(reminder.title)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
+                }
+                .presentationDetents([.medium, .large])
             }
-            .presentationDetents([.medium, .large])
+            else {
+                SharedLinkView(link: reminder.link, time: $reminder.time)
+            }
 
 
         }
 
+
+
+    }
+    func checkIfYoutube(_ link: String) -> Bool{
+        if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
+            return true
+        }
+        else {
+            return false
+        }
 
 
     }
