@@ -40,6 +40,24 @@ class ShareViewController: SLComposeServiceViewController {
         }
     }
 
+    func openApp() {
+        if let url = URL(string: "betterself://") {
+            var responder: UIResponder? = self
+            
+            while responder != nil {
+                if let application = responder as? UIApplication {
+                    application.open(url)
+                    break
+                    
+                }
+                
+                responder = responder?.next
+                
+            }
+        }
+    }
+
+
     private func saveToAppGroup(_ content: String) {
         if let userDefaults = UserDefaults(suiteName: "group.adam.betterself") {
             userDefaults.set(content, forKey: "sharedContent")
