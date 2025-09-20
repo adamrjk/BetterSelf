@@ -10,12 +10,14 @@
 			<dict>
 				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
 				<integer>1</integer>
+				<key>NSExtensionActivationSupportsText</key>
+				<true/>
 			</dict>
 		</dict>
-		<key>NSExtensionMainStoryboard</key>
-		<string>MainInterface</string>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>BetterSelfSharing.ShareViewController</string>
 	</dict>
 </dict>
 </plist>

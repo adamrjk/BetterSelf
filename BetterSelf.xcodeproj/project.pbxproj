@@ -179,7 +179,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					666EFD162E77D07600F853D3 = {
@@ -261,7 +261,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = BetterSelfSharing/BetterSelfSharing.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = BQ5Q73876K;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BetterSelfSharing/Info.plist;
@@ -272,7 +272,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = Adam.BetterSelf.BetterSelfSharing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -287,7 +287,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = BetterSelfSharing/BetterSelfSharing.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = BQ5Q73876K;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BetterSelfSharing/Info.plist;
@@ -298,7 +298,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = Adam.BetterSelf.BetterSelfSharing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -362,6 +362,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -422,6 +423,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -440,13 +442,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = BetterSelf/BetterSelf.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = BQ5Q73876K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BetterSelf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BetterSelf;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "BetterSelf needs camera access to record video reminders that help you remember important ideas and insights.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Please authenticate yourself to unlock your reminders.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BetterSelf needs microphone access to record audio with your video reminders for a complete recording experience.";
@@ -482,13 +486,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = BetterSelf/BetterSelf.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = BQ5Q73876K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BetterSelf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BetterSelf;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "BetterSelf needs camera access to record video reminders that help you remember important ideas and insights.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Please authenticate yourself to unlock your reminders.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BetterSelf needs microphone access to record audio with your video reminders for a complete recording experience.";

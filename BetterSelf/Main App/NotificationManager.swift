@@ -16,10 +16,22 @@ class NotificationManager: ObservableObject {
 
     @Published var reminder: Reminder?
     @Published var shouldNavigateToReminder = false
+    @Published var sharedReminder = false
+
 
     static let shared = NotificationManager()
 
+
+
     private init() {}
+
+    func sharedReminder(_ reminder: Reminder){
+        self.reminder = reminder
+        self.shouldNavigateToReminder = true
+        self.sharedReminder = true
+
+
+    }
 
     
     func addNotification(_ reminder: Reminder) {

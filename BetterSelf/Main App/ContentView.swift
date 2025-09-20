@@ -64,6 +64,31 @@ struct ContentView: View {
                 notificationManager.shouldNavigateToReminder = false
             }
         }
+        .onChange(of: notificationManager.sharedReminder){
+            if notificationManager.sharedReminder {
+                if let url = UserDefaults(suiteName: "group.adam.betterself")?.value(forKey: "incomingURL") as? String {
+                    print("Got the link")
+                    print("In ContentView I have: \(url)")
+                    UserDefaults(suiteName: "group.adam.betterself")?.removeObject(forKey: "incomingURL")
+                    guard let range = url.range(of: "url=") else { return }
+                    let link = String(url[range.upperBound...])  // everything after "url="
+                    let reminder = Reminder(title: "", text: "", link: link)
+                    modelContext.insert(reminder)
+                    reminder.isChecked = true
+                    reminder.type = .TimeLessLetter
+                    notifReminder = reminder
+                    notificationManager.sharedReminder = false
+
+
+
+                }
+
+                else {
+                    notificationManager.sharedReminder = false
+                }
+            }
+        }
+
         .onAppear {
             signInAnonymously()
             checkAndScheduleDailyNotification()
