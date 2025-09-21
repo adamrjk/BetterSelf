@@ -162,30 +162,30 @@ struct HomeView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                EditButton()
-//                Menu {
-//                    Picker("Sort", selection: $sorting) {
-//                        Text("Newest First")
-//                            .tag( Sorting.dateNew)
-//
-//                        Text("Oldest First")
-//                            .tag(Sorting.dateOld)
-//                        Text("Title")
-//                            .tag(Sorting.name)
-//
-//                    }
-//
-//                }label: {
-//                    Image(systemName: "arrow.up.arrow.down")
-//                        .font(.subheadline)
-//                        .foregroundStyle(itemColor)
-//                        .padding(7)
-//                        .background(
-//                            Circle()
-//                                .fill(newCardBackground)
-//                        )
-//                }
-//                .buttonStyle(.plain)
+//                EditButton()
+                Menu {
+                    Picker("Sort", selection: $sorting) {
+                        Text("Newest First")
+                            .tag( Sorting.dateNew)
+
+                        Text("Oldest First")
+                            .tag(Sorting.dateOld)
+                        Text("Title")
+                            .tag(Sorting.name)
+
+                    }
+
+                }label: {
+                    Image(systemName: "arrow.up.arrow.down")
+                        .font(.subheadline)
+                        .foregroundStyle(itemColor)
+                        .padding(7)
+                        .background(
+                            Circle()
+                                .fill(newCardBackground)
+                        )
+                }
+                .buttonStyle(.plain)
             }
             
 

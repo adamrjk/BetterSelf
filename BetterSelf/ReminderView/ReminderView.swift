@@ -63,7 +63,6 @@ struct ReminderView: View {
                 }
             }
         }
-    
         .navigationBarBackButtonHidden()
         .navigationTitle(reminder.title)
         .toolbar {
@@ -75,7 +74,6 @@ struct ReminderView: View {
                 } label: {
                     HStack {
                         Image(systemName: "chevron.left")
-                        Text("Reminders")
                     }
                     .foregroundStyle(primaryColor)
                     .bold()
@@ -95,26 +93,6 @@ struct ReminderView: View {
 
 
             if reminder.type != .InstantInsight {
-                ToolbarItem(placement: .bottomBar){
-                    // Date indicator at bottom right
-                    HStack {
-                        Spacer()
-
-                        HStack {
-                            Image(systemName: "calendar")
-                                .font(.caption)
-                                .foregroundStyle(calendarCardText)
-
-                            Text(reminder.date, style: .date)
-                                .font(.caption)
-                                .foregroundStyle(calendarCardText)
-                        }
-                        .padding(3)
-                        .background(newCardBackground)
-                        .clipShape(.capsule)
-                    }
-
-                }
                 if !reminder.link.isEmpty && !reminder.isYoutube && !reminder.onlyLink{
                     ToolbarItem(placement: .topBarTrailing){
                         Button("Access Link", systemImage: "link.circle.fill"){

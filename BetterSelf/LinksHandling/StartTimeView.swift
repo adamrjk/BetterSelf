@@ -18,9 +18,7 @@ struct StartTimeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.purpleMainGradient
-                    .ignoresSafeArea()
-                Color.purpleOverlayGradient
+                Color.clear
                     .ignoresSafeArea()
 
                 TimeSelector(time: $time, seconds: $seconds, minutes: $minutes, hours: $hours)

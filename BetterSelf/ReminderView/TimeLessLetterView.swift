@@ -96,27 +96,6 @@ struct TimeLessLetterView: View {
                         .foregroundStyle(.primary)
                     }
 
-                    ToolbarItem(placement: .bottomBar){
-                        // Date indicator at bottom right
-                        HStack {
-                            Spacer()
-
-                            HStack {
-                                Image(systemName: "calendar")
-                                    .font(.caption)
-                                    .foregroundStyle(calendarCardText)
-
-                                Text(reminder.date, style: .date)
-                                    .font(.caption)
-                                    .foregroundStyle(calendarCardText)
-
-                            }
-                            .padding(3)
-                            .background(newCardBackground)
-                            .clipShape(.capsule)
-                        }
-
-                    }
                 }
             }
 

@@ -141,7 +141,7 @@ struct YoutubeView: View {
                         YouTubePlayerView(videoID: youtubeId, time: $time, isPlayable: isPlayable){ web in
                             self.webView = web
                         }
-                        .ignoresSafeArea(.all, edges: .top)
+//                        .ignoresSafeArea(.all, edges: .top)
                         .scaledToFit()
                         .cornerRadius(30)
                         .background(
@@ -169,6 +169,7 @@ struct YoutubeView: View {
                             }
                         }
                     }
+                    Spacer()
                     Spacer()
                 }
 

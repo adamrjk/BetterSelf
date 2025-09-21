@@ -17,6 +17,7 @@ struct SharedLinkView: View {
     @Binding var time: Int
 
     var body: some View {
+        
         ZStack {
             Color.purpleMainGradient
                 .ignoresSafeArea()

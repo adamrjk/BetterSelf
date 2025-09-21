@@ -78,23 +78,6 @@ struct EchoSnapView: View {
 
 
                             }
-
-//                            if !reminder.link.isEmpty {
-//                                Spacer()
-//                                    .frame(height: 30)
-//                                Button {
-//                                    launchLink()
-//                                } label: {
-//                                    Text("Access Link")
-//                                        .font(.subheadline)
-//                                        .bold()
-//                                        .foregroundStyle(.secondary)
-//                                        .padding()
-//                                        .background(newCardBackground)
-//                                        .clipShape(.rect(cornerRadius: 14))
-//                                }
-//                                .buttonStyle(.plain)
-//                            }
                         }
                         .padding(.horizontal)
                     
@@ -105,11 +88,6 @@ struct EchoSnapView: View {
             }
 
 
-    }
-
-    func launchLink() {
-        //Either show a sheet or navlink with the link result
-        // or Show an actual WebView with the link result
     }
 
     func loadImage(_ data: Data?) -> Image? {
