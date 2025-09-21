@@ -11,7 +11,7 @@ struct AddingVideoView: View {
     @StateObject private var uploadManager = UploadManager.shared
 
     enum ViewState {
-        case idle, showingThumbnail
+        case idle, loading, showingThumbnail
     }
 
     @State private var viewState = ViewState.idle
@@ -20,6 +20,7 @@ struct AddingVideoView: View {
 
     @Binding private var firebaseVideoURL: String?
     @Binding private var thumbnail: Data?  // ✅ NEW: Binding to reminder.photo
+    @Binding private var isLoading: Bool
 
     var newCardBackground: LinearGradient {
          LinearGradient(
@@ -46,6 +47,48 @@ struct AddingVideoView: View {
                     }
                     .buttonStyle(.plain)
                     .padding()
+                case .loading:
+                    ZStack(alignment: .topTrailing){
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(newCardBackground)
+                            VStack {
+                                Text("Loading Video...")
+                                    .foregroundStyle(.white)
+                                    .font(.headline)
+                                    .padding(.top)
+                                ProgressView()
+                            }
+                        }
+                        Button{
+                            isLoading = false
+                            thumbnailImage = nil
+                            selectedItem = nil
+                            //delete video
+                            firebaseVideoURL = nil
+                            thumbnail = nil
+
+                            viewState = .idle
+
+                        } label: {
+                            Image(systemName: "xmark")
+                                .foregroundStyle(
+                                    colorScheme == .light
+                                    ? .white
+                                    : .black
+                                )
+                                .padding(5)
+                                .background(.red)
+                                .clipShape(.circle)
+                        }
+                        .buttonStyle(.plain)
+                        .offset(x: 10)
+                    }
+                    .frame(minHeight: 300)
+                    .shadow(color: .black.opacity(0.15), radius: 10, y: 5)
+
+
+
                 case .showingThumbnail:
                     if let image = thumbnailImage {
                         ZStack(alignment: .topTrailing){
@@ -67,6 +110,7 @@ struct AddingVideoView: View {
                                       .shadow(color: .black.opacity(0.3), radius: 2)
                             }
                             Button{
+                                isLoading = false
                                 thumbnailImage = nil
                                 selectedItem = nil
                                 //delete video
@@ -119,6 +163,8 @@ struct AddingVideoView: View {
 
 
     func loadVideo() {
+        viewState = .loading
+        isLoading = true
         Task {
             do {
                 if let videoData = try await selectedItem?.loadTransferable(type: Data.self) {
@@ -190,9 +236,10 @@ struct AddingVideoView: View {
             }
         }
     }
-    init(firebaseVideoURL: Binding<String?>, thumbnail: Binding<Data?>) {  // ✅ UPDATED: Added thumbnail parameter
+    init(firebaseVideoURL: Binding<String?>, thumbnail: Binding<Data?>, isLoading: Binding<Bool>) {
         _firebaseVideoURL = firebaseVideoURL
-        _thumbnail = thumbnail  // ✅ NEW: Store thumbnail binding
+        _thumbnail = thumbnail
+        _isLoading = isLoading
     }
 
     
@@ -231,7 +278,7 @@ struct AddingVideoView: View {
 
 
 #Preview {
-    AddingVideoView(firebaseVideoURL: .constant(nil), thumbnail: .constant(nil))
+    AddingVideoView(firebaseVideoURL: .constant(nil), thumbnail: .constant(nil), isLoading: .constant(false))
 }
 
 

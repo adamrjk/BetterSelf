@@ -25,9 +25,10 @@ class Reminder {
     var folder: Folder?
     var pinned: Bool
     var datePinned: Date
-
+    
     var time: Int
     var isShared: Bool
+    var isLoading: Bool
 
 
     init(title: String, type: ReminderType = .InstantInsight,  text: String, photo: Data? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
@@ -44,12 +45,13 @@ class Reminder {
         self.datePinned = .distantPast
         self.time = 0
         self.isShared = false
+        self.isLoading = false
     }
 
     static let example =  Reminder(title: "The One Thing", text: "You can only pursue one goal at a time", firebaseVideoURL: "https://firebasestorage.googleapis.com:443/v0/b/betterself-29f7e.firebasestorage.app/o/videos%2FC29D7FD5-3EEF-417D-BB11-14448E115FFE.mov?alt=media&token=877e7031-36c1-4af0-9941-f85650676519", link: "https://", folder: .example)
 
     var isEmpty: Bool {
-        text.isEmpty && photo == nil && firebaseVideoURL == nil && link.isEmpty
+        text.isEmpty && photo == nil && firebaseVideoURL == nil && link.isEmpty && !isLoading
     }
 
     var isLocked: Bool{

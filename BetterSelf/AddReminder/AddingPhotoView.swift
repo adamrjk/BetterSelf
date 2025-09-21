@@ -38,7 +38,7 @@ struct AddingPhotoView: View {
 
     var body: some View {
         VStack{
-            PhotosPicker(selection: $selectedPhoto) {
+            PhotosPicker(selection: $selectedPhoto, matching: .images) {
                 ZStack {
                     if let image {
                         image

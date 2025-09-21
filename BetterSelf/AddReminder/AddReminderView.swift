@@ -254,7 +254,7 @@ struct AddReminderView: View {
 
 
                 } else {
-                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo)
+                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo, isLoading: $reminder.isLoading)
 
                 }
             case .EchoSnap:

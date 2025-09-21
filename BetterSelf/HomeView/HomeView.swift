@@ -286,7 +286,7 @@ struct HomeView: View {
             if reminder.isEmpty {
                 modelContext.delete(reminder)
             }
-            if (reminder.type != .TimeLessLetter && reminder.photo == nil) {
+            if (reminder.type != .TimeLessLetter && reminder.photo == nil && !reminder.isLoading) {
                 reminder.type = .TimeLessLetter
             }
             reminder.isChecked = true

@@ -165,7 +165,7 @@ struct VideoRecorderView: View {
             }
             .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
                 AddTitleSheet(title: $title)
-                    .presentationDetents([.medium])
+                    .presentationDetents([.height(300)])
             }
 
         }

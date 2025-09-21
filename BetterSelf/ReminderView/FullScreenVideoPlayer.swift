@@ -16,6 +16,7 @@ struct CustomVideoPlayer: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
         controller.player = player
+        controller.videoGravity = .resizeAspectFill
 
         // Disable AirPlay
 //        controller.allowsPictureInPicturePlayback = false
@@ -71,13 +72,13 @@ struct FullScreenVideoPlayer: View {
                 } else if let player = player {
                     // Video player
                     CustomVideoPlayer(player: player)
-                        .clipped()
 //                        .frame(maxWidth: .infinity, maxHeight: .infinity)
 //                        .ignoresSafeArea()
 
 
                 }
             }
+            .ignoresSafeArea(.container, edges: .bottom)
             .onAppear {
                 setupPlayer()
             }
@@ -100,6 +101,7 @@ struct FullScreenVideoPlayer: View {
                     // Create player on main thread
                     await MainActor.run {
                         self.player = AVPlayer(playerItem: AVPlayerItem(asset: asset))
+
                         self.isLoading = false
 
                         // Start playing
@@ -132,3 +134,4 @@ struct FullScreenVideoPlayer: View {
 #Preview {
     FullScreenVideoPlayer(videoURL: URL(string: Reminder.example.firebaseVideoURL!)! )
 }
+

@@ -17,13 +17,13 @@ struct InstantInsightView: View {
 
                     FullScreenVideoPlayer(videoURL: url)
                         .ignoresSafeArea(.all, edges: .top)
-                        .scaledToFill()
+//                        .scaledToFill()
                         .frame(width: proxy.size.width)
                 }
 
             }
         }
-        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
         .statusBarHidden()
     }
 }
