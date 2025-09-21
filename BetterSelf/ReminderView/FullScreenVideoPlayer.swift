@@ -22,13 +22,38 @@ struct CustomVideoPlayer: UIViewControllerRepresentable {
 //        controller.allowsPictureInPicturePlayback = false
         // Hide AirPlay button
         controller.showsPlaybackControls = true
-//        controller.contentOverlayView?.isHidden = false
+
+        // Apply 3D rotation only to the video content (not the controls)
+        // Ensure subviews are laid out first
+        controller.view.setNeedsLayout()
+        controller.view.layoutIfNeeded()
+
+        DispatchQueue.main.async {
+            if let videoView = findPlayerContentView(in: controller.view) {
+                var transform = CATransform3DIdentity
+                transform.m34 = -1.0 / 500.0 // perspective
+                transform = CATransform3DRotate(transform, .pi, 0, 1, 0) // 180 degrees around Y-axis
+                videoView.layer.transform = transform
+            }
+        }
 
         return controller
 
     }
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
 
+    private func findPlayerContentView(in root: UIView) -> UIView? {
+        // Look for a view whose layer tree contains an AVPlayerLayer.
+        if let sublayers = root.layer.sublayers, sublayers.contains(where: { $0 is AVPlayerLayer }) {
+            return root
+        }
+        for subview in root.subviews {
+            if let match = findPlayerContentView(in: subview) {
+                return match
+            }
+        }
+        return nil
+    }
 }
 
 
@@ -72,6 +97,7 @@ struct FullScreenVideoPlayer: View {
                 } else if let player = player {
                     // Video player
                     CustomVideoPlayer(player: player)
+//                        .rotation3DEffect(.degrees(180), axis: (x: 0  , y: 1, z: 0))
 //                        .frame(maxWidth: .infinity, maxHeight: .infinity)
 //                        .ignoresSafeArea()
 

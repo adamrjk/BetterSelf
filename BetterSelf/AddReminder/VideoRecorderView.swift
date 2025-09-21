@@ -29,7 +29,7 @@ struct VideoRecorderView: View {
     }
 
     var newCardBackground: LinearGradient {
-         LinearGradient(
+        LinearGradient(
             colors: [
                 colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
                 colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
@@ -228,7 +228,7 @@ struct VideoRecorderView: View {
             }
         }
     }
-    
+
 
 }
 
@@ -239,7 +239,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     let sourceType: UIImagePickerController.SourceType
     let mediaTypes: [String]
     let onVideoRecorded: (URL) -> Void
-    
+
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.sourceType = sourceType
@@ -247,18 +247,18 @@ struct ImagePicker: UIViewControllerRepresentable {
         picker.videoQuality = .typeHigh
         picker.allowsEditing = false
         picker.delegate = context.coordinator
-        
+
         // Default to front camera (selfie mode)
         picker.cameraDevice = .front
-        
+
         // Respect user camera settings (don't override mirroring, etc.)
         picker.cameraCaptureMode = .video
-        
+
         return picker
     }
-    
+
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
@@ -268,11 +268,11 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         let parent: ImagePicker
-        
+
         init(_ parent: ImagePicker) {
             self.parent = parent
         }
-        
+
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let videoURL = info[.mediaURL] as? URL {
                 // Video was recorded, call the callback
@@ -282,11 +282,11 @@ struct ImagePicker: UIViewControllerRepresentable {
             }
             picker.dismiss(animated: true)
         }
-        
+
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             picker.dismiss(animated: true)
         }
-        
+
         // Allow camera switching during recording
         func imagePickerController(_ picker: UIImagePickerController, didChangeCameraDevice cameraDevice: UIImagePickerController.CameraDevice) {
             // This method is called when user switches between front/back camera
@@ -298,3 +298,4 @@ struct ImagePicker: UIViewControllerRepresentable {
 #Preview {
     VideoRecorderView()
 }
+
