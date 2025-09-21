@@ -28,9 +28,12 @@ struct ContentView: View {
         unlockedReminders.filter{ $0.pinned }
     }
 
+    @State private var tabPage: Int = 0
+
     var body: some View {
-        TabView {
+        TabView(selection: $tabPage) {
             FolderView(notifReminder: $notifReminder)
+                .tag(0)
                 .tabItem{
                     Label("Reminders", systemImage: "list.bullet")
 
@@ -39,27 +42,29 @@ struct ContentView: View {
 
 
             ProblemSolverView()
+                .tag(1)
                 .tabItem{
                     Label("ProblemSolver", systemImage: "lightbulb.fill")
                         .imageScale(.small)
 
                 }
                 .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
-
-            ExploreView()
-                .tabItem{
-                    Label("Explore", systemImage: "magnifyingglass")
-                }
-                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
-
-            SettingsView()
-                .tabItem{
-                    Label("Settings", systemImage: "gear")
-                }
-                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
+            
+//            ExploreView()
+//                .tabItem{
+//                    Label("Explore", systemImage: "magnifyingglass")
+//                }
+//                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
+//
+//            SettingsView()
+//                .tabItem{
+//                    Label("Settings", systemImage: "gear")
+//                }
+//                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
         }
         .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
             if shouldNavigate, let reminder = notificationManager.reminder {
+                tabPage = 0
                 notifReminder = reminder
                 notificationManager.shouldNavigateToReminder = false
             }
@@ -67,8 +72,6 @@ struct ContentView: View {
         .onChange(of: notificationManager.sharedReminder){
             if notificationManager.sharedReminder {
                 if let url = UserDefaults(suiteName: "group.adam.betterself")?.value(forKey: "incomingURL") as? String {
-                    print("Got the link")
-                    print("In ContentView I have: \(url)")
                     UserDefaults(suiteName: "group.adam.betterself")?.removeObject(forKey: "incomingURL")
                     guard let range = url.range(of: "url=") else { return }
                     let link = String(url[range.upperBound...])  // everything after "url="
@@ -76,6 +79,9 @@ struct ContentView: View {
                     modelContext.insert(reminder)
                     reminder.isChecked = true
                     reminder.type = .TimeLessLetter
+                    reminder.isShared = true
+                    tabPage = 0
+                    notificationManager.showSharedReminderSheet = true
                     notifReminder = reminder
                     notificationManager.sharedReminder = false
 

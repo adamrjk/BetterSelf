@@ -2,15 +2,26 @@ import UIKit
 import Social
 import CoreServices
 import UniformTypeIdentifiers
+import SwiftUI
 
 
 
 class ShareViewController: UIViewController {
-    //    private let typeText = String(UTType.plainText)
-    //    private let typeURL = String(UTType.url)
     private var appURLString = "betterself://home?url="
     private let groupName = "group.adam.betterself"
     private let urlDefaultName = "incomingURL"
+
+    override func loadView() {
+
+           let view = UIView()
+           view.backgroundColor = .clear
+           view.frame = .zero
+           self.view = view
+
+    }
+
+
+
 
     func open(_ url: URL) -> Void {
         var responder: UIResponder? = self
@@ -27,7 +38,7 @@ class ShareViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
         // Get the all encompasing object that holds whatever was shared. If not, dismiss view.
         guard let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem,
               let itemProvider = extensionItem.attachments?.first else {
@@ -44,10 +55,6 @@ class ShareViewController: UIViewController {
             print("Error: No url or text found")
             self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
         }
-
-
-        saveURLString(appURLString)
-        self.openMainApp()
     }
 
     private func openMainApp() {
@@ -79,6 +86,9 @@ class ShareViewController: UIViewController {
                 else {
                     print("Unsupported type:", type(of: item))
                 }
+                self.saveURLString(self.appURLString)
+                self.openMainApp()
+
             }
         }
     }
@@ -101,6 +111,8 @@ class ShareViewController: UIViewController {
                     // Get first URL found
                     if let firstMatch = matches.first, let range = Range(firstMatch.range, in: text) {
                         self.appURLString += text[range]
+                        self.saveURLString(self.appURLString)
+                        self.openMainApp()
                     }
                 } catch let error {
                     print("Do-Try Error: \(error.localizedDescription)")

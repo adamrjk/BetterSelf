@@ -17,7 +17,6 @@ struct AddReminderView: View {
     @Bindable var reminder: Reminder
 
     @State private var refuseSaving = false
-    @State private var isYoutube = false
     @State private var startTime = false
 
     enum AddReminderPage: Hashable { case main, description }
@@ -26,7 +25,7 @@ struct AddReminderView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var newCardBackground: LinearGradient {
-         LinearGradient(
+        LinearGradient(
             colors: [
                 colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
                 colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
@@ -59,13 +58,13 @@ struct AddReminderView: View {
                                 .focused($keyboard)
                                 .foregroundStyle(.primary)
                                 .background(
-                                       RoundedRectangle(cornerRadius: 12)
-                                           .fill(Color(.systemGray6)) // Automatically adapts
-                                           .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color(.systemGray6)) // Automatically adapts
+                                        .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
                                 )
                                 .overlay(
-                                       RoundedRectangle(cornerRadius: 12)
-                                           .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.primary.opacity(0.2), lineWidth: 1)
                                 )
 
                         }
@@ -99,11 +98,11 @@ struct AddReminderView: View {
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
-                         
+
                         TabView(selection: $selectedPage) {
 
-                            MainTabContent(reminder: reminder, keyboard: $keyboard, isYoutube: $isYoutube)
-                                    .tag(AddReminderPage.main)
+                            MainTabContent(reminder: reminder, keyboard: $keyboard)
+                                .tag(AddReminderPage.main)
                             if reminder.type != .TimeLessLetter {
                                 AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
                                     .tag(AddReminderPage.description)
@@ -120,14 +119,14 @@ struct AddReminderView: View {
                                 .focused($keyboard)
                                 .foregroundStyle(.primary)
                                 .background(
-                                       RoundedRectangle(cornerRadius: 12)
-                                           .fill(Color(.systemGray6)) // Automatically adapts
-                                           .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
-                                   )
-                                   .overlay(
-                                       RoundedRectangle(cornerRadius: 12)
-                                           .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                                   )
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color(.systemGray6)) // Automatically adapts
+                                        .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                                )
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 16)
@@ -144,7 +143,7 @@ struct AddReminderView: View {
                 }
             }
             .animation(.smooth, value: keyboard)
-//            .animation(.smooth, value: reminder.type)
+            //            .animation(.smooth, value: reminder.type)
             .navigationTitle("New Reminder")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
@@ -205,15 +204,17 @@ struct AddReminderView: View {
                 RefuseSavingView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
                     .presentationDetents([.height(300)])
             }
-            .onChange(of: reminder.link){ oldV, newV in
-                checkIfYoutube(newV)
+            .onChange(of: reminder.isYoutube){ oldV, newV in
+                if newV {
+                    youtubeHandling()
+                }
 
             }
-            .onChange(of: reminder.type) { _, newType in
-                if newType == .TimeLessLetter && selectedPage == .description {
-                    selectedPage = .main
-                }
-            }
+            //            .onChange(of: reminder.type) { _, newType in
+            //                if newType == .TimeLessLetter && selectedPage == .description {
+            //                    selectedPage = .main
+            //                }
+            //            }
 
 
         }
@@ -221,44 +222,66 @@ struct AddReminderView: View {
     }
 
     struct MainTabContent: View {
+        @Environment(\.colorScheme) var colorScheme
         @Bindable var reminder: Reminder
         @FocusState.Binding var keyboard: Bool
-        @Binding var isYoutube: Bool
         var body: some View {
             switch reminder.type {
-                  case .InstantInsight:
-                        if isYoutube {
-                            YoutubeView(isPlayable: false, youtubeId: getId(reminder.link) ?? "", time: $reminder.time)
+            case .InstantInsight:
+                if reminder.isYoutube {
+                    ZStack(alignment: .topTrailing){
 
-                      } else {
-                          AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo)
-          
-                      }
-                  case .EchoSnap:
-                       AddingPhotoView(photo: $reminder.photo)
-                  default:
-                      AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
-                  }
+                        YouTubeThumbnailView(videoURL: reminder.link, type: .addReminder)
+
+                        Button{
+                            reminder.link = ""
+
+                        } label: {
+                            Image(systemName: "xmark")
+                                .foregroundStyle(
+                                    colorScheme == .light
+                                    ? .white
+                                    : .black
+                                )
+                                .padding(5)
+                                .background(.red)
+                                .clipShape(.circle)
+                        }
+                        .buttonStyle(.plain)
+                        .offset(x: 10)
+                    }
+                    .padding(.horizontal, 20)
+
+
+                } else {
+                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo)
+
+                }
+            case .EchoSnap:
+                AddingPhotoView(photo: $reminder.photo)
+            default:
+                AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
+            }
 
         }
         func getId(_ link: String) -> String? {
             let patterns = [
-                  "youtube\\.com/watch\\?v=([a-zA-Z0-9_-]{11})",
-                  "youtu\\.be/([a-zA-Z0-9_-]{11})",
-                  "youtube\\.com/embed/([a-zA-Z0-9_-]{11})"
-              ]
+                "youtube\\.com/watch\\?v=([a-zA-Z0-9_-]{11})",
+                "youtu\\.be/([a-zA-Z0-9_-]{11})",
+                "youtube\\.com/embed/([a-zA-Z0-9_-]{11})"
+            ]
 
-              for pattern in patterns {
-                  if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-                      let range = NSRange(link.startIndex..<link.endIndex, in: link)
-                      if let match = regex.firstMatch(in: link, options: [], range: range) {
-                          if let idRange = Range(match.range(at: 1), in: link) {
-                              return String(link[idRange])
-                          }
-                      }
-                  }
-              }
-              return nil
+            for pattern in patterns {
+                if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                    let range = NSRange(link.startIndex..<link.endIndex, in: link)
+                    if let match = regex.firstMatch(in: link, options: [], range: range) {
+                        if let idRange = Range(match.range(at: 1), in: link) {
+                            return String(link[idRange])
+                        }
+                    }
+                }
+            }
+            return nil
 
         }
     }
@@ -268,18 +291,14 @@ struct AddReminderView: View {
 
 
 
-    func checkIfYoutube(_ link: String){
-        if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
-            isYoutube = true
-            startTime = true
-            reminder.type = .InstantInsight
-            selectedPage = .main
+    func youtubeHandling(){
+        startTime = true
+        reminder.type = .InstantInsight
+        selectedPage = .main
 
 
-        }
-        else {
-            isYoutube = false
-        }
+
+
 
 
     }

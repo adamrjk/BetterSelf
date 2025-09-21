@@ -16,24 +16,32 @@ struct AddTitleSheet: View {
 
     
     @FocusState var keyboard: Bool
-    @Binding private var title: String
+    @Binding var title: String
 
     @Environment(\.colorScheme) var colorScheme
 
 
 
-    var body: some View {
-        NavigationView {
-            ZStack {
-                Color.purpleMainGradient
-                    .ignoresSafeArea()
-                Color.purpleOverlayGradient
-                    .ignoresSafeArea()
 
+    var newCardBackground: LinearGradient {
+        LinearGradient(
+            colors: [
+                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
+                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                 Color.clear
 
                 VStack(spacing: 20){
                     Spacer()
-
                     VStack(alignment: .leading, spacing: 12) {
 
                         CleanText("Title")
@@ -54,67 +62,72 @@ struct AddTitleSheet: View {
                     .padding(.vertical, 16)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Color.cardBackground)
+                            .fill(newCardBackground)
                             .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                     )
                     .padding(.horizontal, 16)
+
                     Spacer()
                     Spacer()
+
 
                 }
-                .overlay(
-                    VStack {
-                        Spacer()  // ← This pushes the button to the bottom of the screen
-                        if keyboard {
-                            HStack {
-                                Spacer()
-                                Button{
-                                    keyboard = false
-                                } label: {
-                                    Image(systemName: "arrow.down")
-                                        .foregroundStyle(.primary)
-                                        .padding()
-                                        .background(
-                                            colorScheme == .light
-                                            ? .white
-                                            : Color( red: 0.318, green: 0.318, blue: 0.318)
 
-                                        )
-                                        .clipShape(.circle)
-                                        .padding(.trailing)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            .padding(.bottom, 8)  // ← This adds 8 points of space below the button
-                        }
-                    }
-                )
-                .padding(.top, 20)
-                .navigationTitle("Add a Title")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button{
-                            dismiss()
-                        } label: {
-                            Text("Save")
-                                .foregroundStyle(.primary)
+            }
+            .navigationTitle("Add a Title")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button{
+                        dismiss()
+                    } label: {
+                        Text("Save")
+                            .foregroundStyle(.primary)
+                            .background(Color.clear)
 
-                        }
-                        .buttonStyle(.plain)
                     }
+                    .buttonStyle(.plain)
                 }
             }
+            .animation(.smooth, value: keyboard)
+            .overlay(
+                VStack {
+                    Spacer()  // ← This pushes the button to the bottom of the screen
+                    if keyboard {
+                        HStack {
+                            Spacer()
+                            Button{
+                                keyboard = false
+                            } label: {
+                                Image(systemName: "arrow.down")
+                                    .foregroundStyle(.primary)
+                                    .padding()
+                                    .background(
+                                        colorScheme == .light
+                                        ? .white
+                                        : Color( red: 0.318, green: 0.318, blue: 0.318)
+
+                                    )
+                                    .clipShape(.circle)
+                                    .padding(.trailing)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.bottom, 8 )  // ← This adds 8 points of space below the button
+                    }
+                }
+            )
         }
-        .presentationDetents([.medium])
     }
     init(title: Binding<String>){
-        _title = title
+        _title = title        
     }
 
 
     
 }
 
-#Preview {
-    AddTitleSheet(title: .constant("Hello World"))
-}
+//#Preview {
+//    AddTitleSheet(title: .constant("Hello World"))
+//}
+

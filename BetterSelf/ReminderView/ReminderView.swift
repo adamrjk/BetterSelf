@@ -25,7 +25,6 @@ struct ReminderView: View {
     @State private var edit = false
     @State private var detailSheet = false
     @State var reminder: Reminder
-    @State private var isYoutube = false
 
     private var primaryColor: Color {
         reminder.type == .InstantInsight
@@ -47,7 +46,7 @@ struct ReminderView: View {
 
     var body: some View {
         Group {
-            if checkIfYoutube(reminder.link) {
+            if reminder.isYoutube {
                 SharedLinkView(link: reminder.link, time: $reminder.time)
             }
             else if reminder.onlyLink {
@@ -116,7 +115,7 @@ struct ReminderView: View {
                     }
 
                 }
-                if !reminder.link.isEmpty && !checkIfYoutube(reminder.link) && !reminder.onlyLink{
+                if !reminder.link.isEmpty && !reminder.isYoutube && !reminder.onlyLink{
                     ToolbarItem(placement: .topBarTrailing){
                         Button("Access Link", systemImage: "link.circle.fill"){
                             detailSheet.toggle()
@@ -144,6 +143,15 @@ struct ReminderView: View {
 
         }
         .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
+        .sheet(isPresented: $reminder.isShared){
+            AddTitleSheet(title: $reminder.title)
+                .presentationDetents([.height(300)])
+
+
+
+
+
+        }
 
 
         .sheet(isPresented: $edit){
@@ -169,16 +177,7 @@ struct ReminderView: View {
 
 
     }
-    func checkIfYoutube(_ link: String) -> Bool{
-        if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
-            return true
-        }
-        else {
-            return false
-        }
 
-
-    }
 
 
 

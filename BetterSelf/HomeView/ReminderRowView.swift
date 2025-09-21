@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ReminderRowView: View {
-    let reminder: Reminder
+    @State var reminder: Reminder
 
     @State var isPreview: Bool
     var body: some View {
@@ -29,6 +29,14 @@ struct ReminderRowView: View {
                     )
                     .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
             }
+            else if reminder.isYoutube {
+
+                YouTubeThumbnailView(videoURL: reminder.link, type: isPreview ? .preview : .reminderRow)
+
+
+
+            }
+
             // Content section with improved typography
             VStack(alignment: .leading, spacing: 6) {
                 Text(reminder.title)
@@ -87,6 +95,26 @@ struct ReminderRowView: View {
             return nil
         }
         return Image(uiImage: uiImage)
+    }
+    func getId(_ link: String) -> String? {
+        let patterns = [
+              "youtube\\.com/watch\\?v=([a-zA-Z0-9_-]{11})",
+              "youtu\\.be/([a-zA-Z0-9_-]{11})",
+              "youtube\\.com/embed/([a-zA-Z0-9_-]{11})"
+          ]
+
+          for pattern in patterns {
+              if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                  let range = NSRange(link.startIndex..<link.endIndex, in: link)
+                  if let match = regex.firstMatch(in: link, options: [], range: range) {
+                      if let idRange = Range(match.range(at: 1), in: link) {
+                          return String(link[idRange])
+                      }
+                  }
+              }
+          }
+          return nil
+
     }
 }
 
