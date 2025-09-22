@@ -1,5 +1,5 @@
 {
-  "originHash" : "c63c63846d9c539229e96de38d6af51417e28c0ee9a0bc48bd0f0f19d923c329",
+  "originHash" : "855ef651f810865db238065b226fc6a46f46a4322d2723896bef1e3ceee76bac",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "bbe8b69694d7873315fd3a4ad41efe043e1c07c5",
         "version" : "1.2024072200.0"
+      }
+    },
+    {
+      "identity" : "aespa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/enebin/Aespa.git",
+      "state" : {
+        "revision" : "66a9face7d4ab96f184650b0e006bcd8bce8f4c2",
+        "version" : "0.5.3"
       }
     },
     {
@@ -125,6 +134,24 @@
       "state" : {
         "revision" : "102a647b573f60f73afdce5613a51d71349fe507",
         "version" : "1.30.0"
+      }
+    },
+    {
+      "identity" : "youtube-ios-player-helper",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/youtube/youtube-ios-player-helper",
+      "state" : {
+        "revision" : "f57129cd4380ec0a74dd3a59da3270a1d653d59b",
+        "version" : "1.0.4"
+      }
+    },
+    {
+      "identity" : "youtubeplayerkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SvenTiigi/YouTubePlayerKit",
+      "state" : {
+        "revision" : "c2665adb3c743b52dd9fde856db46480284ecca4",
+        "version" : "2.0.2"
       }
     }
   ],

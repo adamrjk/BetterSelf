@@ -20,6 +20,7 @@ struct ReminderRowView: View {
             if let image = loadImage(reminder) {
                 image
                     .resizable()
+                    .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
                     .scaledToFill()
                     .frame(width: isPreview ? 40 : 80, height: isPreview ? 40 : 80)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))

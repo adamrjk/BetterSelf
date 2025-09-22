@@ -15,6 +15,9 @@ struct StartTimeView: View {
     @State private var minutes: Int
     @State private var hours: Int
     @Environment(\.colorScheme) var colorScheme
+
+    let saveTime: (Int) -> Void
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -31,6 +34,7 @@ struct StartTimeView: View {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
                         time = hours * 3600 + minutes * 60 + seconds
+                        saveTime(time)
                         dismiss()
                         
                     } label: {
@@ -41,8 +45,9 @@ struct StartTimeView: View {
             }
         }
     }
-    init(time: Binding<Int>) {
+    init(time: Binding<Int>, saveTime: @escaping (Int) -> Void) {
         _time = time
+        self.saveTime = saveTime
         let seconds = time.wrappedValue
         hours = seconds / 3600
         minutes = ( seconds % 3600 ) / 60
@@ -117,6 +122,6 @@ struct TimeSelector: View {
     }
 }
 
-#Preview {
-    StartTimeView(time: .constant(10))
-}
+//#Preview {
+//    StartTimeView(time: .constant(10))
+//}

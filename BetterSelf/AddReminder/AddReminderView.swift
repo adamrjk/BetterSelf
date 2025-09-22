@@ -196,7 +196,8 @@ struct AddReminderView: View {
                 }
             )
             .sheet(isPresented: $startTime){
-                StartTimeView(time: $reminder.time)
+                StartTimeView(time: $reminder.time){ _ in
+                }
                     .presentationDetents([.height(300)])
 
             }

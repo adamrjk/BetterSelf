@@ -12,28 +12,27 @@ import SwiftUI
 
 struct CustomVideoPlayer: UIViewControllerRepresentable {
     let player: AVPlayer
-
+    let isFront: Bool
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
         controller.player = player
         controller.videoGravity = .resizeAspectFill
-
-        // Disable AirPlay
-//        controller.allowsPictureInPicturePlayback = false
-        // Hide AirPlay button
         controller.showsPlaybackControls = true
+        controller.allowsPictureInPicturePlayback = false
 
         // Apply 3D rotation only to the video content (not the controls)
         // Ensure subviews are laid out first
-        controller.view.setNeedsLayout()
-        controller.view.layoutIfNeeded()
+        if isFront {
+            controller.view.setNeedsLayout()
+            controller.view.layoutIfNeeded()
 
-        DispatchQueue.main.async {
-            if let videoView = findPlayerContentView(in: controller.view) {
-                var transform = CATransform3DIdentity
-                transform.m34 = -1.0 / 500.0 // perspective
-                transform = CATransform3DRotate(transform, .pi, 0, 1, 0) // 180 degrees around Y-axis
-                videoView.layer.transform = transform
+            DispatchQueue.main.async {
+                if let videoView = findPlayerContentView(in: controller.view) {
+                    var transform = CATransform3DIdentity
+                    transform.m34 = -1.0 / 500.0 // perspective
+                    transform = CATransform3DRotate(transform, .pi, 0, 1, 0) // 180 degrees around Y-axis
+                    videoView.layer.transform = transform
+                }
             }
         }
 
@@ -62,6 +61,7 @@ struct CustomVideoPlayer: UIViewControllerRepresentable {
 
 struct FullScreenVideoPlayer: View {
     let videoURL: URL
+    let isFront: Bool
     @Environment(\.dismiss) var dismiss
     @State private var player: AVPlayer?
     @State private var isLoading = true
@@ -96,11 +96,7 @@ struct FullScreenVideoPlayer: View {
                     }
                 } else if let player = player {
                     // Video player
-                    CustomVideoPlayer(player: player)
-//                        .rotation3DEffect(.degrees(180), axis: (x: 0  , y: 1, z: 0))
-//                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                        .ignoresSafeArea()
-
+                    CustomVideoPlayer(player: player, isFront: isFront)
 
                 }
             }
@@ -157,7 +153,7 @@ struct FullScreenVideoPlayer: View {
 
 
 
-#Preview {
-    FullScreenVideoPlayer(videoURL: URL(string: Reminder.example.firebaseVideoURL!)! )
-}
+//#Preview {
+//    FullScreenVideoPlayer(videoURL: URL(string: Reminder.example.firebaseVideoURL!)! )
+//}
 

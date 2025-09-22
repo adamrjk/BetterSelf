@@ -32,6 +32,9 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $tabPage) {
+
+
+
             FolderView(notifReminder: $notifReminder)
                 .tag(0)
                 .tabItem{

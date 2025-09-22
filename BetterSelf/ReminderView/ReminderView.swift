@@ -47,10 +47,10 @@ struct ReminderView: View {
     var body: some View {
         Group {
             if reminder.isYoutube {
-                SharedLinkView(link: reminder.link, time: $reminder.time)
+                SharedLinkView(link: reminder.link, time: $reminder.time, text: reminder.text)
             }
             else if reminder.onlyLink {
-                SharedLinkView(link: reminder.link, time: $reminder.time)
+                SharedLinkView(link: reminder.link, time: $reminder.time, text: "")
             }
             else {
                 switch reminder.type {
@@ -146,7 +146,7 @@ struct ReminderView: View {
                 .presentationDetents([.medium, .large])
             }
             else {
-                SharedLinkView(link: reminder.link, time: $reminder.time)
+                SharedLinkView(link: reminder.link, time: $reminder.time, text: "")
             }
 
 

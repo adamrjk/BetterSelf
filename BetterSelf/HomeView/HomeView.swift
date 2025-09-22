@@ -67,8 +67,6 @@ struct HomeView: View {
 
 
 
-
-
     var newCardBackground: LinearGradient {
          LinearGradient(
             colors: [

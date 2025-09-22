@@ -11,10 +11,12 @@ struct SharedLinkView: View {
     @State private var reel = true
     let link: String
 
+
     @State private var type: LinkType
     @State private var shortType: ShortType = .instaReel
 
     @Binding var time: Int
+    let text: String
 
     var body: some View {
         
@@ -26,7 +28,10 @@ struct SharedLinkView: View {
 
             switch type {
             case .youtube:
-                YoutubeView(isPlayable: true, youtubeId: getYoutubeId() ?? "", time: $time)
+//                YoutubeView(isPlayable: true, youtubeId: getYoutubeId() ?? "", time: $time)
+                YoutubeView(videoURL: link,  time: $time, text: text)
+
+
             case .shortForm:
                 ArticleView(link: link)
             
@@ -160,9 +165,10 @@ struct SharedLinkView: View {
         return nil
     }
 
-    init(link: String, time: Binding<Int>) {
+    init(link: String, time: Binding<Int>, text: String) {
         #warning("Work on shorts handling")
         self.link = link
+        self.text = text
         _time = time
 
         if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {

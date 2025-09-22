@@ -2,10 +2,12 @@ import SwiftUI
 import UIKit
 import Photos
 import AVKit
+import Aespa
 
 struct VideoRecorderView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
+
 
     @StateObject private var uploadManager = UploadManager.shared
     @Environment(\.colorScheme) var colorScheme
@@ -42,11 +44,13 @@ struct VideoRecorderView: View {
 
 
 
-
     @State private var showingImagePicker = false
     @State private var recordedVideoURL: URL?
+    @State private var isFront: Bool?
     @State private var videoRecorded = false
     @State private var title = ""
+
+
 
     var body: some View {
         NavigationView {
@@ -89,6 +93,7 @@ struct VideoRecorderView: View {
                     // Record button
                     Button(action: {
                         showingImagePicker = true
+
                     }) {
                         HStack(spacing: 12) {
                             Image(systemName: "camera.fill")
@@ -158,10 +163,12 @@ struct VideoRecorderView: View {
             }
 
             .sheet(isPresented: $showingImagePicker) {
-                ImagePicker(sourceType: .camera, mediaTypes: ["public.movie"], onVideoRecorded: { url in
+                RecordingView(onVideoRecorded: { url, isFront in
                     recordedVideoURL = url
+                    self.isFront = isFront
                     videoRecorded.toggle()
                 })
+
             }
             .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
                 AddTitleSheet(title: $title)
@@ -176,6 +183,9 @@ struct VideoRecorderView: View {
             text: "",
             link: ""
         )
+        if let front = self.isFront {
+            reminder.isFront = front
+        }
         reminder.isChecked = true
         modelContext.insert(reminder)
 
@@ -230,69 +240,7 @@ struct VideoRecorderView: View {
     }
 
 
-}
 
-// UIImagePickerController wrapper for SwiftUI
-struct ImagePicker: UIViewControllerRepresentable {
-    @Environment(\.dismiss) var dismiss
-
-    let sourceType: UIImagePickerController.SourceType
-    let mediaTypes: [String]
-    let onVideoRecorded: (URL) -> Void
-
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = sourceType
-        picker.mediaTypes = mediaTypes
-        picker.videoQuality = .typeHigh
-        picker.allowsEditing = false
-        picker.delegate = context.coordinator
-
-        // Default to front camera (selfie mode)
-        picker.cameraDevice = .front
-
-        // Respect user camera settings (don't override mirroring, etc.)
-        picker.cameraCaptureMode = .video
-
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    func dimissImagePicker(){
-        dismiss()
-    }
-
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: ImagePicker
-
-        init(_ parent: ImagePicker) {
-            self.parent = parent
-        }
-
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let videoURL = info[.mediaURL] as? URL {
-                // Video was recorded, call the callback
-                parent.onVideoRecorded(videoURL)
-                parent.dismiss()
-
-            }
-            picker.dismiss(animated: true)
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            picker.dismiss(animated: true)
-        }
-
-        // Allow camera switching during recording
-        func imagePickerController(_ picker: UIImagePickerController, didChangeCameraDevice cameraDevice: UIImagePickerController.CameraDevice) {
-            // This method is called when user switches between front/back camera
-            // The picker automatically handles the switch, we just let it happen
-        }
-    }
 }
 
 #Preview {
