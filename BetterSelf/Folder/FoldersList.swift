@@ -9,6 +9,7 @@ import LocalAuthentication
 import SwiftData
 import SwiftUI
 import UserNotifications
+import WidgetKit
 
 struct FoldersList: View {
     @Environment(\.modelContext) var modelContext
@@ -196,7 +197,8 @@ struct FoldersList: View {
             
         }
         .animation(.smooth, value: pinned)
-        .onChange(of: pinned){
+        .onChange(of: pinned){ _, newValue in
+            storePinnedReminders(newValue)
             if let last = pinned.last{
                 addNotification(for: last)
             }
@@ -246,6 +248,53 @@ struct FoldersList: View {
             showAlert = true
         }
     }
+    func storePinnedReminders(_ newValue: [Reminder]){
+        UserDefaults(suiteName: "group.adam.betterself")?.removeObject(forKey: "PinnedReminders")
+        var pinnedReminders: [ReminderSnapShot] = []
+        pinned.forEach{ reminder in
+            if !reminder.isLocked {
+                var photoURL: String? = nil
+                if let photo = reminder.photo {
+                    photoURL = storePhotoForWidget(data: photo, id: UUID())
+                }
+                let snapShot = ReminderSnapShot(id: reminder.id, title: reminder.title, text: reminder.text, photoURL: photoURL, link: reminder.link, isFront: reminder.isFront)
+                pinnedReminders.append(snapShot)
+            }
+        }
+
+
+        if let data = try? JSONEncoder().encode(pinnedReminders) {
+            UserDefaults(suiteName: "group.adam.betterself")?.set(data, forKey: "PinnedReminders")
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+        else {
+            print("Failed to Encode Reminders")
+        }
+    }
+
+    func storePhotoForWidget(data: Data, id: UUID) -> String? {
+        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.adam.betterself") else { return nil }
+
+           let fileURL = containerURL.appendingPathComponent("\(id).png")
+
+           // Resize image to reduce memory
+           if let uiImage = UIImage(data: data),
+              let resizedData = resizeImage(uiImage, targetSize: CGSize(width: 50, height: 50)) {
+               try? resizedData.write(to: fileURL)
+               return fileURL.absoluteString
+           }
+           return nil
+    }
+    func resizeImage(_ image: UIImage, targetSize: CGSize) -> Data? {
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        let resized = renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+        return resized.pngData()
+    }
+
+
+
 
     func addNotification(for reminder: Reminder) {
      

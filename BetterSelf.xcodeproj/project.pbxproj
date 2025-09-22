@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6633FB4A2E81431A00720B21 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6633FB492E81431A00720B21 /* WidgetKit.framework */; };
+		6633FB4C2E81431A00720B21 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6633FB4B2E81431A00720B21 /* SwiftUI.framework */; };
+		6633FB5D2E81431B00720B21 /* BetterSelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6633FB472E81431A00720B21 /* BetterSelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		664AABF62E8006C300A829E1 /* Aespa in Frameworks */ = {isa = PBXBuildFile; productRef = 664AABF52E8006C300A829E1 /* Aespa */; };
 		666EFD212E77D07600F853D3 /* BetterSelfSharing.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 666EFD172E77D07600F853D3 /* BetterSelfSharing.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68C2E5453DB00C80E8F /* FirebaseAnalytics */; };
@@ -18,6 +21,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		6633FB5B2E81431B00720B21 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 666F96B82E4F775D007AE674 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6633FB462E81431A00720B21;
+			remoteInfo = BetterSelfWidgetExtension;
+		};
 		666EFD1F2E77D07600F853D3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 666F96B82E4F775D007AE674 /* Project object */;
@@ -34,6 +44,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				6633FB5D2E81431B00720B21 /* BetterSelfWidgetExtension.appex in Embed Foundation Extensions */,
 				666EFD212E77D07600F853D3 /* BetterSelfSharing.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -42,11 +53,32 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6633FB472E81431A00720B21 /* BetterSelfWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BetterSelfWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		6633FB492E81431A00720B21 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		6633FB4B2E81431A00720B21 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		6633FB672E81535E00720B21 /* BetterSelfWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BetterSelfWidgetExtension.entitlements; sourceTree = "<group>"; };
 		666EFD172E77D07600F853D3 /* BetterSelfSharing.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BetterSelfSharing.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		666F96C02E4F775D007AE674 /* BetterSelf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BetterSelf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6633FB612E81431B00720B21 /* Exceptions for "BetterSelfWidget" folder in "BetterSelfWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6633FB462E81431A00720B21 /* BetterSelfWidgetExtension */;
+		};
+		6633FB632E8149B500720B21 /* Exceptions for "BetterSelf" folder in "BetterSelfWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Folder/Folder.swift,
+				Folder/Sorting.swift,
+				ReminderView/Reminder.swift,
+				Utils/CustomColors.swift,
+			);
+			target = 6633FB462E81431A00720B21 /* BetterSelfWidgetExtension */;
+		};
 		666EFD252E77D07600F853D3 /* Exceptions for "BetterSelfSharing" folder in "BetterSelfSharing" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -64,6 +96,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6633FB4D2E81431A00720B21 /* BetterSelfWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6633FB612E81431B00720B21 /* Exceptions for "BetterSelfWidget" folder in "BetterSelfWidgetExtension" target */,
+			);
+			path = BetterSelfWidget;
+			sourceTree = "<group>";
+		};
 		666EFD182E77D07600F853D3 /* BetterSelfSharing */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -76,6 +116,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				667E327A2E78710C00D0E164 /* Exceptions for "BetterSelf" folder in "BetterSelf" target */,
+				6633FB632E8149B500720B21 /* Exceptions for "BetterSelf" folder in "BetterSelfWidgetExtension" target */,
 			);
 			path = BetterSelf;
 			sourceTree = "<group>";
@@ -83,6 +124,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6633FB442E81431A00720B21 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6633FB4C2E81431A00720B21 /* SwiftUI.framework in Frameworks */,
+				6633FB4A2E81431A00720B21 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		666EFD142E77D07600F853D3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -107,11 +157,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6633FB482E81431A00720B21 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6633FB492E81431A00720B21 /* WidgetKit.framework */,
+				6633FB4B2E81431A00720B21 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		666F96B72E4F775D007AE674 = {
 			isa = PBXGroup;
 			children = (
+				6633FB672E81535E00720B21 /* BetterSelfWidgetExtension.entitlements */,
 				666F96C22E4F775D007AE674 /* BetterSelf */,
 				666EFD182E77D07600F853D3 /* BetterSelfSharing */,
+				6633FB4D2E81431A00720B21 /* BetterSelfWidget */,
+				6633FB482E81431A00720B21 /* Frameworks */,
 				666F96C12E4F775D007AE674 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -121,6 +183,7 @@
 			children = (
 				666F96C02E4F775D007AE674 /* BetterSelf.app */,
 				666EFD172E77D07600F853D3 /* BetterSelfSharing.appex */,
+				6633FB472E81431A00720B21 /* BetterSelfWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -128,6 +191,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6633FB462E81431A00720B21 /* BetterSelfWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6633FB602E81431B00720B21 /* Build configuration list for PBXNativeTarget "BetterSelfWidgetExtension" */;
+			buildPhases = (
+				6633FB432E81431A00720B21 /* Sources */,
+				6633FB442E81431A00720B21 /* Frameworks */,
+				6633FB452E81431A00720B21 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6633FB4D2E81431A00720B21 /* BetterSelfWidget */,
+			);
+			name = BetterSelfWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = BetterSelfWidgetExtension;
+			productReference = 6633FB472E81431A00720B21 /* BetterSelfWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		666EFD162E77D07600F853D3 /* BetterSelfSharing */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 666EFD262E77D07600F853D3 /* Build configuration list for PBXNativeTarget "BetterSelfSharing" */;
@@ -163,6 +248,7 @@
 			);
 			dependencies = (
 				666EFD202E77D07600F853D3 /* PBXTargetDependency */,
+				6633FB5C2E81431B00720B21 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				666F96C22E4F775D007AE674 /* BetterSelf */,
@@ -191,6 +277,9 @@
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					6633FB462E81431A00720B21 = {
+						CreatedOnToolsVersion = 26.0;
+					};
 					666EFD162E77D07600F853D3 = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -221,11 +310,19 @@
 			targets = (
 				666F96BF2E4F775D007AE674 /* BetterSelf */,
 				666EFD162E77D07600F853D3 /* BetterSelfSharing */,
+				6633FB462E81431A00720B21 /* BetterSelfWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6633FB452E81431A00720B21 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		666EFD152E77D07600F853D3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -243,6 +340,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6633FB432E81431A00720B21 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		666EFD132E77D07600F853D3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -260,6 +364,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		6633FB5C2E81431B00720B21 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6633FB462E81431A00720B21 /* BetterSelfWidgetExtension */;
+			targetProxy = 6633FB5B2E81431B00720B21 /* PBXContainerItemProxy */;
+		};
 		666EFD202E77D07600F853D3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 666EFD162E77D07600F853D3 /* BetterSelfSharing */;
@@ -268,6 +377,70 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		6633FB5E2E81431B00720B21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = BetterSelfWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.1;
+				DEVELOPMENT_TEAM = BQ5Q73876K;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BetterSelfWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BetterSelfWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = Adam.BetterSelf.BetterSelfWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6633FB5F2E81431B00720B21 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = BetterSelfWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.1;
+				DEVELOPMENT_TEAM = BQ5Q73876K;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BetterSelfWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BetterSelfWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = Adam.BetterSelf.BetterSelfWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		666EFD232E77D07600F853D3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -538,6 +711,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6633FB602E81431B00720B21 /* Build configuration list for PBXNativeTarget "BetterSelfWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6633FB5E2E81431B00720B21 /* Debug */,
+				6633FB5F2E81431B00720B21 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		666EFD262E77D07600F853D3 /* Build configuration list for PBXNativeTarget "BetterSelfSharing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -11,8 +11,7 @@ import SwiftData
 
 @Model
 class Reminder {
-
-    
+    var id: UUID
     var title: String
     var type: ReminderType
     var text: String
@@ -33,6 +32,7 @@ class Reminder {
 
 
     init(title: String, type: ReminderType = .InstantInsight,  text: String, photo: Data? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
+        self.id = UUID()
         self.title = title
         self.type = type
         self.text = text
@@ -76,6 +76,18 @@ class Reminder {
 
 
 }
+
+struct ReminderSnapShot: Codable, Identifiable{
+    var id: UUID
+    var title: String
+    var text: String
+    var photoURL: String?
+    var link: String
+    var isFront: Bool
+
+
+}
+
 
 enum ReminderType: String, Codable, CaseIterable {
     case InstantInsight = "InstantInsight"

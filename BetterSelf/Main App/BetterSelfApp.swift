@@ -50,8 +50,18 @@ struct BetterSelfApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(NotificationManager.shared)
-                .onOpenURL { _ in
-                    NotificationManager.shared.sharedReminder = true
+                .onOpenURL { url in
+                    if url.absoluteString.localizedStandardContains("url") {
+                        NotificationManager.shared.sharedReminder = true
+                    }
+                    else {
+
+                        guard let range = url.absoluteString.range(of: "reminder=") else { return }
+                        NotificationManager.shared.widgetReminderId = String(url.absoluteString[range.upperBound...])
+                        NotificationManager.shared.widgetReminder = true
+                    }
+
+
 
 
                 }

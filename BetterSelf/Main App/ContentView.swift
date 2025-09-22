@@ -84,7 +84,6 @@ struct ContentView: View {
                     reminder.type = .TimeLessLetter
                     reminder.isShared = true
                     tabPage = 0
-                    notificationManager.showSharedReminderSheet = true
                     notifReminder = reminder
                     notificationManager.sharedReminder = false
 
@@ -95,6 +94,17 @@ struct ContentView: View {
                 else {
                     notificationManager.sharedReminder = false
                 }
+            }
+        }
+        .onChange(of: notificationManager.widgetReminder){
+            if notificationManager.widgetReminder {
+                let id = notificationManager.widgetReminderId
+                let reminder = reminders.first(where: { reminder in
+                    reminder.id.uuidString == id
+                })
+                tabPage = 0
+                notifReminder = reminder
+                notificationManager.widgetReminder = false
             }
         }
 

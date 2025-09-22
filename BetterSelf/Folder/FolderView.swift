@@ -89,6 +89,7 @@ struct FolderView: View {
             }
 
         }
+
     }
 
     func deleteEmptyFolder() {

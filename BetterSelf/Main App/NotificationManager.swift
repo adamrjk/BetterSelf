@@ -17,7 +17,9 @@ class NotificationManager: ObservableObject {
     @Published var reminder: Reminder?
     @Published var shouldNavigateToReminder = false
     @Published var sharedReminder = false
-    @Published var showSharedReminderSheet = false
+    @Published var widgetReminder = false
+    @Published var widgetReminderId: String?
+
 
 
     static let shared = NotificationManager()

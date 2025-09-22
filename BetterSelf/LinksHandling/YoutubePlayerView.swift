@@ -40,31 +40,18 @@ struct YoutubeView: View {
             ZStack {
                 ScrollView {
 
-                    YouTubePlayerView(player){ state in
-                        switch state {
-                        case .idle:
-                            ProgressView()
-                        case .ready:
-                            EmptyView()
-                        case .error:
-                            Label(
-                                "An error occurred.",
-                                systemImage: "xmark.circle.fill"
-                            )
-                            .foregroundStyle(.red)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(16/9, contentMode: .fit)
-                    .scaledToFit()
-                    .cornerRadius(30)
-                    .background(
-                        RoundedRectangle(cornerRadius: 30)
-                            .stroke(Color.purple.opacity(0.2), lineWidth: 1)
-                    )
-                    .shadow(color: .purple.opacity(0.15), radius: 8, x: 0, y: 4)
-                    .shadow(color: .purple.opacity(0.1), radius: 16, x: 0, y: 8)
-                    .padding(.bottom, 8)
+                    YouTubePlayerView(player)
+                        .frame(maxWidth: .infinity)
+                        .aspectRatio(16/9, contentMode: .fit)
+                        .scaledToFit()
+                        .cornerRadius(30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 30)
+                                .stroke(Color.purple.opacity(0.2), lineWidth: 1)
+                        )
+                        .shadow(color: .purple.opacity(0.15), radius: 8, x: 0, y: 4)
+                        .shadow(color: .purple.opacity(0.1), radius: 16, x: 0, y: 8)
+                        .padding(.bottom, 8)
 
                     if !text.isEmpty {
                         DescriptionView(text: text)
