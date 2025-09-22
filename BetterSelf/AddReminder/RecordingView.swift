@@ -7,10 +7,11 @@
 
 import Aespa
 import SwiftUI
+import AVKit
 
 struct RecordingView: View {
     @Environment(\.dismiss) var dismiss
-    @ObservedObject private var viewModel = RecordingViewModel()
+    @Binding var viewModel: RecordingViewModel
 
     @State var isRecording = false
     @State var isFront = true
@@ -18,76 +19,97 @@ struct RecordingView: View {
     let onVideoRecorded: (URL, Bool) -> Void
 
     var body: some View {
-        ZStack {
-            viewModel.preview
-                .frame(minWidth: 0,
-                       maxWidth: .infinity,
-                       minHeight: 0,
-                       maxHeight: .infinity)
-                .edgesIgnoringSafeArea(.all)
+        NavigationStack {
+            ZStack {
+                viewModel.preview
+                    .frame(minWidth: 0,
+                           maxWidth: .infinity,
+                           minHeight: 0,
+                           maxHeight: .infinity)
+                    .edgesIgnoringSafeArea(.all)
 
-            VStack {
-                Spacer()
+                VStack {
+                    Spacer()
 
-                ZStack {
-                    HStack {
+                    ZStack {
+                        HStack {
 
-                        Spacer()
+                            Spacer()
 
-                        // Position change + button
-                        Button(action: {
-                            viewModel.aespaSession.common(.position(position: isFront ? .back : .front))
-                            isFront.toggle()
-
-
-                        }) {
-                            Image(systemName: "arrow.triangle.2.circlepath.camera.fill")
-                                .resizable()
-                                .foregroundColor(.white)
-                                .scaledToFit()
-                                .frame(width: 50, height: 50)
-                                .padding(20)
-                                .padding(.trailing, 20)
-                        }
-                        .shadow(radius: 5)
-                        .contentShape(Rectangle())
-                    }
-
-                    // Shutter + button
-                    recordingButtonShape(width: 60).onTapGesture {
-                        if isRecording {
-                            viewModel.aespaSession.stopRecording{ result in
-                                switch result {
-                                case .success(let videoFile):
-                                    if let url = videoFile.path {
-
-                                        onVideoRecorded(url, isFront)
+                            // Position change + button
+                            Button(action: {
+                                viewModel.aespaSession.common(.position(position: isFront ? .back : .front))
+                                isFront.toggle()
 
 
-                                    }
-                                    else {
-                                        print("No Valid URL")
-                                    }
-                                    dismiss()
-                                case .failure(let error):
-                                    print("Error \(error.localizedDescription)")
-                                    dismiss()
-                                }
-
-
+                            }) {
+                                Image(systemName: "arrow.triangle.2.circlepath.camera.fill")
+                                    .resizable()
+                                    .foregroundColor(.white)
+                                    .scaledToFit()
+                                    .frame(width: 50, height: 50)
+                                    .padding(20)
+                                    .padding(.trailing, 20)
                             }
-                            isRecording = false
-                        } else {
-                            viewModel.aespaSession.startRecording(autoVideoOrientationEnabled: true)
-                            isRecording = true
+                            .shadow(radius: 5)
+                            .contentShape(Rectangle())
+                        }
+
+                        // Shutter + button
+                        recordingButtonShape(width: 60).onTapGesture {
+                            if isRecording {
+                                viewModel.aespaSession.stopRecording{ result in
+                                    switch result {
+                                    case .success(let videoFile):
+                                        if let url = videoFile.path {
+
+                                            onVideoRecorded(url, isFront)
+
+
+                                        }
+                                        else {
+                                            print("No Valid URL")
+                                        }
+                                        dismiss()
+                                    case .failure(let error):
+                                        print("Error \(error.localizedDescription)")
+                                        dismiss()
+                                    }
+
+
+                                }
+                                isRecording = false
+                            } else {
+                                viewModel.aespaSession.video(.unmute)
+
+
+                                viewModel.aespaSession.startRecording(autoVideoOrientationEnabled: true)
+
+                                isRecording = true
+                            }
                         }
                     }
                 }
             }
-        }
-        .animation(.easeInOut(duration: 0.5), value: isRecording)
-    }
+            .animation(.easeInOut(duration: 0.5), value: isRecording)
+            .navigationTitle("Video Recorder")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button{
+                        dismiss()
+                    } label: {
+                        Text("Cancel")
+                            .frame(minWidth: 70)
 
+                            .clipShape(.capsule)
+
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
 }
 extension RecordingView {
     @ViewBuilder

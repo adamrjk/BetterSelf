@@ -14,7 +14,9 @@ import SwiftData
 struct HomeView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
+    @Environment(\.editMode) var editMode
 
+    @StateObject var cameraManager = CameraManager()
 
     let folder: Folder?
 
@@ -25,7 +27,7 @@ struct HomeView: View {
     @State private var searchText = ""
     @State private var addReminder = false
     @State private var selectedReminder: Reminder?
-    @State private var reminderToMove: Reminder?
+    @State private var remindersToMove: [Reminder]?
     @State private var newReminder: Reminder?
     @State private var videoRecorder = false
     @State private var refuseLoading = false
@@ -80,8 +82,13 @@ struct HomeView: View {
     @State private var sorting: Sorting
 
 
+    @State private var selection = Set<Reminder>()
+    @State private var recordedVideoURL: URL?
+    @State private var isFront: Bool?
+    @State private var videoRecorded = false
+    @State private var title = ""
 
-
+    
     var body: some View {
 
         ZStack {
@@ -102,7 +109,7 @@ struct HomeView: View {
                     }
                 }
                 else {
-                    List {
+                    List(selection: $selection) {
                         ForEach(sortedReminders){ reminder in
                             Button {
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !checkIfYoutube(reminder.link)  {
@@ -115,8 +122,6 @@ struct HomeView: View {
                                 ReminderRowView(reminder: reminder, isPreview: false)
 
                             }
-//                            .padding(.vertical, 4)
-//                            .padding(.horizontal, 16)
 
                             .swipeActions{
 
@@ -125,7 +130,7 @@ struct HomeView: View {
                                 }
 
                                 Button("", systemImage: "folder.fill"){
-                                    reminderToMove = reminder
+                                    remindersToMove = [reminder]
                                     moveToFolder.toggle()
                                 }
 
@@ -146,7 +151,7 @@ struct HomeView: View {
                             .tag(reminder)
 
                         }
-                        .onDelete(perform: deleteReminder)
+//                        .onDelete(perform: deleteReminder)
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
 
@@ -157,10 +162,34 @@ struct HomeView: View {
 
                 }
             }
+
+            if !selection.isEmpty {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Button("Delete", action: delete)
+                            .buttonStyle(.plain)
+                            .padding()
+                            .clipShape(.capsule)
+                            .glassEffect(.regular, in: .buttonBorder)
+
+                        Spacer()
+
+
+                        Button("Move", action: move)
+                            .buttonStyle(.plain)
+                            .padding()
+                            .clipShape(.capsule)
+                            .glassEffect(.regular, in: .buttonBorder)
+                    }
+                    .padding(.horizontal, 5)
+                }
+
+
+            }
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-//                EditButton()
                 Menu {
                     Picker("Sort", selection: $sorting) {
                         Text("Newest First")
@@ -178,10 +207,10 @@ struct HomeView: View {
                         .font(.subheadline)
                         .foregroundStyle(itemColor)
                         .padding(7)
-                        .background(
-                            Circle()
-                                .fill(newCardBackground)
-                        )
+//                        .background(
+//                            Circle()
+//                                .fill(newCardBackground)
+//                        )
                 }
                 .buttonStyle(.plain)
             }
@@ -197,7 +226,7 @@ struct HomeView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(itemColor)
                 .padding(7)
-                .background(newCardBackground)
+//                .background(newCardBackground)
                 .clipShape(.capsule)
             }
 
@@ -209,13 +238,15 @@ struct HomeView: View {
                 .padding(.trailing)
                 .font(.headline)
                 .buttonStyle(.plain)
-                .foregroundStyle(.primary)
+                .foregroundStyle(itemColor)
+                .padding(7)
+//                .background(newCardBackground)
+                .clipShape(.capsule)
 
 
 
 
             }
-
             ToolbarItem(placement: .topBarLeading){
                 Button("Quick Add", systemImage: "video.fill.badge.plus"){
                     videoRecorder.toggle()
@@ -224,9 +255,27 @@ struct HomeView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(itemColor)
                 .padding(8)
-                .background(newCardBackground)
-                .clipShape(.capsule)
+//                .background(newCardBackground)
+//                .clipShape(.capsule)
             }
+            ToolbarItem(placement: .topBarLeading){
+                Button{
+                    if editMode?.wrappedValue == .inactive {
+                        editMode?.wrappedValue = .active
+                    } else {
+                        editMode?.wrappedValue = .inactive
+                    }
+                } label: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.subheadline)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(itemColor)
+                        .padding(8)
+        //                .background(newCardBackground)
+        //                .clipShape(.capsule)
+                }
+            }
+
 
 
 
@@ -257,11 +306,23 @@ struct HomeView: View {
         }
 
         .sheet(isPresented: $videoRecorder) {
-            VideoRecorderView()
+
+            RecordingView(viewModel: $cameraManager.viewModel, onVideoRecorded: { url, isFront in
+                recordedVideoURL = url
+                self.isFront = isFront
+                videoRecorded.toggle()
+            })
         }
-        .sheet(isPresented: $moveToFolder){
-            if let reminder = reminderToMove {
-                MoveToFolder(reminder: reminder)
+        .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
+            AddTitleSheet(title: $title)
+                .presentationDetents([.height(300)])
+        }
+        .sheet(isPresented: $moveToFolder, onDismiss: {
+            selection = []
+            editMode?.wrappedValue = .inactive
+        }){
+            if let reminders = remindersToMove {
+                MoveToFolder(reminders: reminders)
 
             }
 
@@ -278,6 +339,33 @@ struct HomeView: View {
 
 
     }
+
+    func move() {
+        remindersToMove = Array(selection)
+        moveToFolder.toggle()
+
+    }
+
+    func delete() {
+        // Extract URLs before deletion
+        let videoURLs = selection.compactMap { $0.firebaseVideoURL }
+
+        selection.forEach{ reminder in
+            modelContext.delete(reminder)
+        }
+
+        editMode?.wrappedValue = .inactive
+
+        Task {
+            for url in videoURLs {
+                await deleteVideo(url)
+            }
+        }
+
+
+    }
+
+
     func deleteEmptyReminder() {
         if let reminder = newReminder{
             guard reminder.isChecked == false else { return }
@@ -298,7 +386,7 @@ struct HomeView: View {
     func deleteReminder(at offsets: IndexSet) {
         for offset in offsets {
             let reminder = reminders[offset]
-
+            
             if let url = reminder.firebaseVideoURL {
                 Task {
                     await deleteVideo(url)
@@ -380,7 +468,66 @@ struct HomeView: View {
             UserDefaults.standard.set(data, forKey: "AllRemindersSorting")
         }
     }
+    func saveReminder() {
+        let reminder = Reminder(
+            title: title,
+            text: "",
+            link: ""
+        )
+        if let front = self.isFront {
+            reminder.isFront = front
+        }
+        reminder.isChecked = true
+        modelContext.insert(reminder)
 
+        loadVideo(reminder)
+
+    }
+
+
+    func loadVideo(_ reminder: Reminder) {
+        Task {
+            if let url = recordedVideoURL {
+                // Generate thumbnail immediately
+                if let thumbnail = await generateThumbnail(from: url) {
+                    reminder.photo = thumbnail.jpegData(compressionQuality: 0.8)
+                }
+
+                // Upload video in background
+                await uploadVideoToFirebase(videoURL: url, reminder: reminder)
+            }
+        }
+    }
+
+    // Generate thumbnail from video URL
+    private func generateThumbnail(from videoURL: URL) async -> UIImage? {
+        let asset = AVURLAsset(url: videoURL)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+
+        // Get thumbnail at 0.1 seconds (very fast)
+        let time = CMTime(seconds: 0.1, preferredTimescale: 600)
+
+        do {
+            let cgImage = try await generator.image(at: time).image
+            return UIImage(cgImage: cgImage)
+        } catch {
+            print("Thumbnail generation error: \(error)")
+            return nil
+        }
+    }
+
+    func uploadVideoToFirebase(videoURL: URL, reminder: Reminder) async {
+        uploadManager.startUpload(videoURL: videoURL){ result in
+            switch result {
+            case .success(let firebaseURL):
+                reminder.firebaseVideoURL = firebaseURL
+
+            case .failure(let error):
+                print("Firebase upload failed: \(error.localizedDescription)")
+            }
+        }
+    }
 
 }
 

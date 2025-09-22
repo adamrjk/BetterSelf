@@ -95,7 +95,6 @@ struct BetterSelfWidgetEntryView : View {
                                 .padding(.vertical, 3)
                                 .background(Color.clear)
                             }
-                            //                        .buttonStyle(.plain)
                         }
 
                     }

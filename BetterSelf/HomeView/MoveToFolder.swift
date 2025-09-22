@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MoveToFolder: View {
     @Environment(\.dismiss) var dismiss
-    let reminder: Reminder
+    let reminders: [Reminder]
 
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
            sort: \Folder.date) var folders: [Folder]
@@ -26,15 +26,43 @@ struct MoveToFolder: View {
 
 
                 List{
+                    Group {
+                        if reminders.count == 1, let reminder = reminders.first  {
+                            ReminderRowView(reminder: reminder, isPreview: true)
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        }
+                        else {
+                            VStack {
 
-                    ReminderRowView(reminder: reminder, isPreview: true)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                                HStack {
+                                    Image(systemName: "document.on.document.fill")
+                                        .frame(width: 40, height: 40)
+                                        .bold()
+                                        .foregroundStyle(Color.creamyYellow)
+                                    ForEach(reminders){ reminder in
+                                        Text(ListFormatter.localizedString(byJoining: reminders.map{ reminder in
+                                            reminder.title
+                                        }))
+                                            .lineLimit(1)
+                                    }
+                                }
+
+                                Text("\(reminders.count) Reminders")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        }
+                    }
 
 
                     ForEach(folders){ folder in
                         Button{
-                            reminder.folder = folder
+                            reminders.forEach{ reminder in
+                                reminder.folder = folder
+                            }
                             dismiss()
                         } label: {
                             FolderRowView(folder: folder)
@@ -67,5 +95,5 @@ struct MoveToFolder: View {
 }
 
 #Preview {
-    MoveToFolder(reminder: .example)
+    MoveToFolder(reminders: [.example])
 }

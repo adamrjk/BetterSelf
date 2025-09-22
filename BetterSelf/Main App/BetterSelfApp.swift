@@ -36,6 +36,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         // When notification is tapped, trigger the navigation
+
+        let request = response.notification.request
+        NotificationManager.shared.reminderID = request.identifier
         NotificationManager.shared.shouldNavigateToReminder = true
         completionHandler()
     }

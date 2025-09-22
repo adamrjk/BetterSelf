@@ -13,7 +13,6 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var notificationManager: NotificationManager
     @State private var notifReminder: Reminder?
-    @AppStorage("lastScheduled") private var lastScheduledDate: Date = Date.distantPast
 
     @Environment(\.modelContext) var modelContext
     @Query(filter: #Predicate<Reminder> {
@@ -66,7 +65,10 @@ struct ContentView: View {
 //                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
         }
         .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
-            if shouldNavigate, let reminder = notificationManager.reminder {
+            if shouldNavigate, let reminderID = notificationManager.reminderID {
+                let reminder = reminders.first(where: {reminder in
+                    reminder.id.uuidString == reminderID
+                })
                 tabPage = 0
                 notifReminder = reminder
                 notificationManager.shouldNavigateToReminder = false
@@ -117,7 +119,8 @@ struct ContentView: View {
         //Let's schedule notifications on each of the pinned reminders.
 
         let today = Calendar.current.startOfDay(for: Date())
-        let lastScheduled = Calendar.current.startOfDay(for: lastScheduledDate)
+
+        let lastScheduled = Calendar.current.startOfDay(for: getLastScheduledDate())
 
         // If we haven't scheduled today, schedule tomorrow's notification
         if !Calendar.current.isDate(lastScheduled, inSameDayAs: today) {
@@ -131,11 +134,24 @@ struct ContentView: View {
                     NotificationManager.shared.addNotification(reminder)
                 }
             }
+            UserDefaults().set(today , forKey: "lastScheduledDate")
 
-            lastScheduledDate = today
         }
     }
-    
+    func getLastScheduledDate() -> Date {
+        if let date = UserDefaults().value(forKey: "lastScheduledDate") as? Date{
+            return date
+        }
+        else {
+            UserDefaults().set(Date.distantPast, forKey: "lastScheduledDate")
+            return .distantPast
+        }
+
+    }
+
+
+
+
     private func signInAnonymously() {
 
         Auth.auth().signInAnonymously { _ , error in

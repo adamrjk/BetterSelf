@@ -8,6 +8,8 @@ struct VideoRecorderView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
 
+    @StateObject var cameraManager = CameraManager()
+
 
     @StateObject private var uploadManager = UploadManager.shared
     @Environment(\.colorScheme) var colorScheme
@@ -154,16 +156,20 @@ struct VideoRecorderView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button{
                         dismiss()
+                    } label: {
+                        Text("Cancel")
+                            .padding()
+                            .clipShape(.capsule)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.primary)
+
                 }
             }
 
             .sheet(isPresented: $showingImagePicker) {
-                RecordingView(onVideoRecorded: { url, isFront in
+                RecordingView(viewModel: $cameraManager.viewModel, onVideoRecorded: { url, isFront in
                     recordedVideoURL = url
                     self.isFront = isFront
                     videoRecorded.toggle()

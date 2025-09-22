@@ -31,6 +31,7 @@ class RecordingViewModel: ObservableObject {
         let option = AespaOption(albumName: nil)
         self.aespaSession = Aespa.session(with: option)
 
+
         // Common setting
         aespaSession
             .common(.position(position: .front))
@@ -43,9 +44,9 @@ class RecordingViewModel: ObservableObject {
 //                    print("Error: ", error)
 //                }
 //            }
-
         aespaSession
             .video(.unmute)
+
 //            .video(.stabilization(mode: .standard))
 
 
@@ -59,5 +60,9 @@ extension RecordingViewModel {
             session.avCaptureSession.automaticallyConfiguresCaptureDeviceForWideColor = true
         }
     }
+}
+
+class CameraManager: ObservableObject {
+    @Published var viewModel = RecordingViewModel()
 }
 

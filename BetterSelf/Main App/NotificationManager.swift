@@ -14,7 +14,7 @@ import UserNotifications
 class NotificationManager: ObservableObject {
     
 
-    @Published var reminder: Reminder?
+    @Published var reminderID: String?
     @Published var shouldNavigateToReminder = false
     @Published var sharedReminder = false
     @Published var widgetReminder = false
@@ -32,7 +32,6 @@ class NotificationManager: ObservableObject {
 
     
     func addNotification(_ reminder: Reminder) {
-        self.reminder = reminder
         let center = UNUserNotificationCenter.current()
 
         let addRequest = {
@@ -50,9 +49,9 @@ class NotificationManager: ObservableObject {
 
             let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
 
-//            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
+//            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: false)
 
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+            let request = UNNotificationRequest(identifier: reminder.id.uuidString, content: content, trigger: trigger)
             center.add(request)
         }
 
