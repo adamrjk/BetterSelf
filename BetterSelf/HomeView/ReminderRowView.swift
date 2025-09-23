@@ -9,8 +9,12 @@ import SwiftUI
 
 struct ReminderRowView: View {
     @State var reminder: Reminder
-
+    
     @State var isPreview: Bool
+    @StateObject var color = ColorManager.shared
+    @Environment(\.colorScheme) var scheme
+
+
     var body: some View {
 
 

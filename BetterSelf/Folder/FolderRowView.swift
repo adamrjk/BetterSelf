@@ -23,7 +23,10 @@ struct FolderRowView: View {
     var count: Int {
         folder?.reminders.count ?? unlockedReminders.count
     }
-    
+
+    @StateObject var color = ColorManager.shared
+
+
     var body: some View {
         HStack {
             Image(systemName: "folder.fill")

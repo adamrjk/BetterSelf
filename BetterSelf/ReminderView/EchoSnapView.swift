@@ -10,26 +10,18 @@ import SwiftUI
 struct EchoSnapView: View {
     @State var reminder: Reminder
 
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
 
-    var newCardBackground: LinearGradient {
-         LinearGradient(
-            colors: [
-                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
+    
 
     var body: some View {
 
             ZStack {
-                Color.purpleMainGradient
+                color.mainGradient(scheme)
                     .ignoresSafeArea()
 
-                Color.purpleOverlayGradient
+                color.overlayGradient(scheme)
                     .ignoresSafeArea()
                 ScrollView {
                         VStack(spacing: 16) {
@@ -49,7 +41,7 @@ struct EchoSnapView: View {
                                 .padding()
                                 .background(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .fill(newCardBackground)
+                                        .fill(color.cardBackground(scheme))
                                 )
                                 .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
                             }
@@ -70,7 +62,7 @@ struct EchoSnapView: View {
                                 .frame(minWidth: 350)
                                 .background(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .fill(newCardBackground)
+                                        .fill(color.cardBackground(scheme))
 
                                 )
                                 .shadow(color: .black.opacity(0.05), radius: 6, y: 2)

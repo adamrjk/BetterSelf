@@ -93,6 +93,15 @@ extension Color {
         startPoint: .top,
         endPoint: .bottom
     )
+    static let overlayCreamyYellowGradient = RadialGradient(
+        colors: [
+            Color(red: 1.0, green: 0.95, blue: 0.8).opacity(0.3),
+            Color.clear
+        ],
+        center: .topLeading,
+        startRadius: 0,
+        endRadius: 400
+    )
 
 
 

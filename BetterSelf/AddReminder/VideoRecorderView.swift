@@ -14,6 +14,9 @@ struct VideoRecorderView: View {
     @StateObject private var uploadManager = UploadManager.shared
     @Environment(\.colorScheme) var colorScheme
 
+    @StateObject var color = ColorManager.shared
+
+
     var itemColor: LinearGradient {
         colorScheme == .light
         ? Color.purpleMainGradient
@@ -58,10 +61,10 @@ struct VideoRecorderView: View {
         NavigationView {
             ZStack {
 
-                Color.purpleMainGradient
+                color.mainGradient(colorScheme)
                     .ignoresSafeArea()
 
-                Color.purpleOverlayGradient
+                color.overlayGradient(colorScheme)
                     .ignoresSafeArea()
                 VStack(spacing: 20) {
                     // Header

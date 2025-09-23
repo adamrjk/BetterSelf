@@ -10,8 +10,9 @@ import YouTubePlayerKit
 
 struct YoutubeView: View {
     @State private var startTime = false
-
-
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
+    
     //    @State var videoURL: String
     @Binding var time: Int //in Seconds
     private let player: YouTubePlayer
@@ -32,10 +33,10 @@ struct YoutubeView: View {
     }
     var body: some View {
         ZStack {
-            Color.purpleMainGradient
+            color.mainGradient(scheme)
                 .ignoresSafeArea()
 
-            Color.purpleOverlayGradient
+            color.overlayGradient(scheme)
                 .ignoresSafeArea()
             ZStack {
                 ScrollView {

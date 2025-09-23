@@ -10,22 +10,14 @@ import SwiftUI
 
 
 struct AddingDescriptionView: View {
-
+    
     @Binding var text: String
     @FocusState.Binding var keyboard: Bool
 
-    @Environment(\.colorScheme) var colorScheme
+    @StateObject var color = ColorManager.shared
 
-    var newCardBackground: LinearGradient {
-         LinearGradient(
-            colors: [
-                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
+    @Environment(\.colorScheme) var scheme
+
 
 
 
@@ -65,7 +57,7 @@ struct AddingDescriptionView: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(newCardBackground)
+                .fill(color.cardBackground(scheme))
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
         )
         .padding(.horizontal, 16)

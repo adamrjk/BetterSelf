@@ -14,6 +14,8 @@ struct FolderView: View {
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
            sort: \Folder.date) var folders: [Folder]
 
+    @StateObject var color = ColorManager.shared
+
     @Environment(\.scenePhase) var scenePhase
 
     @State private var newFolder: Folder?
@@ -24,14 +26,16 @@ struct FolderView: View {
     @State private var selectedFolder: Folder?
     @Binding var notifReminder: Reminder?
 
+    @Environment(\.colorScheme) var scheme
+
     var body: some View {
         NavigationStack {
 
             ZStack {
-                Color.purpleMainGradient
+                color.mainGradient(scheme)
                     .ignoresSafeArea()
 
-                Color.purpleOverlayGradient
+                color.overlayGradient(scheme)
                     .ignoresSafeArea()
 
                 FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert)

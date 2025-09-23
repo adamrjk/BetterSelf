@@ -9,11 +9,15 @@ import SwiftUI
 
 struct RefuseLoadingView: View {
     @Environment(\.dismiss) var dismiss
+    @StateObject var color = ColorManager.shared
+    @Environment(\.colorScheme) var scheme
+
+
     var body: some View {
         ZStack {
-            Color.purpleMainGradient
+            color.mainGradient(scheme)
                 .ignoresSafeArea()
-            Color.purpleOverlayGradient
+            color.overlayGradient(scheme)
                 .ignoresSafeArea()
 
             VStack(spacing: 40) {
@@ -32,7 +36,7 @@ struct RefuseLoadingView: View {
                 .padding()
                 .buttonStyle(.borderedProminent)
                 .frame(width: 100)
-                .background(Color.cardBackground)
+                .background(color.itemColor(scheme))
                 .clipShape(
                     RoundedRectangle(cornerRadius: 14)
 

@@ -9,16 +9,18 @@ import SwiftUI
 
 struct RefuseSavingView: View {
 
+    @Environment(\.colorScheme) var scheme
     @Environment(\.dismiss) var dismiss
 
     let title: String
     let description: String
+    @StateObject var color = ColorManager.shared
 
     var body: some View {
         ZStack {
-            Color.purpleMainGradient
+            color.mainGradient(scheme)
                 .ignoresSafeArea()
-            Color.purpleOverlayGradient
+            color.overlayGradient(scheme)
                 .ignoresSafeArea()
 
             VStack(spacing: 40) {
@@ -37,7 +39,7 @@ struct RefuseSavingView: View {
                 .padding()
                 .buttonStyle(.borderedProminent)
                 .frame(width: 100)
-                .background(Color.cardBackground)
+                .background(color.cardBackground(scheme))
                 .clipShape(
                     RoundedRectangle(cornerRadius: 14)
 

@@ -16,14 +16,17 @@ struct AddFolderView: View {
     @FocusState private var keyboard: Bool
     @State private var refuseSaving = false
 
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) var scheme
+
+    @StateObject var color = ColorManager.shared
+
 
     var body: some View {
         NavigationStack{
             ZStack {
-                Color.purpleMainGradient
+                color.mainGradient(scheme)
                     .ignoresSafeArea()
-                Color.purpleOverlayGradient
+                color.overlayGradient(scheme)
                     .ignoresSafeArea()
                 VStack(spacing: 20){
 
@@ -112,7 +115,7 @@ struct AddFolderView: View {
                                     .foregroundStyle(.primary)
                                     .padding()
                                     .background(
-                                        colorScheme == .light
+                                        scheme == .light
                                         ? .white
                                         : Color( red: 0.318, green: 0.318, blue: 0.318)
 

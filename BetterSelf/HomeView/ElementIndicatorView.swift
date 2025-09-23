@@ -8,20 +8,19 @@
 import SwiftUI
 
 struct ElementIndicatorView: View {
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) var scheme
 
-    var itemColor: LinearGradient {
-                colorScheme == .light
-        ? Color.purpleMainGradient
-        : Color.creamyYellowGradient
-    }
+    @StateObject var color = ColorManager.shared
+
+
+
 
 
     @State var systemName: String
     var body: some View {
         Image(systemName: systemName)
             .font(.caption)
-            .foregroundStyle(itemColor)
+            .foregroundStyle(color.itemColor(scheme))
             .fontWeight(.medium)
             .padding(1)
     }

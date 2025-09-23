@@ -17,13 +17,15 @@ struct SharedLinkView: View {
 
     @Binding var time: Int
     let text: String
+    @StateObject var color = ColorManager.shared
+    @Environment(\.colorScheme) var scheme
 
     var body: some View {
         
         ZStack {
-            Color.purpleMainGradient
+            color.mainGradient(scheme)
                 .ignoresSafeArea()
-            Color.purpleOverlayGradient
+            color.overlayGradient(scheme)
                 .ignoresSafeArea()
 
             switch type {

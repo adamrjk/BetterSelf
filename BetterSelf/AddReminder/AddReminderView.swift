@@ -16,34 +16,25 @@ struct AddReminderView: View {
 
     @Bindable var reminder: Reminder
 
+    @StateObject var color = ColorManager.shared
+
     @State private var refuseSaving = false
     @State private var startTime = false
 
     enum AddReminderPage: Hashable { case main, description }
     @State private var selectedPage: AddReminderPage = .main
 
-    @Environment(\.colorScheme) var colorScheme
-
-    var newCardBackground: LinearGradient {
-        LinearGradient(
-            colors: [
-                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
+    @Environment(\.colorScheme) var scheme
 
 
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.purpleMainGradient
+                color.mainGradient(scheme)
                     .ignoresSafeArea()
 
-                Color.purpleOverlayGradient
+                color.overlayGradient(scheme)
                     .ignoresSafeArea()
 
                 ScrollView {
@@ -72,7 +63,7 @@ struct AddReminderView: View {
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(newCardBackground)
+                                .fill(color.cardBackground(scheme))
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -94,7 +85,7 @@ struct AddReminderView: View {
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(newCardBackground)
+                                .fill(color.cardBackground(scheme))
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -132,7 +123,7 @@ struct AddReminderView: View {
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(newCardBackground)
+                                .fill(color.cardBackground(scheme))
                                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                         )
                         .padding(.horizontal, 16)
@@ -161,7 +152,7 @@ struct AddReminderView: View {
                                 .font(.headline)
                                 .foregroundStyle(.primary)
                                 .padding(7)
-                                .background(newCardBackground)
+                                .background(color.cardBackground(scheme))
                                 .clipShape(.capsule)
                         }
                     }
@@ -181,7 +172,7 @@ struct AddReminderView: View {
                                     .foregroundStyle(.primary)
                                     .padding()
                                     .background(
-                                        colorScheme == .light
+                                        scheme == .light
                                         ? .white
                                         : Color( red: 0.318, green: 0.318, blue: 0.318)
 
@@ -223,7 +214,7 @@ struct AddReminderView: View {
     }
 
     struct MainTabContent: View {
-        @Environment(\.colorScheme) var colorScheme
+        @Environment(\.colorScheme) var scheme
         @Bindable var reminder: Reminder
         @FocusState.Binding var keyboard: Bool
         var body: some View {
@@ -240,7 +231,7 @@ struct AddReminderView: View {
                         } label: {
                             Image(systemName: "xmark")
                                 .foregroundStyle(
-                                    colorScheme == .light
+                                    scheme == .light
                                     ? .white
                                     : .black
                                 )

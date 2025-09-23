@@ -16,6 +16,10 @@ struct HomeView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.editMode) var editMode
 
+
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
+
     @StateObject var cameraManager = CameraManager()
 
     let folder: Folder?
@@ -32,13 +36,6 @@ struct HomeView: View {
     @State private var videoRecorder = false
     @State private var refuseLoading = false
     @State private var moveToFolder = false
-    @Environment(\.colorScheme) var colorScheme
-
-    var itemColor: LinearGradient {
-        colorScheme == .light
-        ? LinearGradient(colors: [.black], startPoint: .top, endPoint: .bottom)
-        : Color.creamyYellowGradient
-    }
 
     var unlockedReminders: [Reminder]{
         reminders.filter{
@@ -67,18 +64,7 @@ struct HomeView: View {
     }
 
 
-
-
-    var newCardBackground: LinearGradient {
-         LinearGradient(
-            colors: [
-                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
+    
     @State private var sorting: Sorting
 
 
@@ -92,10 +78,10 @@ struct HomeView: View {
     var body: some View {
 
         ZStack {
-            Color.purpleMainGradient
+            color.mainGradient(scheme)
                 .ignoresSafeArea()
 
-            Color.purpleOverlayGradient
+            color.overlayGradient(scheme)
                 .ignoresSafeArea()
             Group {
                 if reminders.isEmpty {
@@ -205,7 +191,7 @@ struct HomeView: View {
                 }label: {
                     Image(systemName: "arrow.up.arrow.down")
                         .font(.subheadline)
-                        .foregroundStyle(itemColor)
+                        .foregroundStyle(color.itemColor(scheme))
                         .padding(7)
 //                        .background(
 //                            Circle()
@@ -224,7 +210,7 @@ struct HomeView: View {
                     addReminder.toggle()
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(itemColor)
+                .foregroundStyle(color.itemColor(scheme))
                 .padding(7)
 //                .background(newCardBackground)
                 .clipShape(.capsule)
@@ -238,7 +224,7 @@ struct HomeView: View {
                 .padding(.trailing)
                 .font(.headline)
                 .buttonStyle(.plain)
-                .foregroundStyle(itemColor)
+                .foregroundStyle(color.itemColor(scheme))
                 .padding(7)
 //                .background(newCardBackground)
                 .clipShape(.capsule)
@@ -253,7 +239,7 @@ struct HomeView: View {
                 }
                 .font(.caption)
                 .buttonStyle(.plain)
-                .foregroundStyle(itemColor)
+                .foregroundStyle(color.itemColor(scheme))
                 .padding(8)
 //                .background(newCardBackground)
 //                .clipShape(.capsule)
@@ -269,7 +255,7 @@ struct HomeView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.subheadline)
                         .buttonStyle(.plain)
-                        .foregroundStyle(itemColor)
+                        .foregroundStyle(color.itemColor(scheme))
                         .padding(8)
         //                .background(newCardBackground)
         //                .clipShape(.capsule)

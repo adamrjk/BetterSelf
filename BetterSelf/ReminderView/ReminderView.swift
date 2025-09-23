@@ -13,13 +13,8 @@ struct ReminderView: View {
 
     @Environment(\.dismiss) var dismiss
 
-    @Environment(\.colorScheme) var colorScheme
-
-    var calendarCardText: Color {
-        colorScheme == .light
-        ? .purple.opacity(0.7)
-        : .creamyYellow
-    }
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
 
 
     @State private var edit = false
@@ -31,17 +26,6 @@ struct ReminderView: View {
         ? .white
         : .primary
 
-    }
-
-    var newCardBackground: LinearGradient {
-         LinearGradient(
-            colors: [
-                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
     }
 
     var body: some View {
@@ -120,7 +104,7 @@ struct ReminderView: View {
             }
 
         }
-        .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
+        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
         .sheet(isPresented: $reminder.isShared){
             AddTitleSheet(title: $reminder.title)
                 .presentationDetents([.height(300)])
@@ -141,7 +125,7 @@ struct ReminderView: View {
                     TimeLessLetterView(isSheet: true, reminder: reminder)
                         .navigationTitle(reminder.title)
                         .navigationBarTitleDisplayMode(.inline)
-                        .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
+                        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
                 }
                 .presentationDetents([.medium, .large])
             }

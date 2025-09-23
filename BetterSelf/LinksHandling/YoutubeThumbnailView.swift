@@ -9,6 +9,7 @@ import SwiftUI
 
 struct YouTubeThumbnailView: View {
     let videoURL: String
+    
 
     private var videoID: String? {
         if let url = URL(string: videoURL) {

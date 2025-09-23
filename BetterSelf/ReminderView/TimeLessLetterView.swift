@@ -15,12 +15,17 @@ struct TimeLessLetterView: View {
     @State var isSheet = false
 
     @State var reminder: Reminder
+    @StateObject var color = ColorManager.shared
+
+
+    @Environment(\.colorScheme) var scheme
+
     var body: some View {
 
         ZStack{
-            Color.purpleMainGradient
+            color.mainGradient(scheme)
                 .ignoresSafeArea()
-            Color.purpleOverlayGradient
+            color.overlayGradient(scheme)
                 .ignoresSafeArea()
 
             ScrollView {
@@ -51,17 +56,9 @@ struct TimeLessLetterView: View {
 
 struct DescriptionView: View {
     let text: String
-    @Environment(\.colorScheme) var colorScheme
-    var newCardBackground: LinearGradient {
-         LinearGradient(
-            colors: [
-                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
+    @StateObject var color = ColorManager.shared
+    @Environment(\.colorScheme) var scheme
+
     var body: some View{
         VStack(spacing: 16) {
             if !text.isEmpty {
@@ -79,7 +76,7 @@ struct DescriptionView: View {
                 .frame(minWidth: 350)
                 .background(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(newCardBackground)
+                        .fill(color.cardBackground(scheme))
 
                 )
                 .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
@@ -96,7 +93,7 @@ struct DescriptionView: View {
 
                 .background(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(newCardBackground)
+                        .fill(color.cardBackground(scheme))
 
                 )
                 .shadow(color: .black.opacity(0.05), radius: 6, y: 2)

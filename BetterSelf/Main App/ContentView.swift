@@ -26,8 +26,11 @@ struct ContentView: View {
     var unlockedPinnedReminders: [Reminder]{
         unlockedReminders.filter{ $0.pinned }
     }
-
+    
     @State private var tabPage: Int = 0
+
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
 
     var body: some View {
         TabView(selection: $tabPage) {
@@ -40,7 +43,7 @@ struct ContentView: View {
                     Label("Reminders", systemImage: "list.bullet")
 
                 }
-                .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar)
+                .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
 
 
             ProblemSolverView()
@@ -50,7 +53,7 @@ struct ContentView: View {
                         .imageScale(.small)
 
                 }
-                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
+                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
             
 //            ExploreView()
 //                .tabItem{

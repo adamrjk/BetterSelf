@@ -14,7 +14,9 @@ struct StartTimeView: View {
     @State private var seconds: Int
     @State private var minutes: Int
     @State private var hours: Int
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
+
 
     let saveTime: (Int) -> Void
 

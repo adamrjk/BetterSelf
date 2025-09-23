@@ -53,6 +53,10 @@ struct FoldersList: View {
         return pinned
     }
 
+//    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
+
+
     var body: some View {
         
         ScrollView {

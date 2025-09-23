@@ -14,25 +14,12 @@ struct AddTitleSheet: View {
 
     @Environment(\.dismiss) var dismiss
 
-    
+    @StateObject var color = ColorManager.shared
+
     @FocusState var keyboard: Bool
     @Binding var title: String
 
-    @Environment(\.colorScheme) var colorScheme
-
-
-
-
-    var newCardBackground: LinearGradient {
-        LinearGradient(
-            colors: [
-                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
+    @Environment(\.colorScheme) var scheme
 
 
     var body: some View {
@@ -62,7 +49,7 @@ struct AddTitleSheet: View {
                     .padding(.vertical, 16)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(newCardBackground)
+                            .fill(color.cardBackground(scheme))
                             .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                     )
                     .padding(.horizontal, 16)
@@ -103,7 +90,7 @@ struct AddTitleSheet: View {
                                     .foregroundStyle(.primary)
                                     .padding()
                                     .background(
-                                        colorScheme == .light
+                                        scheme == .light
                                         ? .white
                                         : Color( red: 0.318, green: 0.318, blue: 0.318)
 

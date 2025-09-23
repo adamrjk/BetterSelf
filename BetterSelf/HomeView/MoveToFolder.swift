@@ -11,6 +11,8 @@ import SwiftUI
 struct MoveToFolder: View {
     @Environment(\.dismiss) var dismiss
     let reminders: [Reminder]
+    @StateObject var color = ColorManager.shared
+    @Environment(\.colorScheme) var scheme
 
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
            sort: \Folder.date) var folders: [Folder]
@@ -18,10 +20,10 @@ struct MoveToFolder: View {
     var body: some View {
         NavigationStack{
             ZStack {
-                Color.purpleMainGradient
+                color.mainGradient(scheme)
                     .ignoresSafeArea()
 
-                Color.purpleOverlayGradient
+                color.overlayGradient(scheme)
                     .ignoresSafeArea()
 
 
@@ -39,7 +41,7 @@ struct MoveToFolder: View {
                                     Image(systemName: "document.on.document.fill")
                                         .frame(width: 40, height: 40)
                                         .bold()
-                                        .foregroundStyle(Color.creamyYellow)
+                                        .foregroundStyle(color.itemColor(scheme))
                                     ForEach(reminders){ reminder in
                                         Text(ListFormatter.localizedString(byJoining: reminders.map{ reminder in
                                             reminder.title

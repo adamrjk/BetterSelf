@@ -16,6 +16,8 @@ class UploadManager: ObservableObject {
 
     @Published var activeUploads: [String: UploadStatus] = [:]
 
+    @StateObject var color = ColorManager.shared
+
     private init() {}
 
     func startUpload(

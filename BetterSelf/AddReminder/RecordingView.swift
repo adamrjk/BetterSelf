@@ -16,6 +16,8 @@ struct RecordingView: View {
     @State var isRecording = false
     @State var isFront = true
 
+    @StateObject var color = ColorManager.shared
+
     let onVideoRecorded: (URL, Bool) -> Void
 
     var body: some View {

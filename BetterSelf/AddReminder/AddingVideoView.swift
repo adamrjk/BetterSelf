@@ -7,7 +7,11 @@ import Photos
 
 
 struct AddingVideoView: View {
-    @Environment(\.colorScheme) var colorScheme
+
+    
+    @Environment(\.colorScheme) var scheme
+
+    @StateObject var color = ColorManager.shared
     @StateObject private var uploadManager = UploadManager.shared
 
     enum ViewState {
@@ -19,19 +23,8 @@ struct AddingVideoView: View {
     @State private var selectedItem: PhotosPickerItem?
 
     @Binding private var firebaseVideoURL: String?
-    @Binding private var thumbnail: Data?  // ✅ NEW: Binding to reminder.photo
+    @Binding private var thumbnail: Data?  
     @Binding private var isLoading: Bool
-
-    var newCardBackground: LinearGradient {
-         LinearGradient(
-            colors: [
-                colorScheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-                colorScheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
 
 
     var body: some View {
@@ -40,7 +33,7 @@ struct AddingVideoView: View {
                 switch viewState {
                 case .idle:
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(newCardBackground)
+                        .fill(color.cardBackground(scheme))
 
                     PhotosPicker(selection: $selectedItem, matching: .videos){
                         VideoLoadingView()
@@ -51,7 +44,7 @@ struct AddingVideoView: View {
                     ZStack(alignment: .topTrailing){
                         ZStack {
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(newCardBackground)
+                                .fill(color.cardBackground(scheme))
                             VStack {
                                 Text("Loading Video...")
                                     .foregroundStyle(.white)
@@ -73,7 +66,7 @@ struct AddingVideoView: View {
                         } label: {
                             Image(systemName: "xmark")
                                 .foregroundStyle(
-                                    colorScheme == .light
+                                    scheme == .light
                                     ? .white
                                     : .black
                                 )
@@ -100,7 +93,7 @@ struct AddingVideoView: View {
                                     .padding(15)
                                     .background(
                                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                            .fill(newCardBackground)
+                                            .fill(color.cardBackground(scheme))
                                     )
 
                                 // Video play indicator
@@ -122,7 +115,7 @@ struct AddingVideoView: View {
                             } label: {
                                 Image(systemName: "xmark")
                                     .foregroundStyle(
-                                        colorScheme == .light
+                                        scheme == .light
                                         ? .white
                                         : .black
                                     )
@@ -245,18 +238,14 @@ struct AddingVideoView: View {
     
     struct VideoLoadingView: View {
 
-        @Environment(\.colorScheme) var colorScheme
+        @Environment(\.colorScheme) var scheme
+        @StateObject var color = ColorManager.shared
 
-        var itemColor: LinearGradient {
-            colorScheme == .light
-            ? Color.purpleMainGradient
-            : Color.creamyYellowGradient
-        }
         var body: some View {
             VStack(alignment: .center, spacing: 8) {
                 Image(systemName: "video.fill.badge.plus")
                     .font(.system(size: 40, weight: .semibold))
-                    .foregroundStyle(itemColor)
+                    .foregroundStyle(color.itemColor(scheme))
 
 
 
@@ -280,5 +269,4 @@ struct AddingVideoView: View {
 #Preview {
     AddingVideoView(firebaseVideoURL: .constant(nil), thumbnail: .constant(nil), isLoading: .constant(false))
 }
-
 
