@@ -152,7 +152,7 @@ struct AddReminderView: View {
                                 .font(.headline)
                                 .foregroundStyle(.primary)
                                 .padding(7)
-                                .background(color.cardBackground(scheme))
+                                .background(color.cardBackground(scheme))   
                                 .clipShape(.capsule)
                         }
                     }
