@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct YouTubeThumbnailView: View {
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
     let videoURL: String
     
 
@@ -68,10 +70,10 @@ struct YouTubeThumbnailView: View {
                             .cornerRadius(30)
                             .background(
                                 RoundedRectangle(cornerRadius: 30)
-                                    .stroke(Color.purple.opacity(0.2), lineWidth: 1)
+                                    .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
                             )
-                            .shadow(color: .purple.opacity(0.15), radius: 8, x: 0, y: 4)
-                            .shadow(color: .purple.opacity(0.1), radius: 16, x: 0, y: 8)
+                            .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+                            .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
 
 
 

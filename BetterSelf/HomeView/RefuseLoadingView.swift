@@ -36,7 +36,7 @@ struct RefuseLoadingView: View {
                 .padding()
                 .buttonStyle(.borderedProminent)
                 .frame(width: 100)
-                .background(color.itemColor(scheme))
+                .background(Color(.systemGray6))
                 .clipShape(
                     RoundedRectangle(cornerRadius: 14)
 

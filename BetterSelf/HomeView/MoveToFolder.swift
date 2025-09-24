@@ -86,7 +86,6 @@ struct MoveToFolder: View {
                     Button("Cancel"){
                         dismiss()
                     }
-                    .buttonStyle(.plain)
                 }
             }
 

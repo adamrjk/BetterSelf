@@ -130,7 +130,7 @@ struct ReminderView: View {
                 .presentationDetents([.medium, .large])
             }
             else {
-                SharedLinkView(link: reminder.link, time: $reminder.time, text: "")
+                SharedLinkView(link: reminder.link, time: $reminder.time, text: "", isSheet: true)
             }
 
 

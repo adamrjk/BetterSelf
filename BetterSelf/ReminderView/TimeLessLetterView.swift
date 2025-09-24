@@ -56,6 +56,7 @@ struct TimeLessLetterView: View {
 
 struct DescriptionView: View {
     let text: String
+    let isYoutube: Bool
     @StateObject var color = ColorManager.shared
     @Environment(\.colorScheme) var scheme
 
@@ -75,7 +76,7 @@ struct DescriptionView: View {
                 .padding()
                 .frame(minWidth: 350)
                 .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    RoundedRectangle(cornerRadius: isYoutube ? 30 : 14, style: .continuous)
                         .fill(color.cardBackground(scheme))
 
                 )
@@ -101,7 +102,12 @@ struct DescriptionView: View {
 
 
         }
-        .padding(.horizontal)
+        .padding(.horizontal, isYoutube ? 0 : 16)
+    }
+    init(text: String, isYoutube: Bool? = nil) {
+        self.text = text
+        self.isYoutube = isYoutube ?? false
+
     }
 }
 

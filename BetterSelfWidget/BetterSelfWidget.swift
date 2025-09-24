@@ -46,6 +46,12 @@ struct ReminderEntry: TimelineEntry {
 }
 
 struct BetterSelfWidgetEntryView : View {
+    @Environment(\.colorScheme) var scheme
+    var itemColor: LinearGradient {
+        scheme == .light
+        ? Color.blackGradient
+        : Color.creamyYellowGradient
+    }
     var entry: Provider.Entry
 
     var body: some View {
@@ -59,7 +65,7 @@ struct BetterSelfWidgetEntryView : View {
             VStack(alignment: .leading, spacing: 5) {
 
                 Text("Pinned")
-                    .foregroundStyle(Color.creamyYellowGradient)
+                    .foregroundStyle(itemColor)
                     .bold()
                     .padding(.bottom, 3)
 

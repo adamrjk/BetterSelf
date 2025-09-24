@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SharedLinkView: View {
+
+    @Environment(\.dismiss) var dismiss
     @State private var reel = true
     let link: String
 
@@ -20,42 +22,58 @@ struct SharedLinkView: View {
     @StateObject var color = ColorManager.shared
     @Environment(\.colorScheme) var scheme
 
+    var isSheet: Bool
+
     var body: some View {
-        
-        ZStack {
-            color.mainGradient(scheme)
-                .ignoresSafeArea()
-            color.overlayGradient(scheme)
-                .ignoresSafeArea()
+        NavigationStack {
 
-            switch type {
-            case .youtube:
-//                YoutubeView(isPlayable: true, youtubeId: getYoutubeId() ?? "", time: $time)
-                YoutubeView(videoURL: link,  time: $time, text: text)
+            ZStack {
+                color.mainGradient(scheme)
+                    .ignoresSafeArea()
+                color.overlayGradient(scheme)
+                    .ignoresSafeArea()
+
+                switch type {
+                case .youtube:
+                    //                YoutubeView(isPlayable: true, youtubeId: getYoutubeId() ?? "", time: $time)
+                    YoutubeView(videoURL: link,  time: $time, text: text)
 
 
-            case .shortForm:
-                ArticleView(link: link)
-            
+                case .shortForm:
+                    ArticleView(link: link)
+                        .ignoresSafeArea()
 
-//            case .shortForm:
-//                switch shortType {
-//                case .youtubeShort:
-//                    Text("youtube Shorts handling coming soon")
-//                case .instaReel:
-//                    InstagramReelView(reelID: getInstagramReelID() ?? "")
-//                case .tiktok:
-//                    TikTokVideoView(username: getTikTokUsername() ?? "", videoID: getTikTokVideoID() ?? "")
-//                }
 
-            case .article:
-                ArticleView(link: link)
+                    //            case .shortForm:
+                    //                switch shortType {
+                    //                case .youtubeShort:
+                    //                    Text("youtube Shorts handling coming soon")
+                    //                case .instaReel:
+                    //                    InstagramReelView(reelID: getInstagramReelID() ?? "")
+                    //                case .tiktok:
+                    //                    TikTokVideoView(username: getTikTokUsername() ?? "", videoID: getTikTokVideoID() ?? "")
+                    //                }
+
+                case .article:
+                    ArticleView(link: link)
+                        .ignoresSafeArea()
+                }
+
+
+
+
+
             }
+            .toolbar {
+                if isSheet {
+                    ToolbarItem(placement: .topBarLeading){
+                        Button("Cancel"){
+                            dismiss()
 
-
-
-
-
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -167,11 +185,12 @@ struct SharedLinkView: View {
         return nil
     }
 
-    init(link: String, time: Binding<Int>, text: String) {
-        #warning("Work on shorts handling")
+    init(link: String, time: Binding<Int>, text: String, isSheet: Bool? = nil) {
+        
         self.link = link
         self.text = text
         _time = time
+        self.isSheet = isSheet ?? false
 
         if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
 //            if link.localizedStandardContains("shorts") {

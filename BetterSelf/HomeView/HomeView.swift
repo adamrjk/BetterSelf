@@ -98,7 +98,7 @@ struct HomeView: View {
                     List(selection: $selection) {
                         ForEach(sortedReminders){ reminder in
                             Button {
-                                if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !checkIfYoutube(reminder.link)  {
+                                if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube  {
                                     refuseLoading.toggle()
                                 }
                                 else {
@@ -316,7 +316,7 @@ struct HomeView: View {
         }
         .navigationTitle(folder?.name ?? "All Reminders")
 
-        .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
+        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
         .navigationDestination(item: $selectedReminder) { reminder in
             ReminderView(reminder: reminder)
         }
@@ -394,16 +394,7 @@ struct HomeView: View {
 
 
 
-    func checkIfYoutube(_ link: String) -> Bool {
-        if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
-            return true
-        }
-        else {
-            return false
-        }
 
-
-    }
 
 
 

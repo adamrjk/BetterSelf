@@ -26,9 +26,20 @@ class ColorManager: ObservableObject {
     }
     func itemColor(_ scheme: ColorScheme) -> LinearGradient {
         scheme == .light
-        ? Color.purpleMainGradient
+        ? Color.blackGradient
         : Color.creamyYellowGradient
     }
+
+
+
+
+
+    func shadow(_ scheme: ColorScheme) -> Color {
+        scheme == .light
+        ? .black
+        : .purple
+    }
+
 
 
     func cardBackground(_ scheme: ColorScheme) ->  LinearGradient {

@@ -102,12 +102,7 @@ struct RecordingView: View {
                         dismiss()
                     } label: {
                         Text("Cancel")
-                            .frame(minWidth: 70)
-
-                            .clipShape(.capsule)
-
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }

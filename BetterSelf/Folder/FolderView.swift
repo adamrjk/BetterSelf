@@ -21,7 +21,7 @@ struct FolderView: View {
     @State private var newFolder: Folder?
     @State private var searchText = ""
     @State private var showAlert = false
-
+    @State private var refuseLoading = false
     @State private var selectedReminder: Reminder?
     @State private var selectedFolder: Folder?
     @Binding var notifReminder: Reminder?
@@ -38,7 +38,7 @@ struct FolderView: View {
                 color.overlayGradient(scheme)
                     .ignoresSafeArea()
 
-                FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert)
+                FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert, refuseLoading: $refuseLoading)
                     .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
                     .onChange(of: scenePhase){ oldPhase, newPhase in
                         if newPhase == .background {
@@ -71,9 +71,17 @@ struct FolderView: View {
             }
             .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
                 AddFolderView(folder: folder)
+                    .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
                     .presentationDetents([.medium, .large])
+
             }
-            .toolbarBackground(Color.purpleOverlayGradient, for: .bottomBar, .navigationBar, .tabBar)
+            .sheet(isPresented: $refuseLoading){
+                RefuseLoadingView()
+                    .presentationDetents([.height(300)])
+            }
+
+
+            .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
             .navigationDestination(item: $selectedReminder) { reminder in
                 ReminderView(reminder: reminder)
             }

@@ -42,7 +42,7 @@ struct StartTimeView: View {
                     } label: {
                         Text("Ok")
                     }
-                    .buttonStyle(.plain)
+//                    .buttonStyle(.plain)
                 }
             }
         }

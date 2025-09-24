@@ -48,14 +48,23 @@ struct YoutubeView: View {
                         .cornerRadius(30)
                         .background(
                             RoundedRectangle(cornerRadius: 30)
-                                .stroke(Color.purple.opacity(0.2), lineWidth: 1)
+                                .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
                         )
-                        .shadow(color: .purple.opacity(0.15), radius: 8, x: 0, y: 4)
-                        .shadow(color: .purple.opacity(0.1), radius: 16, x: 0, y: 8)
+                        .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+                        .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
                         .padding(.bottom, 8)
 
                     if !text.isEmpty {
-                        DescriptionView(text: text)
+                        DescriptionView(text: text, isYoutube: true)
+                            .background(
+                                RoundedRectangle(cornerRadius: 30)
+                                    .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
+                                    .frame(maxWidth: .infinity)
+                            )
+                            .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+                            .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
+                            .padding(.bottom, 8)
+
                     }
 
 
@@ -70,7 +79,7 @@ struct YoutubeView: View {
                             startTime.toggle()
                         } label: {
                             Image(systemName: "timer")
-                                .foregroundColor(.white)
+                                .foregroundColor(.primary)
                                 .padding()
                                 .glassEffect(.regular, in: .buttonBorder)
                                 .clipShape(Circle())
@@ -89,11 +98,17 @@ struct YoutubeView: View {
         }
         .sheet(isPresented: $startTime){
             StartTimeView(time: $time){ newTime in
+
                 player.parameters.startTime = Measurement(value: Double(newTime), unit: UnitDuration.seconds)
-                Task {
-                    try await self.player.reload()
+                Task { @MainActor in
+                    do {
+                        try await player.reload()
+                    } catch {
+                        print("Failed to reload player: \(error)")
+                    }
                 }
             }
+            .id(time)
             .presentationDetents([.height(300)])
         }
     }

@@ -10,7 +10,9 @@ import SwiftUI
 
 
 struct ArticleWebView: UIViewRepresentable {
+
     let url: URL
+
 
     func makeUIView(context: Context) -> WKWebView {
         return WKWebView()
@@ -25,15 +27,18 @@ struct ArticleWebView: UIViewRepresentable {
 struct ArticleView: View {
     @State var link: String
     var body: some View {
-        if let url = URL(string: link) {
-            ArticleWebView(url: url)
-                .edgesIgnoringSafeArea(.all) // make it fullscreen
-        }
-        else {
-            Text("Failed to load URL")
-                .font(.headline)
+        Group {
+            if let url = URL(string: link) {
+                ArticleWebView(url: url)
+                    .edgesIgnoringSafeArea(.all) // make it fullscreen
+            }
+            else {
+                Text("Failed to load URL")
+                    .font(.headline)
 
+            }
         }
+
     }
 }
 

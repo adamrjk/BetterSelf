@@ -146,17 +146,17 @@ struct AddReminderView: View {
                             dismiss()
                         }
                     } label: {
-                        HStack {
+//                        HStack {
                             Text("Save")
-                                .frame(width: 50)
-                                .font(.headline)
-                                .foregroundStyle(.primary)
-                                .padding(7)
-                                .background(color.cardBackground(scheme))   
-                                .clipShape(.capsule)
-                        }
+//                                .frame(width: 50)
+//                                .font(.headline)
+//                                .foregroundStyle(.primary)
+//                                .padding(7)
+//                                .background(color.cardBackground(scheme))
+//                                .clipShape(.capsule)
+//                        }
                     }
-                    .buttonStyle(.plain)
+//                    .buttonStyle(.plain)
                 }
             }
             .overlay(

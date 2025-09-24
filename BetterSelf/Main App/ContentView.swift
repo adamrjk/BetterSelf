@@ -59,13 +59,13 @@ struct ContentView: View {
 //                .tabItem{
 //                    Label("Explore", systemImage: "magnifyingglass")
 //                }
-//                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
+//                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
 //
 //            SettingsView()
 //                .tabItem{
 //                    Label("Settings", systemImage: "gear")
 //                }
-//                .toolbarBackground(Color.purpleOverlayGradient, for: .tabBar, .bottomBar, .navigationBar)
+//                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
         }
         .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
             if shouldNavigate, let reminderID = notificationManager.reminderID {

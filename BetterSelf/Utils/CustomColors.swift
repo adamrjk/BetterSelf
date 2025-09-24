@@ -93,6 +93,17 @@ extension Color {
         startPoint: .top,
         endPoint: .bottom
     )
+
+    static let blackGradient = LinearGradient(
+        colors: [
+            .black,
+            .black
+
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
     static let overlayCreamyYellowGradient = RadialGradient(
         colors: [
             Color(red: 1.0, green: 0.95, blue: 0.8).opacity(0.3),

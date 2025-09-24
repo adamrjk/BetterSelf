@@ -95,9 +95,9 @@ struct AddFolderView: View {
                     } label: {
                         Text("Save")
                     }
-                    .buttonStyle(.plain)
                 }
             }
+            .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
             .sheet(isPresented: $refuseSaving){
                 RefuseSavingView(title: "This Folder name is not valid", description: "The name cannot be empty nor identical to another folder")
                     .presentationDetents([.height(300)])
