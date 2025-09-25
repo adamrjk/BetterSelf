@@ -83,7 +83,7 @@ struct YoutubeView: View {
                             Image(systemName: "timer")
                                 .foregroundColor(.primary)
                                 .padding()
-                                .glassEffect(.regular, in: .buttonBorder)
+                                .adaptiveGlass(scheme)
                                 .clipShape(Circle())
                         }
                         .padding()

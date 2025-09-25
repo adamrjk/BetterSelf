@@ -24,7 +24,6 @@ struct WelcomeView: View {
                     Image(systemName: "lightbulb.min.badge.exclamationmark.fill")
                         .font(.largeTitle)
                         .foregroundStyle(color.itemColor(scheme))
-                        .padding()
                     Text("Welcome to BetterSelf")
                         .font(.largeTitle)
                         .bold()
@@ -38,6 +37,12 @@ struct WelcomeView: View {
                         .frame(width: 300)
                         .padding(.bottom)
 
+                    Text("Click Next to discover the features")
+                        .font(.headline)
+                        .italic()
+                        .multilineTextAlignment(.center)
+                        .frame(width: 300)
+                        .padding(.bottom)
 
                     NavigationLink{
                         StoreIdeas(onDismiss: {
@@ -76,8 +81,8 @@ struct StoreIdeas: View{
 
     
     let elements: [String] = [
-        "An Image you care about",
-        "A Video of you explaining the idea",
+        "An Image of an unforgettable memory",
+        "A Video of you explaining an idea",
         "A Clip from a Podcast",
         "An Article",
         "A written summary of the idea"
@@ -93,7 +98,6 @@ struct StoreIdeas: View{
                 Image(systemName: "square.and.arrow.down.fill")
                     .font(.largeTitle)
                     .foregroundStyle(color.itemColor(scheme))
-                    .padding()
                 Text("Store Ideas")
                     .font(.largeTitle)
                     .bold()
@@ -171,18 +175,23 @@ struct OrganiseIdeas: View {
                 Image(systemName: "folder.fill")
                     .font(.largeTitle)
                     .foregroundStyle(color.itemColor(scheme))
-                    .padding()
                 Text("Organise Them")
                     .font(.largeTitle)
                     .bold()
                     .padding()
 
                 VStack(alignment: .leading, spacing: 15){
-                    Text("Have separate spaces for each category:")
+                    Text("Have separate Folders for each category:")
                         .font(.headline)
                         .italic()
                         .multilineTextAlignment(.center)
-                        .frame(width: 200)
+                        .frame(width: 300)
+                        .padding(.bottom)
+                }
+
+
+                VStack(alignment: .leading, spacing: 15){
+
 
                     ForEach(elements, id: \.self){ element in
                         HStack {
@@ -195,24 +204,38 @@ struct OrganiseIdeas: View {
 //                                .font(.footnote)
                                 .bold()
                                 .italic()
+                            Spacer()
 
 
                         }
+                        .multilineTextAlignment(.center)
+                        .frame(width: 150)
 
                     }
 
 //                    .multilineTextAlignment(.center)
                 }
-                HStack {
-                    Image(systemName: "lock.fill")
 
-                    Text("Lock with Face ID for privacy")
-                        .font(.headline)
-                        .italic()
+                Image(systemName: "lock.fill")
+                    .padding(.top)
+                    .font(.headline)
+                    .padding(5)
+                VStack(alignment: .leading, spacing: 15){
 
-//                        .frame(width: 200)
+
+
+
+                        Text("Additionally, Lock a Folder with Face ID for privacy")
+                            .multilineTextAlignment(.center)
+                            .frame(width: 250)
+                            .font(.headline)
+                            .italic()
+
+
+                        //                        .frame(width: 200)
+
                 }
-                .padding()
+                .padding(.bottom)
 
 
 
@@ -248,7 +271,7 @@ struct QuickAccess: View {
 
     let elements: [String] = [
         "Daily Notifications",
-        "Access From Main View",
+        "Access from Main View",
         "Access through BetterSelf Widget"
     ]
 
@@ -267,7 +290,7 @@ struct QuickAccess: View {
                 Image(systemName: "bolt.fill")
                     .font(.largeTitle)
                     .foregroundStyle(color.itemColor(scheme))
-                    .padding()
+
                 Text("Quick Access")
                     .font(.largeTitle)
                     .bold()

@@ -157,7 +157,7 @@ struct HomeView: View {
                             .buttonStyle(.plain)
                             .padding()
                             .clipShape(.capsule)
-                            .glassEffect(.regular, in: .buttonBorder)
+                            .adaptiveGlass(scheme)
 
                         Spacer()
 
@@ -166,7 +166,7 @@ struct HomeView: View {
                             .buttonStyle(.plain)
                             .padding()
                             .clipShape(.capsule)
-                            .glassEffect(.regular, in: .buttonBorder)
+                            .adaptiveGlass(scheme)
                     }
                     .padding(.horizontal, 5)
                 }
@@ -198,7 +198,6 @@ struct HomeView: View {
 //                                .fill(newCardBackground)
 //                        )
                 }
-                .buttonStyle(.plain)
             }
             
 
