@@ -21,12 +21,6 @@ struct ReminderView: View {
     @State private var detailSheet = false
     @State var reminder: Reminder
 
-    private var primaryColor: Color {
-        reminder.type == .InstantInsight
-        ? .white
-        : .primary
-
-    }
 
     var body: some View {
         Group {
@@ -59,7 +53,6 @@ struct ReminderView: View {
                     HStack {
                         Image(systemName: "chevron.left")
                     }
-                    .foregroundStyle(primaryColor)
                     .bold()
 
                 }
@@ -70,7 +63,6 @@ struct ReminderView: View {
                     edit.toggle()
                 } label: {
                     Text("Edit")
-                        .foregroundStyle(primaryColor)
                         .bold()
                 }
             }
@@ -84,7 +76,6 @@ struct ReminderView: View {
                         }
                         .font(.headline)
                         .buttonStyle(.plain)
-                        .foregroundStyle(.white)
                         .padding(8)
                     }
                 }
@@ -98,7 +89,6 @@ struct ReminderView: View {
                     }
                     .font(.headline)
                     .buttonStyle(.plain)
-                    .foregroundStyle(.white)
                     .padding(8)
                 }
             }

@@ -41,8 +41,8 @@ struct AddFolderView: View {
                             .foregroundStyle(.primary)
                             .background(
                                    RoundedRectangle(cornerRadius: 12)
-                                       .fill(Color(.systemGray6)) // Automatically adapts
-                                       .shadow(color: .primary.opacity(0.06), radius: 2, y: 1)
+                                    .fill(Color(.systemGray6)) // Automatically adapts
+                                    .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
                             )
                             .overlay(
                                    RoundedRectangle(cornerRadius: 12)
@@ -53,7 +53,7 @@ struct AddFolderView: View {
                     .padding(.vertical, 16)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Color(.systemGray6))
+                            .fill(color.cardBackground(scheme))
                             .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                     )
                     .padding(.horizontal, 16)
@@ -63,6 +63,9 @@ struct AddFolderView: View {
 
                     HStack(spacing: 16 ) {
                         Toggle("Face ID to Unlock", isOn: $folder.faceID)
+                            .tint(scheme == .light
+                                  ? .purple
+                                  : .yellow)
                             .foregroundStyle(.secondary)
                             .font(.subheadline)
 
@@ -71,7 +74,7 @@ struct AddFolderView: View {
                     .padding(.vertical, 16)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Color(.systemGray6))
+                            .fill(color.cardBackground(scheme))
                             .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                     )
                     .padding(.horizontal, 16)

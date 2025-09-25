@@ -96,13 +96,13 @@ struct YouTubeThumbnailView: View {
 
 
                 case .failure:
-                    Image(systemName: "exclamationmark.triangle")
+                    EmptyView()
                 @unknown default:
                     EmptyView()
                 }
             }
         } else {
-            Image(systemName: "xmark.circle")
+            EmptyView()
         }
     }
     enum thumbnailType {

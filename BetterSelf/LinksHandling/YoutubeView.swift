@@ -42,6 +42,7 @@ struct YoutubeView: View {
                 ScrollView {
 
                     YouTubePlayerView(player)
+                        .id(time)
                         .frame(maxWidth: .infinity)
                         .aspectRatio(16/9, contentMode: .fit)
                         .scaledToFit()
@@ -77,6 +78,7 @@ struct YoutubeView: View {
                         Spacer()
                         Button {
                             startTime.toggle()
+
                         } label: {
                             Image(systemName: "timer")
                                 .foregroundColor(.primary)
@@ -98,17 +100,8 @@ struct YoutubeView: View {
         }
         .sheet(isPresented: $startTime){
             StartTimeView(time: $time){ newTime in
-
                 player.parameters.startTime = Measurement(value: Double(newTime), unit: UnitDuration.seconds)
-                Task { @MainActor in
-                    do {
-                        try await player.reload()
-                    } catch {
-                        print("Failed to reload player: \(error)")
-                    }
-                }
             }
-            .id(time)
             .presentationDetents([.height(300)])
         }
     }

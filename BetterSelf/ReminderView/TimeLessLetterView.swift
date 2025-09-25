@@ -40,8 +40,6 @@ struct TimeLessLetterView: View {
                         Button("Back"){
                             dismiss()
                         }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.primary)
                     }
 
                 }

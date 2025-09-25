@@ -20,7 +20,7 @@ struct HomeView: View {
     @Environment(\.colorScheme) var scheme
     @StateObject var color = ColorManager.shared
 
-    @StateObject var cameraManager = CameraManager()
+//    @StateObject var cameraManager = CameraManager()
 
     let folder: Folder?
 
@@ -292,12 +292,18 @@ struct HomeView: View {
         }
 
         .sheet(isPresented: $videoRecorder) {
-
-            RecordingView(viewModel: $cameraManager.viewModel, onVideoRecorded: { url, isFront in
-                recordedVideoURL = url
-                self.isFront = isFront
-                videoRecorded.toggle()
-            })
+            CustomCameraView(
+                isPresented: $videoRecorder,
+                onVideoRecorded: { url, isFront in
+                    recordedVideoURL = url
+                    self.isFront = isFront
+                    videoRecorded.toggle()
+                }
+            )
+            .ignoresSafeArea()
+//            RecordingView(viewModel: $cameraManager.viewModel, onVideoRecorded: { url, isFront in
+//
+//            })
         }
         .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
             AddTitleSheet(title: $title)
