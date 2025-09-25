@@ -9,9 +9,43 @@ import SwiftUI
 
 struct ProblemSolverView: View {
     @StateObject var color = ColorManager.shared
+    @Environment(\.colorScheme) var scheme
 
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ZStack {
+                color.mainGradient(scheme)
+                    .ignoresSafeArea()
+                color.overlayGradient(scheme)
+                    .ignoresSafeArea()
+
+                VStack {
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(color.itemColor(scheme))
+                        .font(.largeTitle)
+
+
+                    Text("Coming Soon")
+                        .font(.largeTitle)
+                        .bold()
+                        .padding()
+
+
+                    Group{
+                        Text("ProblemSolver uses AI to pick the reminder that best fits your current situation.")
+                        
+                             Text(" For now, add reminders, get familiar with BetterSelf")
+                             Text("By the time you have too many to sort through, ProblemSolver will be there to help.")
+                    }
+                    .multilineTextAlignment(.center)
+                    .frame(width: 350)
+                    .italic()
+                    .font(.subheadline)
+                }
+
+            }
+            .navigationTitle("ProblemSolver")
+        }
     }
 }
 

@@ -64,7 +64,7 @@ struct YoutubeView: View {
                             )
                             .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
                             .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                            .padding(.bottom, 8)
+                            .padding(.vertical, 20)
 
                     }
 

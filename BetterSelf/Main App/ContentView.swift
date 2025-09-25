@@ -32,6 +32,8 @@ struct ContentView: View {
     @Environment(\.colorScheme) var scheme
     @StateObject var color = ColorManager.shared
 
+    @State private var welcome = false
+
     var body: some View {
         TabView(selection: $tabPage) {
 
@@ -66,6 +68,9 @@ struct ContentView: View {
 //                    Label("Settings", systemImage: "gear")
 //                }
 //                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
+        }
+        .sheet(isPresented: $welcome){
+            WelcomeView()
         }
         .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
             if shouldNavigate, let reminderID = notificationManager.reminderID {
@@ -112,12 +117,26 @@ struct ContentView: View {
                 notificationManager.widgetReminder = false
             }
         }
-
         .onAppear {
+            checkIfWelcome()
             signInAnonymously()
             checkAndScheduleDailyNotification()
         }
     }
+
+    func checkIfWelcome(){
+        if UserDefaults.standard.bool(forKey: "Welcome") {
+        }
+        else {
+            welcome = true
+            UserDefaults.standard.set(true, forKey: "Welcome")
+        }
+
+
+
+    }
+
+
     private func checkAndScheduleDailyNotification() {
         //Let's schedule notifications on each of the pinned reminders.
 

@@ -19,6 +19,7 @@ struct CustomVideoPlayer: UIViewControllerRepresentable {
         controller.videoGravity = .resizeAspectFill
         controller.showsPlaybackControls = true
         controller.allowsPictureInPicturePlayback = false
+        player.allowsExternalPlayback = false
 
         // Apply 3D rotation only to the video content (not the controls)
         // Ensure subviews are laid out first

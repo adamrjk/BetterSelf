@@ -40,6 +40,19 @@ class ColorManager: ObservableObject {
         : .purple
     }
 
+    func button(_ scheme: ColorScheme) -> Color {
+        scheme == .light
+        ? .black
+        : .creamyYellow
+
+    }
+
+    func text(_ scheme: ColorScheme) -> Color {
+        scheme == .light
+        ? .white
+        : .black
+    }
+
 
 
     func cardBackground(_ scheme: ColorScheme) ->  LinearGradient {

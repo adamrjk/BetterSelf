@@ -301,9 +301,7 @@ struct HomeView: View {
                 }
             )
             .ignoresSafeArea()
-//            RecordingView(viewModel: $cameraManager.viewModel, onVideoRecorded: { url, isFront in
-//
-//            })
+
         }
         .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
             AddTitleSheet(title: $title)

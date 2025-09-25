@@ -88,9 +88,15 @@ struct ReminderRowView: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.white.opacity(0.1))
-        )
-        .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
 
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 0.1)
+
+                .shadow(color: color.shadow(scheme).opacity(0.2), radius: 8, x: 0, y: 4)
+                .shadow(color: color.shadow(scheme).opacity(0.2), radius: 16, x: 0, y: 8)
+        )
 
     }
 
