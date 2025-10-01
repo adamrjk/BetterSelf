@@ -47,7 +47,6 @@ struct AddingVideoView: View {
                                 .fill(color.cardBackground(scheme))
                             VStack {
                                 Text("Loading Video...")
-                                    .foregroundStyle(.white)
                                     .font(.headline)
                                     .padding(.top)
                                 ProgressView()
