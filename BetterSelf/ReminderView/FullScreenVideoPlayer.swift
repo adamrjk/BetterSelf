@@ -7,6 +7,7 @@
 
 import AVKit
 import SwiftUI
+import AVFoundation
 
 
 
@@ -68,8 +69,15 @@ struct FullScreenVideoPlayer: View {
     @State private var isLoading = true
     @State private var loadError = false
 
-
-
+    private func configureAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .moviePlayback, options: [])
+            try session.setActive(true)
+        } catch {
+            print("Audio session setup error: \(error)")
+        }
+    }
 
     var body: some View {
         GeometryReader { proxy in
@@ -112,6 +120,7 @@ struct FullScreenVideoPlayer: View {
     }
 
     private func setupPlayer() {
+        configureAudioSession()
         Task {
             do {
                 // Create asset asynchronously
@@ -145,6 +154,12 @@ struct FullScreenVideoPlayer: View {
     private func cleanupPlayer() {
         player?.pause()
         player = nil
+        // Deactivate audio session to restore system behavior
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("Failed to deactivate audio session: \(error)")
+        }
     }
 
 }
@@ -157,4 +172,5 @@ struct FullScreenVideoPlayer: View {
 //#Preview {
 //    FullScreenVideoPlayer(videoURL: URL(string: Reminder.example.firebaseVideoURL!)! )
 //}
+
 
