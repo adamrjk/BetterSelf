@@ -27,7 +27,8 @@ struct FoldersList: View {
     @Binding var selectedFolder: Folder?
     @Binding var showAlert: Bool
     @Binding var refuseLoading: Bool
-
+    @State private var deleteAlert = false
+    @State private var folderToDelete: Folder?
 
     var unlockedReminders: [Reminder]{
         reminders.filter{
@@ -196,10 +197,18 @@ struct FoldersList: View {
                                                     }
 
                                                 }
+                                                .swipeActions{
+                                                    Button("", systemImage: "trash"){
+                                                        folderToDelete = folder
+                                                        deleteAlert.toggle()
+                                                    }
+                                                    .tint(.red)
+
+
+                                                }
                                             }
 
                                         }
-                                        .onDelete(perform: deleteFolder)
                                         .listRowInsets(EdgeInsets())
                                         .listRowBackground(Color.clear)
                                         .listRowSeparator(.hidden)
@@ -237,9 +246,16 @@ struct FoldersList: View {
             }
 
             }
-            
-
         .animation(.smooth, value: pinned)
+        .alert("Are you Sure?", isPresented: $deleteAlert){
+            Button("Delete", role: .destructive){
+                if let folder = folderToDelete {
+                    deleteFolder(folder)
+                }
+            }
+        } message: {
+            Text("This will delete all the Reminders in this Folder")
+        }
         .onChange(of: pinned){ _, newValue in
             storePinnedReminders(newValue)
             if let last = pinned.last{
@@ -248,18 +264,16 @@ struct FoldersList: View {
         }
     }
 
-    func deleteFolder(at offsets: IndexSet) {
-        for offset in offsets {
-            let folder = folders[offset]
-            // Extract URLs before deletion
-            let videoURLs = folder.reminders.compactMap { $0.firebaseVideoURL }
-            modelContext.delete(folder)
+    func deleteFolder(_ folder: Folder) {
+        // Extract URLs before deletion
+        let videoURLs = folder.reminders.compactMap { $0.firebaseVideoURL }
+        modelContext.delete(folder)
 
-            Task {
-                for url in videoURLs {
-                    await deleteVideo(url)
-                }
+        Task {
+            for url in videoURLs {
+                await deleteVideo(url)
             }
+
         }
     }
 

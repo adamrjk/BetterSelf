@@ -37,6 +37,9 @@ struct HomeView: View {
     @State private var refuseLoading = false
     @State private var moveToFolder = false
 
+    @State private var deleteAlert = false
+    @State private var reminderToDelete: Reminder?
+
     var unlockedReminders: [Reminder]{
         reminders.filter{
             $0.isLocked == false
@@ -111,9 +114,11 @@ struct HomeView: View {
 
                             .swipeActions{
 
-                                Button("", systemImage: "trash", role: .destructive){
-                                    deleteReminder(reminder)
+                                Button("", systemImage: "trash"){
+                                    reminderToDelete = reminder
+                                    deleteAlert.toggle()
                                 }
+                                .tint(.red)
 
                                 Button("", systemImage: "folder.fill"){
                                     remindersToMove = [reminder]
@@ -137,7 +142,6 @@ struct HomeView: View {
                             .tag(reminder)
 
                         }
-//                        .onDelete(perform: deleteReminder)
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
 
@@ -153,7 +157,9 @@ struct HomeView: View {
                 VStack {
                     Spacer()
                     HStack {
-                        Button("Delete", action: delete)
+                        Button("Delete"){
+                            deleteAlert.toggle()
+                        }
                             .buttonStyle(.plain)
                             .padding()
                             .clipShape(.capsule)
@@ -280,6 +286,13 @@ struct HomeView: View {
 
 
         }
+        .alert("Are you Sure?", isPresented: $deleteAlert){
+            Button("Delete", role: .destructive){
+                delete()
+            }
+        } message: {
+            Text("You won't be able to restore this Reminder")
+        }
         .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
             if let reminder = newReminder {
                 AddReminderView(reminder: reminder)
@@ -336,18 +349,25 @@ struct HomeView: View {
     }
 
     func delete() {
-        // Extract URLs before deletion
-        let videoURLs = selection.compactMap { $0.firebaseVideoURL }
+        if selection.isEmpty {
+            if let reminder = reminderToDelete {
+                deleteReminder(reminder)
+            }
 
-        selection.forEach{ reminder in
-            modelContext.delete(reminder)
-        }
+        } else {
+            // Extract URLs before deletion
+            let videoURLs = selection.compactMap { $0.firebaseVideoURL }
 
-        editMode?.wrappedValue = .inactive
+            selection.forEach{ reminder in
+                modelContext.delete(reminder)
+            }
 
-        Task {
-            for url in videoURLs {
-                await deleteVideo(url)
+            editMode?.wrappedValue = .inactive
+
+            Task {
+                for url in videoURLs {
+                    await deleteVideo(url)
+                }
             }
         }
 
