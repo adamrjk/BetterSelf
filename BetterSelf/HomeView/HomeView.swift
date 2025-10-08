@@ -20,7 +20,7 @@ struct HomeView: View {
     @Environment(\.colorScheme) var scheme
     @StateObject var color = ColorManager.shared
 
-//    @StateObject var cameraManager = CameraManager()
+    //    @StateObject var cameraManager = CameraManager()
 
     let folder: Folder?
 
@@ -66,8 +66,10 @@ struct HomeView: View {
         }
     }
 
+    @State private var welcome = true
 
-    
+
+
     @State private var sorting: Sorting
 
 
@@ -77,7 +79,23 @@ struct HomeView: View {
     @State private var videoRecorded = false
     @State private var title = ""
 
-    
+
+    var tutorialSteps: [TutorialStep] {
+        switch TutorialManager.shared.homeViewStep {
+        case 0:
+            StepStorage.HomeViewSteps0
+
+        case 1:
+            StepStorage.HomeViewSteps1
+
+        case 2:
+            StepStorage.homeViewSteps2
+        default:
+            []
+        }
+    }
+
+
     var body: some View {
 
         ZStack {
@@ -101,6 +119,8 @@ struct HomeView: View {
                     List(selection: $selection) {
                         ForEach(sortedReminders){ reminder in
                             Button {
+                                TutorialManager.shared.handleTargetViewClick(viewId: "ReminderButton")
+//                                TutorialManager.shared.homeViewStep = 2
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube  {
                                     refuseLoading.toggle()
                                 }
@@ -111,6 +131,7 @@ struct HomeView: View {
                                 ReminderRowView(reminder: reminder, isPreview: false)
 
                             }
+                            .tutorialIdentifier("ReminderButton")
 
                             .swipeActions{
 
@@ -160,10 +181,10 @@ struct HomeView: View {
                         Button("Delete"){
                             deleteAlert.toggle()
                         }
-                            .buttonStyle(.plain)
-                            .padding()
-                            .clipShape(.capsule)
-                            .adaptiveGlass(scheme)
+                        .buttonStyle(.plain)
+                        .padding()
+                        .clipShape(.capsule)
+                        .adaptiveGlass(scheme)
 
                         Spacer()
 
@@ -180,32 +201,78 @@ struct HomeView: View {
 
             }
         }
+        .onAppear{
+            TutorialManager.shared.startTutorial(tutorialSteps)
+        }
+        .onChange(of: TutorialManager.shared.homeViewStep){
+            TutorialManager.shared.startTutorial(tutorialSteps)
+        }
+
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Picker("Sort", selection: $sorting) {
-                        Text("Newest First")
-                            .tag( Sorting.dateNew)
 
-                        Text("Oldest First")
-                            .tag(Sorting.dateOld)
-                        Text("Title")
-                            .tag(Sorting.name)
+                    Menu {
+
+                        Picker("Sort By", selection: $sorting) {
+                            Text("Newest First")
+                                .tag( Sorting.dateNew)
+
+                            Text("Oldest First")
+                                .tag(Sorting.dateOld)
+                            Text("Title")
+                                .tag(Sorting.name)
+
+                        }
+                    }label: {
+                        HStack {
+                            Image(systemName: "arrow.up.arrow.down")
+                                .font(.subheadline)
+                                .foregroundStyle(color.itemColor(scheme))
+                                .padding(7)
+
+                            Text("Sort")
+
+                        }
+                    }
+
+                    Button{
+                        if editMode?.wrappedValue == .inactive {
+                            editMode?.wrappedValue = .active
+                        } else {
+                            editMode?.wrappedValue = .inactive
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.subheadline)
+                                .buttonStyle(.plain)
+                                .foregroundStyle(color.itemColor(scheme))
+                                .padding(8)
+                            //                .background(newCardBackground)
+                            //                .clipShape(.capsule)
+
+                            Text("Select Reminders")
+                        }
+
 
                     }
 
+
+
+
                 }label: {
-                    Image(systemName: "arrow.up.arrow.down")
+                    Image(systemName: "ellipsis")
                         .font(.subheadline)
                         .foregroundStyle(color.itemColor(scheme))
                         .padding(7)
-//                        .background(
-//                            Circle()
-//                                .fill(newCardBackground)
-//                        )
+                    //                        .background(
+                    //                            Circle()
+                    //                                .fill(newCardBackground)
+                    //                        )
                 }
             }
-            
+
 
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Add Reminder", systemImage: "plus"){
@@ -213,11 +280,13 @@ struct HomeView: View {
                     modelContext.insert(reminder)
                     newReminder = reminder
                     addReminder.toggle()
+                    TutorialManager.shared.handleTargetViewClick(viewId: "PlusButton")
                 }
+                .tutorialIdentifier("PlusButton")
                 .buttonStyle(.plain)
                 .foregroundStyle(color.itemColor(scheme))
                 .padding(7)
-//                .background(newCardBackground)
+                //                .background(newCardBackground)
                 .clipShape(.capsule)
             }
 
@@ -231,7 +300,7 @@ struct HomeView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(color.itemColor(scheme))
                 .padding(7)
-//                .background(newCardBackground)
+                //                .background(newCardBackground)
                 .clipShape(.capsule)
 
 
@@ -246,29 +315,9 @@ struct HomeView: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(color.itemColor(scheme))
                 .padding(8)
-//                .background(newCardBackground)
-//                .clipShape(.capsule)
+                //                .background(newCardBackground)
+                //                .clipShape(.capsule)
             }
-            ToolbarItem(placement: .topBarLeading){
-                Button{
-                    if editMode?.wrappedValue == .inactive {
-                        editMode?.wrappedValue = .active
-                    } else {
-                        editMode?.wrappedValue = .inactive
-                    }
-                } label: {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.subheadline)
-                        .buttonStyle(.plain)
-                        .foregroundStyle(color.itemColor(scheme))
-                        .padding(8)
-        //                .background(newCardBackground)
-        //                .clipShape(.capsule)
-                }
-            }
-
-
-
 
 
         }
@@ -376,6 +425,11 @@ struct HomeView: View {
 
 
     func deleteEmptyReminder() {
+
+        if welcome {
+            TutorialManager.shared.startTutorial(StepStorage.HomeViewSteps1)
+        }
+
         if let reminder = newReminder{
             guard reminder.isChecked == false else { return }
             if reminder.isEmpty {
@@ -395,7 +449,7 @@ struct HomeView: View {
     func deleteReminder(at offsets: IndexSet) {
         for offset in offsets {
             let reminder = reminders[offset]
-            
+
             if let url = reminder.firebaseVideoURL {
                 Task {
                     await deleteVideo(url)

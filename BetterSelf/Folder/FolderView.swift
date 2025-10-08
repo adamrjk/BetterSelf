@@ -9,6 +9,7 @@ import LocalAuthentication
 import SwiftData
 import SwiftUI
 
+
 struct FolderView: View {
     @Environment(\.modelContext) var modelContext
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
@@ -26,78 +27,102 @@ struct FolderView: View {
     @State private var selectedFolder: Folder?
     @Binding var notifReminder: Reminder?
 
+    @State private var grayOut = true
+
     @Environment(\.colorScheme) var scheme
+
+    @State private var settings = false
 
     var body: some View {
         NavigationStack {
+            GeometryReader { proxy in
 
-            ZStack {
-                color.mainGradient(scheme)
-                    .ignoresSafeArea()
+                ZStack {
 
-                color.overlayGradient(scheme)
-                    .ignoresSafeArea()
 
-                FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert, refuseLoading: $refuseLoading)
-                    .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
-                    .onChange(of: scenePhase){ oldPhase, newPhase in
-                        if newPhase == .background {
-                            // App is leaving → lock again
-                            folders.forEach { folder in
-                                folder.isLocked = true
+
+                    ZStack {
+                        color.mainGradient(scheme)
+                            .ignoresSafeArea()
+
+                        color.overlayGradient(scheme)
+                            .ignoresSafeArea()
+
+                        FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert, refuseLoading: $refuseLoading)
+                            .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
+                            .onChange(of: scenePhase){ oldPhase, newPhase in
+                                if newPhase == .background {
+                                    // App is leaving → lock again
+                                    folders.forEach { folder in
+                                        folder.isLocked = true
+                                    }
+                                }
                             }
+
+
+                        //                                            Color.gray.opacity(grayOut ? 0.3 : 0.0)
+                        //                                                .ignoresSafeArea()
+                    }
+                }
+                .onAppear{
+                    TutorialManager.shared.startTutorial(StepStorage.folderViewSteps)
+
+                }
+                .navigationTitle("BetterSelf")
+                .toolbar{
+                    ToolbarItem(placement: .topBarTrailing){
+                        Button("Add Folder", systemImage: "folder.fill.badge.plus"){
+                            let folder = Folder(name: "")
+                            modelContext.insert(folder)
+                            newFolder = folder
                         }
-                    }
-
-
-
-            }
-            .navigationTitle("BetterSelf")
-            .toolbar{
-                ToolbarItem(placement: .topBarTrailing){
-                    Button("Add Folder", systemImage: "folder.fill.badge.plus"){
-                        let folder = Folder(name: "")
-                        modelContext.insert(folder)
-                        newFolder = folder
-                    }
-                    .buttonStyle(.plain)
-
-                }
-                ToolbarItem(placement: .topBarLeading){
-                    EditButton()
                         .buttonStyle(.plain)
+
+                    }
+
+                    ToolbarItem(placement: .topBarLeading){
+                        Button("Settings", systemImage: "gear"){
+
+                            settings.toggle()
+                        }
+
+                    }
+
+
+                }
+                .sheet(isPresented: $settings){
+                    SettingsView()
+                }
+                .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
+                    AddFolderView(folder: folder)
+                        .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
+                        .presentationDetents([.medium, .large])
+
+                }
+                .sheet(isPresented: $refuseLoading){
+                    RefuseLoadingView()
+                        .presentationDetents([.height(300)])
                 }
 
-            }
-            .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
-                AddFolderView(folder: folder)
-                    .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
-                    .presentationDetents([.medium, .large])
 
-            }
-            .sheet(isPresented: $refuseLoading){
-                RefuseLoadingView()
-                    .presentationDetents([.height(300)])
-            }
-
-
-            .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-            .navigationDestination(item: $selectedReminder) { reminder in
-                ReminderView(reminder: reminder)
-            }
-            .navigationDestination(item: $notifReminder){ reminder in
-                ReminderView(reminder: reminder)
-
-            }
-            .navigationDestination(item: $selectedFolder) { folder in
-                if folder.name.isEmpty {
-                    HomeView()
+                .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
+                .navigationDestination(item: $selectedReminder) { reminder in
+                    ReminderView(reminder: reminder)
                 }
-                else {
-                    HomeView(folder: folder)
+                .navigationDestination(item: $notifReminder){ reminder in
+                    ReminderView(reminder: reminder)
+
                 }
-            }
-            .alert("Failed Authentication", isPresented: $showAlert){
+                .navigationDestination(item: $selectedFolder) { folder in
+                    if folder.name.isEmpty {
+                        HomeView()
+                    }
+                    else {
+                        HomeView(folder: folder)
+                    }
+                }
+                .alert("Failed Authentication", isPresented: $showAlert){
+                }
             }
 
         }
@@ -121,6 +146,8 @@ struct FolderView: View {
     init(notifReminder: Binding<Reminder?>){
         _notifReminder = notifReminder
     }
+
+    
 
 
 

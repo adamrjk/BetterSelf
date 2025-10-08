@@ -161,6 +161,7 @@ struct AddingVideoView: View {
             do {
                 if let videoData = try await selectedItem?.loadTransferable(type: Data.self) {
                     if let uIImage = await generateThumbnail(from: videoData) {
+                        TutorialManager.shared.handleTargetViewClick(viewId: "CameraIconButton")
                         thumbnail = uIImage.jpegData(compressionQuality: 0.8)
                         self.thumbnailImage = Image(uiImage: uIImage)
                         self.viewState = .showingThumbnail
@@ -245,6 +246,7 @@ struct AddingVideoView: View {
                 Image(systemName: "video.fill.badge.plus")
                     .font(.system(size: 40, weight: .semibold))
                     .foregroundStyle(color.itemColor(scheme))
+                    .tutorialIdentifier("CameraIconButton")
 
 
 

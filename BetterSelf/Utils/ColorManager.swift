@@ -12,6 +12,7 @@ class ColorManager: ObservableObject {
 
     static let shared = ColorManager()
 
+
     func mainGradient(_ scheme: ColorScheme) ->  LinearGradient {
         scheme == .light
         ? Color.creamyYellowGradient

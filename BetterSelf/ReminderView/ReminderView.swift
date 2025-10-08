@@ -41,6 +41,9 @@ struct ReminderView: View {
                 }
             }
         }
+        .onAppear{
+            TutorialManager.shared.startTutorial(StepStorage.reminderSteps)
+        }
         .navigationBarBackButtonHidden()
         .navigationTitle(reminder.title)
         .toolbar {
@@ -98,10 +101,6 @@ struct ReminderView: View {
         .sheet(isPresented: $reminder.isShared){
             AddTitleSheet(title: $reminder.title)
                 .presentationDetents([.height(300)])
-
-
-
-
 
         }
 

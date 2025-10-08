@@ -8,8 +8,42 @@
 import SwiftUI
 
 struct SettingsView: View {
+
+    @StateObject var color = ColorManager.shared
+    @Environment(\.colorScheme) var scheme
+
+    @State private var tutorial = false
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ZStack {
+                color.mainGradient(scheme)
+                    .ignoresSafeArea()
+                color.overlayGradient(scheme)
+                    .ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 16){
+
+                        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+
+                        Toggle("Start Tutorial Again", isOn: $tutorial)
+
+
+
+
+                    }
+
+                }
+                .defaultScrollAnchor(.center)
+
+
+
+
+            }
+            .navigationTitle("Settings")
+        }
+
+
+
     }
 }
 

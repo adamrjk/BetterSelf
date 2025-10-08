@@ -52,6 +52,7 @@ struct BetterSelfApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .tutorialOverlay()
                 .environmentObject(NotificationManager.shared)
                 .onOpenURL { url in
                     if url.absoluteString.localizedStandardContains("url") {

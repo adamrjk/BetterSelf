@@ -29,6 +29,8 @@ struct ContentView: View {
     
     @State private var tabPage: Int = 0
 
+    @StateObject var tutorialManager = TutorialManager.shared
+
     @Environment(\.colorScheme) var scheme
     @StateObject var color = ColorManager.shared
 
@@ -182,6 +184,7 @@ struct ContentView: View {
             }
         }
     }
+
 }
 
 #Preview {

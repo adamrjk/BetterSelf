@@ -26,6 +26,8 @@ struct AddReminderView: View {
 
     @Environment(\.colorScheme) var scheme
 
+    @State private var welcome = true
+
 
 
     var body: some View {
@@ -133,6 +135,14 @@ struct AddReminderView: View {
                     .padding(.top, 20)
                 }
             }
+            .overlay{
+                TutorialManager.shared.tutorialView()
+
+            }
+            .onAppear{
+                TutorialManager.shared.startTutorialForSheet(StepStorage.AddReminderSteps)
+
+            }
             .animation(.smooth, value: keyboard)
             //            .animation(.smooth, value: reminder.type)
             .navigationTitle("New Reminder")
@@ -143,6 +153,9 @@ struct AddReminderView: View {
                             refuseSaving.toggle()
                         }
                         else {
+                            if welcome{
+                                TutorialManager.shared.homeViewStep = 1
+                            }
                             dismiss()
                         }
                     } label: {
@@ -156,6 +169,7 @@ struct AddReminderView: View {
 //                                .clipShape(.capsule)
 //                        }
                     }
+                    .tutorialIdentifier("SaveReminderButton")
 //                    .buttonStyle(.plain)
                 }
             }
@@ -210,6 +224,7 @@ struct AddReminderView: View {
 
 
         }
+
 
     }
 

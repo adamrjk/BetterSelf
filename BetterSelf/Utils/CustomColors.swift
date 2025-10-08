@@ -28,6 +28,15 @@ extension Color {
         startRadius: 0,
         endRadius: 400
     )
+    static let blueGradient = LinearGradient(
+        colors: [
+            Color.blue.opacity(0.3),
+            Color.blue.opacity(0.2),
+            Color.blue.opacity(0.15)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 
     static let tabViewGradient = LinearGradient(
         colors: [
