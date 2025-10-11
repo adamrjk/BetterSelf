@@ -58,7 +58,6 @@ struct AddingDescriptionView: View {
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(color.cardBackground(scheme))
-                .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
         )
         .padding(.horizontal, 16)
 

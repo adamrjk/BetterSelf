@@ -136,7 +136,6 @@ struct AddingVideoView: View {
                 }
             }
             .frame(minHeight: 300)
-            .shadow(color: .black.opacity(0.15), radius: 10, y: 5)
         }
         .padding(.horizontal, 20)
         .onChange(of: selectedItem, loadVideo)
@@ -255,8 +254,8 @@ struct AddingVideoView: View {
                 CleanText("Add a Video that reminds you of this idea")
                     .multilineTextAlignment(.center)
             }
-            .shadow(color: .black.opacity(0.15), radius: 10, y: 5)
             .padding(.horizontal, 20)
+            .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
         }
     }
 }

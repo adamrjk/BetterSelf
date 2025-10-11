@@ -18,7 +18,31 @@ extension Color {
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
+
+    static let darkPurple = Color(red: 0.5, green: 0, blue: 0.5)
+
+    static let darkPurpleMainGradient = LinearGradient(
+        colors: [
+            Color(red: 0.5, green: 0, blue: 0.5).opacity(0.3),
+            Color(red: 0.5, green: 0, blue: 0.5).opacity(0.2),
+            Color(red: 0.5, green: 0, blue: 0.5).opacity(0.15)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let whiteBackgroundGradient: LinearGradient =
+        LinearGradient(
+            colors: [
+                Color(red: 1.0, green: 0.98, blue: 0.90),
+                Color(red: 1.0, green: 0.96, blue: 0.85),
+                Color(red: 1.0, green: 0.94, blue: 0.80)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     
+
     static let purpleOverlayGradient = RadialGradient(
         colors: [
             Color.purple.opacity(0.2),

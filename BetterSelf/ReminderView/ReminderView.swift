@@ -22,6 +22,7 @@ struct ReminderView: View {
     @State var reminder: Reminder
 
 
+
     var body: some View {
         Group {
             if reminder.isYoutube {
@@ -107,8 +108,6 @@ struct ReminderView: View {
                 .presentationDetents([.height(300)])
 
         }
-
-
         .sheet(isPresented: $edit){
             AddReminderView(reminder: reminder)
         }
@@ -131,6 +130,9 @@ struct ReminderView: View {
 
 
 
+    }
+    init(reminder: Reminder) {
+        _reminder = State(initialValue: reminder)
     }
 
 

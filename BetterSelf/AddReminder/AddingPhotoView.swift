@@ -62,7 +62,6 @@ struct AddingPhotoView: View {
                 }
                 .frame(minHeight: 300)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .shadow(color: .black.opacity(0.15), radius: 10, y: 5)
             }
             .padding(.horizontal, 20)
             .buttonStyle(.plain)

@@ -37,143 +37,120 @@ struct ContentView: View {
     @State private var welcome = false
 
     var body: some View {
-        TabView(selection: $tabPage) {
-
-
-
-            FolderView(notifReminder: $notifReminder)
-                .tag(0)
-                .tabItem{
-                    Label("Reminders", systemImage: "list.bullet")
-
-                }
-                .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
-
-
-            ProblemSolverView()
-                .tag(1)
-                .tabItem{
-                    Label("ProblemSolver", systemImage: "lightbulb.fill")
-                        .imageScale(.small)
-
-                }
-                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
-            
-//            ExploreView()
-//                .tabItem{
-//                    Label("Explore", systemImage: "magnifyingglass")
-//                }
-//                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
-//
-//            SettingsView()
-//                .tabItem{
-//                    Label("Settings", systemImage: "gear")
-//                }
-//                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
-        }
-        .sheet(isPresented: $welcome){
-            WelcomeView()
-        }
-        .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
-            if shouldNavigate, let reminderID = notificationManager.reminderID {
-                let reminder = reminders.first(where: {reminder in
-                    reminder.id.uuidString == reminderID
-                })
-                tabPage = 0
-                notifReminder = reminder
-                notificationManager.shouldNavigateToReminder = false
+            TabView(selection: $tabPage) {
+                FolderView(notifReminder: $notifReminder)
+                    .tag(0)
+                    .tabItem{
+                        Label("Reminders", systemImage: "list.bullet")
+                        
+                    }
+                    .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
+                
+                
+                ProblemSolverView()
+                    .tag(1)
+                    .tabItem{
+                        Label("ProblemSolver", systemImage: "lightbulb.fill")
+                            .imageScale(.small)
+                        
+                    }
+                    .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
+                
+                //            ExploreView()
+                //                .tabItem{
+                //                    Label("Explore", systemImage: "magnifyingglass")
+                //                }
+                //                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
+                //
+                //            SettingsView()
+                //                .tabItem{
+                //                    Label("Settings", systemImage: "gear")
+                //                }
+                //                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
             }
-        }
-        .onChange(of: notificationManager.sharedReminder){
-            if notificationManager.sharedReminder {
-                if let url = UserDefaults(suiteName: "group.adam.betterself")?.value(forKey: "incomingURL") as? String {
-                    UserDefaults(suiteName: "group.adam.betterself")?.removeObject(forKey: "incomingURL")
-                    guard let range = url.range(of: "url=") else { return }
-                    let link = String(url[range.upperBound...])  // everything after "url="
-                    let reminder = Reminder(title: "", text: "", link: link)
-                    modelContext.insert(reminder)
-                    reminder.isChecked = true
-                    reminder.type = .TimeLessLetter
-                    reminder.isShared = true
+            .sheet(isPresented: $welcome){
+                WelcomeView()
+            }
+            .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
+                if shouldNavigate, let reminderID = notificationManager.reminderID {
+                    
+                    let reminder = reminders.first(where: {reminder in
+                        reminder.id.uuidString == reminderID
+                    })
                     tabPage = 0
                     notifReminder = reminder
-                    notificationManager.sharedReminder = false
-
-
-
-                }
-
-                else {
-                    notificationManager.sharedReminder = false
+                    notificationManager.shouldNavigateToReminder = false
                 }
             }
-        }
-        .onChange(of: notificationManager.widgetReminder){
-            if notificationManager.widgetReminder {
-                let id = notificationManager.widgetReminderId
-                let reminder = reminders.first(where: { reminder in
-                    reminder.id.uuidString == id
-                })
-                tabPage = 0
-                notifReminder = reminder
-                notificationManager.widgetReminder = false
+            .onChange(of: notificationManager.sharedReminder){
+                if notificationManager.sharedReminder {
+                    if let url = UserDefaults(suiteName: "group.adam.betterself")?.value(forKey: "incomingURL") as? String {
+                        UserDefaults(suiteName: "group.adam.betterself")?.removeObject(forKey: "incomingURL")
+                        guard let range = url.range(of: "url=") else { return }
+                        let link = String(url[range.upperBound...])  // everything after "url="
+                        let reminder = Reminder(title: "", text: "", link: link)
+                        modelContext.insert(reminder)
+                        reminder.isChecked = true
+                        reminder.type = .TimeLessLetter
+                        reminder.isShared = true
+                        tabPage = 0
+                        notifReminder = reminder
+                        notificationManager.sharedReminder = false
+                    }
+                    else {
+                        notificationManager.sharedReminder = false
+                    }
+                }
+            }
+            .onChange(of: notificationManager.widgetReminder){
+                if notificationManager.widgetReminder {
+                    let id = notificationManager.widgetReminderId
+                    let reminder = reminders.first(where: { reminder in
+                        reminder.id.uuidString == id
+                    })
+                    tabPage = 0
+                    notifReminder = reminder
+                    notificationManager.widgetReminder = false
+                }
+            }
+            .onAppear {
+                checkIfWelcome()
+                signInAnonymously()
+                scheduleBulkNotifications()
             }
         }
-        .onAppear {
-            checkIfWelcome()
-            signInAnonymously()
-            checkAndScheduleDailyNotification()
-            
 
-
-        }
-    }
 
     func checkIfWelcome(){
-        if UserDefaults.standard.bool(forKey: "Welcome 1.3") {
-        }
-        else {
-            welcome = true
-            UserDefaults.standard.set(true, forKey: "Welcome 1.3")
-        }
-
-
-
+//        if UserDefaults.standard.bool(forKey: "Welcome \(notificationManager.version)") {
+//        }
+//        else {
+//            welcome = true
+//            UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
+//        }
+        welcome = true
     }
 
 
-    private func checkAndScheduleDailyNotification() {
-        //Let's schedule notifications on each of the pinned reminders.
-
-        let today = Calendar.current.startOfDay(for: Date())
-
-        let lastScheduled = Calendar.current.startOfDay(for: getLastScheduledDate())
-
-        // If we haven't scheduled today, schedule tomorrow's notification
-        if !Calendar.current.isDate(lastScheduled, inSameDayAs: today) {
-            if unlockedPinnedReminders.isEmpty {
-                if let randomReminder = unlockedReminders.randomElement() {
-                    NotificationManager.shared.addNotification(randomReminder)
-                }
-            }
-            else {
-                unlockedPinnedReminders.forEach{ reminder in
-                    NotificationManager.shared.addNotification(reminder)
-                }
-            }
-            UserDefaults().set(today , forKey: "lastScheduledDate")
-
+    
+    // Schedules 7 days of notifications every time the app launches
+    // Always reschedules to keep content fresh with current pinned reminders
+    private func scheduleBulkNotifications() {
+        // Determine which reminders to use
+        let remindersToSchedule: [Reminder]
+        
+        if unlockedPinnedReminders.isEmpty {
+            // No pinned reminders - pick up to 3 random ones
+            remindersToSchedule = Array(unlockedReminders.shuffled().prefix(3))
+        } else {
+            // Use pinned reminders (up to 3)
+            remindersToSchedule = Array(unlockedPinnedReminders.prefix(3))
         }
-    }
-    func getLastScheduledDate() -> Date {
-        if let date = UserDefaults().value(forKey: "lastScheduledDate") as? Date{
-            return date
+        if !remindersToSchedule.isEmpty {
+            NotificationManager.shared.scheduleBulkNotifications(for: remindersToSchedule)
+        } else {
+            print("⚠️ No reminders available to schedule notifications")
         }
-        else {
-            UserDefaults().set(Date.distantPast, forKey: "lastScheduledDate")
-            return .distantPast
-        }
-
     }
 
 

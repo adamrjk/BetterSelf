@@ -9,8 +9,13 @@ import SwiftUI
 
 struct SettingsView: View {
 
+    @Environment(\.dismiss) var dismiss
     @StateObject var color = ColorManager.shared
     @Environment(\.colorScheme) var scheme
+
+    @State private var name = ""
+
+    @State private var mode: AppearanceMode = .system
 
     @State private var tutorial = false
     var body: some View {
@@ -23,45 +28,67 @@ struct SettingsView: View {
 
                 VStack(spacing: 16){
 
-                    VStack(alignment: .leading, spacing: 12) {
+//                    Text("Hey \(name)")
+//                        .font(.headline)
+//                        .padding()
+//                        .frame(maxWidth: 320)
+//                        .padding(.vertical, 16)
+//                        .padding(.horizontal, 40)
+//                        .background(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .fill(color.cardBackground(scheme))
+//                                .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
+//                        )
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+//                        )
+//                        .padding(20)
 
-                        CleanText("LightTheme")
-                            .foregroundColor(.primary)
-                        ScrollView(.horizontal){
-                            Button{
-                                print("Hello")
-                            }label: {
-                                Color.creamyYellow
-                                    .frame(width: 30, height: 30)
-                                    .clipShape(.circle)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                                            .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
-                                    )
-                            }
 
+//                    AppearancePicker(selectedMode: $mode)
 
-                        }
-                        .padding(12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(.systemGray6)) // Automatically adapts
-                                .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                        )
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Color(.systemGray6))
-                            .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-                    )
-                    .padding(.horizontal, 16)
+//                    VStack(alignment: .leading, spacing: 12) {
+//
+//
+//
+//                        CleanText("LightTheme")
+//                            .foregroundColor(.primary)
+//                        ScrollView(.horizontal){
+//                            Button{
+//                                print("Hello")
+//                            }label: {
+//                                Color.creamyYellow
+//                                    .frame(width: 30, height: 30)
+//                                    .clipShape(.circle)
+//                                    .overlay(
+//                                        RoundedRectangle(cornerRadius: 12)
+//                                            .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+//                                            .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
+//                                    )
+//                            }
+//
+//
+//                        }
+//                        .padding(12)
+//                        .background(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .fill(color.cardBackground(scheme))
+//                                .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
+//                        )
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+//                        )
+//                    }
+//                    .padding(.horizontal, 20)
+//                    .padding(.vertical, 16)
+//                    .background(
+//                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+//                            .fill(color.cardBackground(scheme))
+//                            .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+//                    )
+//                    .padding(.horizontal, 16)
 
                     Spacer()
                         .frame(maxHeight: 20)
@@ -87,8 +114,24 @@ struct SettingsView: View {
 
                 }
             }
+            .onAppear{
+                if let name = UserDefaults().value(forKey: "UserName") as? String{
+                    self.name = name
+                }
+            }
+
+
             .navigationTitle("Settings")
             .onChange(of: tutorial, launchTutorial)
+            .toolbar{
+                ToolbarItem(placement: .topBarTrailing){
+                    Button{
+                        dismiss()
+                    }label: {
+                        Image(systemName: "arrow.down")
+                    }
+                }
+            }
         }
 
 
@@ -96,13 +139,76 @@ struct SettingsView: View {
     }
     func launchTutorial(){
         if tutorial {
-            UserDefaults().set(false, forKey: "Tutorial 1.3")
-            TutorialManager.shared.folderViewStep = 3
+            UserDefaults().set(false, forKey: "Tutorial \(NotificationManager.shared.version)")
+            dismiss()
         }
 
 
 
 
+    }
+}
+
+enum AppearanceMode: String, CaseIterable {
+    case light = "Light"
+    case dark = "Dark"
+    case system = "System"
+
+    var icon: String {
+        switch self {
+        case .light: return "sun.max.fill"
+        case .dark: return "moon.fill"
+        case .system: return "circle.lefthalf.filled"
+        }
+    }
+}
+
+
+struct AppearancePicker: View {
+    @Binding var selectedMode: AppearanceMode
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
+
+
+    var body: some View {
+        VStack(spacing: 12) {
+            CleanText("Appearance")
+
+            HStack(spacing: 12) {
+                ForEach(AppearanceMode.allCases, id: \.self) { mode in
+                    Button {
+                        selectedMode = mode
+                    } label: {
+                        VStack(spacing: 8) {
+                            Image(systemName: mode.icon)
+                                .font(.system(size: 28))
+//                                .foregroundStyle(selectedMode == mode ? color.text(scheme) : .secondary)
+
+                            Text(mode.rawValue)
+                                .font(.subheadline)
+                                .fontWeight(selectedMode == mode ? .semibold : .regular)
+                                .foregroundStyle(selectedMode == mode ? .primary : .secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(selectedMode == mode ?
+                                      Color.primary.opacity(scheme == .dark ? 0.15 : 0.08) :
+                                      Color.primary.opacity(scheme == .dark ? 0.05 : 0.03))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(selectedMode == mode ?
+                                        color.text(scheme) :
+                                       Color.clear,
+                                       lineWidth: 2)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 }
 

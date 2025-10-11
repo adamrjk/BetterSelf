@@ -17,19 +17,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
-
         UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-            if granted {
-                DispatchQueue.main.async {
-                    application.registerForRemoteNotifications()
-                }
-            }
-        }
-
         return true
     }
-
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound])
     }
@@ -38,7 +28,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // When notification is tapped, trigger the navigation
 
         let request = response.notification.request
-        NotificationManager.shared.reminderID = request.identifier
+        NotificationManager.shared.reminderID =  request.identifier.components(separatedBy: "_").first
         NotificationManager.shared.shouldNavigateToReminder = true
         completionHandler()
     }
@@ -59,7 +49,6 @@ struct BetterSelfApp: App {
                         NotificationManager.shared.sharedReminder = true
                     }
                     else {
-
                         guard let range = url.absoluteString.range(of: "reminder=") else { return }
                         NotificationManager.shared.widgetReminderId = String(url.absoluteString[range.upperBound...])
                         NotificationManager.shared.widgetReminder = true

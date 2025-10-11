@@ -40,6 +40,7 @@ struct HomeView: View {
     @State private var deleteAlert = false
     @State private var reminderToDelete: Reminder?
 
+
     var unlockedReminders: [Reminder]{
         reminders.filter{
             $0.isLocked == false
@@ -69,8 +70,6 @@ struct HomeView: View {
     @State private var welcome = true
 
 
-
-
     @State private var sorting: Sorting
 
 
@@ -80,49 +79,6 @@ struct HomeView: View {
     @State private var videoRecorded = false
     @State private var title = ""
 
-
-    var tutorialSteps: [TutorialStep] {
-        switch TutorialManager.shared.homeViewStep {
-        case 0:
-            StepStorage.HomeViewSteps0
-
-        case 1:
-            StepStorage.HomeViewSteps1
-
-        case 2:
-            StepStorage.homeViewSteps2
-        default:
-            []
-        }
-    }
-    var tutorialId: String {
-        switch TutorialManager.shared.homeViewStep {
-        case 0:
-            "Home0"
-
-        case 1:
-            "Home1"
-
-        case 2:
-            "Home2"
-        default:
-            ""
-        }
-    }
-    var previousId: String {
-        switch TutorialManager.shared.homeViewStep {
-        case 3:
-            "Folder0"
-
-        case 0:
-            "AddReminder"
-
-        case 1:
-            "Reminder"
-        default:
-            ""
-        }
-    }
 
 
     var body: some View {
@@ -265,7 +221,7 @@ struct HomeView: View {
                         HStack {
                             Image(systemName: "arrow.up.arrow.down")
                                 .font(.subheadline)
-                                .foregroundStyle(color.itemColor(scheme))
+                                .foregroundStyle(color.button(scheme))
                                 .padding(7)
 
                             Text("Sort By")
@@ -284,7 +240,7 @@ struct HomeView: View {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.subheadline)
                                 .buttonStyle(.plain)
-                                .foregroundStyle(color.itemColor(scheme))
+                                .foregroundStyle(color.button(scheme))
                                 .padding(8)
                             //                .background(newCardBackground)
                             //                .clipShape(.capsule)
@@ -301,7 +257,7 @@ struct HomeView: View {
                 }label: {
                     Image(systemName: "ellipsis")
                         .font(.subheadline)
-                        .foregroundStyle(color.itemColor(scheme))
+                        .foregroundStyle(color.button(scheme))
                         .padding(7)
                     //                        .background(
                     //                            Circle()
@@ -309,8 +265,6 @@ struct HomeView: View {
                     //                        )
                 }
             }
-
-
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Add Reminder", systemImage: "plus"){
                     let reminder = Reminder(title: "", text: "", link: "", folder: folder)
@@ -323,7 +277,7 @@ struct HomeView: View {
                 }
                 .tutorialIdentifier("PlusButton")
                 .buttonStyle(.plain)
-                .foregroundStyle(color.itemColor(scheme))
+                .foregroundStyle(color.button(scheme))
                 .padding(7)
                 //                .background(newCardBackground)
                 .clipShape(.capsule)
@@ -337,7 +291,7 @@ struct HomeView: View {
                 .padding(.trailing)
                 .font(.headline)
                 .buttonStyle(.plain)
-                .foregroundStyle(color.itemColor(scheme))
+                .foregroundStyle(color.button(scheme))
                 .padding(7)
                 //                .background(newCardBackground)
                 .clipShape(.capsule)
@@ -352,7 +306,7 @@ struct HomeView: View {
                 }
                 .font(.caption)
                 .buttonStyle(.plain)
-                .foregroundStyle(color.itemColor(scheme))
+                .foregroundStyle(color.button(scheme))
                 .padding(8)
                 //                .background(newCardBackground)
                 //                .clipShape(.capsule)
@@ -429,13 +383,14 @@ struct HomeView: View {
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
         .navigationDestination(item: $selectedReminder) { reminder in
             ReminderView(reminder: reminder)
-                .onDisappear{
-                    if TutorialManager.shared.inTutorial{
-                        TutorialManager.shared.homeViewStep = 2
-                    }
-
-                }
+//                .onDisappear{
+//                    if TutorialManager.shared.inTutorial{
+//                        TutorialManager.shared.homeViewStep = 2
+//                    }
+//
+//                }
         }
+
         .navigationBarBackButtonHidden()
 
 

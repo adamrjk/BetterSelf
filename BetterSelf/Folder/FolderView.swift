@@ -34,46 +34,9 @@ struct FolderView: View {
     @State private var welcome = true
 
 
-    private var folderSteps: [TutorialStep] {
-        switch TutorialManager.shared.folderViewStep {
-        case 0:
-            StepStorage.folderViewSteps0
-        case 1:
-            StepStorage.folderViewSteps1
-        case 2:
-            StepStorage.folderViewSteps2
-        default:
-            []
-        }
-    }
-    private var tutorialId: String {
-        switch TutorialManager.shared.folderViewStep {
-        case 0:
-            "Folder0"
-        case 1:
-            "Folder1"
-        case 2:
-            "Folder2"
-        default:
-            ""
-        }
-    }
-    private var previousId: String {
-        switch TutorialManager.shared.folderViewStep {
-        case 3:
-            ""
-        case 0:
-            "Home2"
-        case 1:
-            "AddFolder"
-        default:
-            ""
-        }
-    }
-
-
     var body: some View {
         NavigationStack {
+
             GeometryReader { proxy in
 
                 ZStack {
@@ -114,6 +77,13 @@ struct FolderView: View {
                     }
 
                 }
+//                .onChange(of: TutorialManager.shared.inTutorial){
+//                    if TutorialManager.shared.inTutorial {
+//                        TutorialManager.shared.viewId("Folder")
+//                        TutorialManager.shared.startTutorial("Folder")
+//
+//                    }
+//                }
                 .navigationTitle("BetterSelf")
                 .toolbar{
                     ToolbarItem(placement: .topBarTrailing){
@@ -212,11 +182,11 @@ struct FolderView: View {
     }
 
     func checkIfWelcome(){
-        if UserDefaults().bool(forKey: "Tutorial 1.3") {
+        if UserDefaults().bool(forKey: "Tutorial \(NotificationManager.shared.version)") {
         }
         else {
             TutorialManager.shared.getStarted()
-            UserDefaults().set(true, forKey: "Tutorial 1.3")
+            UserDefaults().set(true, forKey: "Tutorial \(NotificationManager.shared.version)")
         }
 
 
