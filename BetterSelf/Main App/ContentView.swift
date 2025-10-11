@@ -72,45 +72,18 @@ struct ContentView: View {
                 WelcomeView()
             }
             .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
-                if shouldNavigate, let reminderID = notificationManager.reminderID {
-                    
-                    let reminder = reminders.first(where: {reminder in
-                        reminder.id.uuidString == reminderID
-                    })
-                    tabPage = 0
-                    notifReminder = reminder
-                    notificationManager.shouldNavigateToReminder = false
+                if shouldNavigate {
+                    handleNotificationNavigation()
                 }
             }
-            .onChange(of: notificationManager.sharedReminder){
+            .onChange(of: notificationManager.sharedReminder) {
                 if notificationManager.sharedReminder {
-                    if let url = UserDefaults(suiteName: "group.adam.betterself")?.value(forKey: "incomingURL") as? String {
-                        UserDefaults(suiteName: "group.adam.betterself")?.removeObject(forKey: "incomingURL")
-                        guard let range = url.range(of: "url=") else { return }
-                        let link = String(url[range.upperBound...])  // everything after "url="
-                        let reminder = Reminder(title: "", text: "", link: link)
-                        modelContext.insert(reminder)
-                        reminder.isChecked = true
-                        reminder.type = .TimeLessLetter
-                        reminder.isShared = true
-                        tabPage = 0
-                        notifReminder = reminder
-                        notificationManager.sharedReminder = false
-                    }
-                    else {
-                        notificationManager.sharedReminder = false
-                    }
+                    handleSharedLinkNavigation()
                 }
             }
-            .onChange(of: notificationManager.widgetReminder){
+            .onChange(of: notificationManager.widgetReminder) {
                 if notificationManager.widgetReminder {
-                    let id = notificationManager.widgetReminderId
-                    let reminder = reminders.first(where: { reminder in
-                        reminder.id.uuidString == id
-                    })
-                    tabPage = 0
-                    notifReminder = reminder
-                    notificationManager.widgetReminder = false
+                    handleWidgetNavigation()
                 }
             }
             .onAppear {
@@ -122,42 +95,83 @@ struct ContentView: View {
 
 
     func checkIfWelcome(){
-//        if UserDefaults.standard.bool(forKey: "Welcome \(notificationManager.version)") {
-//        }
-//        else {
-//            welcome = true
-//            UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
-//        }
-        welcome = true
+        if UserDefaults.standard.bool(forKey: "Welcome \(notificationManager.version)") {
+        }
+        else {
+            welcome = true
+            UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
+        }
     }
-
-
+    
+    // MARK: - Navigation Handlers
+    
+    private func handleNotificationNavigation() {
+        guard let reminderID = notificationManager.reminderID else { return }
+        
+        let reminder = reminders.first(where: { reminder in
+            reminder.id.uuidString == reminderID
+        })
+        tabPage = 0
+        notifReminder = reminder
+        notificationManager.shouldNavigateToReminder = false
+    }
+    
+    private func handleSharedLinkNavigation() {
+        guard let url = UserDefaults(suiteName: "group.adam.betterself")?.value(forKey: "incomingURL") as? String else {
+            notificationManager.sharedReminder = false
+            return
+        }
+        
+        UserDefaults(suiteName: "group.adam.betterself")?.removeObject(forKey: "incomingURL")
+        guard let range = url.range(of: "url=") else { return }
+        let link = String(url[range.upperBound...])
+        
+        let reminder = Reminder(title: "", text: "", link: link)
+        modelContext.insert(reminder)
+        reminder.isChecked = true
+        reminder.type = .TimeLessLetter
+        reminder.isShared = true
+        
+        tabPage = 0
+        notifReminder = reminder
+        notificationManager.sharedReminder = false
+    }
+    
+    private func handleWidgetNavigation() {
+        guard let id = notificationManager.widgetReminderId else {
+            notificationManager.widgetReminder = false
+            return
+        }
+        
+        let reminder = reminders.first(where: { reminder in
+            reminder.id.uuidString == id
+        })
+        tabPage = 0
+        notifReminder = reminder
+        notificationManager.widgetReminder = false
+    }
+    
+    // MARK: - Notifications
     
     // Schedules 7 days of notifications every time the app launches
     // Always reschedules to keep content fresh with current pinned reminders
     private func scheduleBulkNotifications() {
-        // Determine which reminders to use
         let remindersToSchedule: [Reminder]
         
         if unlockedPinnedReminders.isEmpty {
-            // No pinned reminders - pick up to 3 random ones
             remindersToSchedule = Array(unlockedReminders.shuffled().prefix(3))
         } else {
-            // Use pinned reminders (up to 3)
             remindersToSchedule = Array(unlockedPinnedReminders.prefix(3))
         }
+        
         if !remindersToSchedule.isEmpty {
             NotificationManager.shared.scheduleBulkNotifications(for: remindersToSchedule)
-        } else {
-            print("⚠️ No reminders available to schedule notifications")
         }
     }
-
-
-
-
+    
+    // MARK: - Firebase
+    
     private func signInAnonymously() {
-
         Auth.auth().signInAnonymously { _ , error in
             if let error = error {
                 print("Authentication failed: \(error.localizedDescription)")
