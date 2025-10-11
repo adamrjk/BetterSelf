@@ -44,6 +44,11 @@ struct ProblemSolverView: View {
                 }
 
             }
+            .onAppear{
+                if TutorialManager.shared.inTutorial {
+                    TutorialManager.shared.viewId("ProblemSolver")
+                }
+            }
             .navigationTitle("ProblemSolver")
         }
     }

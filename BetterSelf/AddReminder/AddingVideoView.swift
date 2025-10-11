@@ -38,6 +38,7 @@ struct AddingVideoView: View {
                     PhotosPicker(selection: $selectedItem, matching: .videos){
                         VideoLoadingView()
                     }
+                    .tutorialIdentifier("CameraIconButton")
                     .buttonStyle(.plain)
                     .padding()
                 case .loading:
@@ -161,7 +162,7 @@ struct AddingVideoView: View {
             do {
                 if let videoData = try await selectedItem?.loadTransferable(type: Data.self) {
                     if let uIImage = await generateThumbnail(from: videoData) {
-                        TutorialManager.shared.handleTargetViewClick(viewId: "CameraIconButton")
+                        TutorialManager.shared.handleTargetViewClick(target: "CameraIconButton")
                         thumbnail = uIImage.jpegData(compressionQuality: 0.8)
                         self.thumbnailImage = Image(uiImage: uIImage)
                         self.viewState = .showingThumbnail
@@ -221,7 +222,6 @@ struct AddingVideoView: View {
                 switch result {
                 case .success(let firebaseURL):
                     self.firebaseVideoURL = firebaseURL
-                    print(firebaseVideoURL ?? "")
 
                 case .failure(let error):
                     print("Firebase upload failed: \(error.localizedDescription)")
@@ -246,7 +246,7 @@ struct AddingVideoView: View {
                 Image(systemName: "video.fill.badge.plus")
                     .font(.system(size: 40, weight: .semibold))
                     .foregroundStyle(color.itemColor(scheme))
-                    .tutorialIdentifier("CameraIconButton")
+
 
 
 

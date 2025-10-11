@@ -73,14 +73,11 @@ class ShareViewController: UIViewController {
             }
             else{
                 if let url = item as? URL {
-                    print(url.absoluteString)
                     self.appURLString += url.absoluteString
                 }else if let url = item as? NSURL, let urlString = url.absoluteString {
-                    print(urlString)
                     self.appURLString += urlString
                 }
                 else if let str = item as? String, let url = URL(string: str) {
-                    print(str)
                     self.appURLString += url.absoluteString
                 }
                 else {

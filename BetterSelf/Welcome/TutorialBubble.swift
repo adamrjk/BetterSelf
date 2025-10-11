@@ -45,6 +45,24 @@ struct TutorialBubble: View {
                     .multilineTextAlignment(.center)
                     .lineLimit(nil)
                 
+                // Helper Button (if available)
+                if let helperButtonText = step.helperButtonText {
+                    Button(helperButtonText) {
+                        TutorialManager.shared.showHelperSheet = true
+                        TutorialManager.shared.tutorialIsDone()
+                    }
+                    .font(.caption)
+                    .foregroundColor(bubbleColor)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(bubbleColor.opacity(0.1))
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(bubbleColor.opacity(0.3), lineWidth: 1)
+                    )
+                }
+                
                 // Buttons
                 HStack(spacing: 12) {
                     if !isFirstStep {

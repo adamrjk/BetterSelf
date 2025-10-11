@@ -29,7 +29,7 @@ struct FoldersList: View {
     @Binding var refuseLoading: Bool
     @State private var deleteAlert = false
     @State private var folderToDelete: Folder?
-    
+
 
 
     var unlockedReminders: [Reminder]{
@@ -69,7 +69,7 @@ struct FoldersList: View {
 
 
     var body: some View {
-        
+
         ScrollView {
             VStack(spacing: 0){
 
@@ -161,78 +161,79 @@ struct FoldersList: View {
                                     .padding(.bottom, 12)
 
 
-                                    VStack(spacing: 0) {
+                                VStack(spacing: 0) {
 
 
-                                        // All Reminders folder
-                                        Button {
-                                            selectedFolder = Folder(name: "")
-                                            if TutorialManager.shared.inTutorial {
-                                                TutorialManager.shared.handleTargetViewClick(viewId: "AllRemindersButton")
-                                            }
-
-                                        } label: {
-                                            FolderRowView(folder: nil)
-                                                .padding(.horizontal, 16)
-                                                .padding(.vertical, 12)
-                                                .opacity(1)
+                                    // All Reminders folder
+                                    Button {
+                                        if TutorialManager.shared.inTutorial {
+                                            TutorialManager.shared.handleTargetViewClick(target: "AllRemindersButton")
                                         }
-                                        .tutorialIdentifier("AllRemindersButton")
-
-                                        if !folders.isEmpty {
-                                            Divider()
-                                                .padding(.top, 6)
-                                        }
-
-                                        List {
-                                            // Individual folders
-                                            ForEach(folders) { folder in
-                                                if folder.faceID && folder.isLocked {
-                                                    Button {
-                                                        authenticate(folder)
-                                                    } label: {
-                                                        FolderRowView(folder: folder)
-                                                            .padding(.horizontal, 16)
-                                                            .padding(.vertical, 12)
-                                                        if folder != folders.last {
-                                                            Divider()
-                                                        }
-                                                    }
-                                                } else {
-                                                    Button {
-                                                        selectedFolder = folder
-                                                    } label: {
-                                                        FolderRowView(folder: folder)
-                                                            .padding(.horizontal, 16)
-                                                            .padding(.vertical, 12)
-                                                        if folder != folders.last {
-                                                            Divider()
-                                                        }
-
-                                                    }
-                                                    .swipeActions{
-                                                        Button("", systemImage: "trash"){
-                                                            folderToDelete = folder
-                                                            deleteAlert.toggle()
-                                                        }
-                                                        .tint(.red)
+                                        selectedFolder = Folder(name: "")
 
 
+                                    } label: {
+                                        FolderRowView(folder: nil)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 12)
+                                            .opacity(1)
+                                    }
+                                    .tutorialIdentifier("AllRemindersButton")
+
+                                    if !folders.isEmpty {
+                                        Divider()
+                                            .padding(.top, 6)
+                                    }
+
+                                    List {
+                                        // Individual folders
+                                        ForEach(folders) { folder in
+                                            if folder.faceID && folder.isLocked {
+                                                Button {
+                                                    authenticate(folder)
+                                                } label: {
+                                                    FolderRowView(folder: folder)
+                                                        .padding(.horizontal, 16)
+                                                        .padding(.vertical, 12)
+                                                    if folder != folders.last {
+                                                        Divider()
                                                     }
                                                 }
+                                            } else {
+                                                Button {
+                                                    selectedFolder = folder
+                                                } label: {
+                                                    FolderRowView(folder: folder)
+                                                        .padding(.horizontal, 16)
+                                                        .padding(.vertical, 12)
+                                                    if folder != folders.last {
+                                                        Divider()
+                                                    }
 
+                                                }
+                                                .swipeActions{
+                                                    Button("", systemImage: "trash"){
+                                                        folderToDelete = folder
+                                                        deleteAlert.toggle()
+                                                    }
+                                                    .tint(.red)
+
+
+                                                }
                                             }
-                                            .listRowInsets(EdgeInsets())
-                                            .listRowBackground(Color.clear)
-                                            .listRowSeparator(.hidden)
+
                                         }
-                                        .frame(height: CGFloat(55 * folders.count))
-                                        .scrollDisabled(false)
-                                        .listStyle(.plain)
-
-
+                                        .listRowInsets(EdgeInsets())
+                                        .listRowBackground(Color.clear)
+                                        .listRowSeparator(.hidden)
                                     }
-                                
+                                    .frame(height: CGFloat(55 * folders.count))
+                                    .scrollDisabled(false)
+                                    .listStyle(.plain)
+
+
+                                }
+
 
                             }
                         }
@@ -259,7 +260,8 @@ struct FoldersList: View {
                 }
             }
 
-            }
+        }
+        .defaultScrollAnchor(.center)
         .animation(.smooth, value: pinned)
         .alert("Are you Sure?", isPresented: $deleteAlert){
             Button("Delete", role: .destructive){
@@ -346,15 +348,15 @@ struct FoldersList: View {
     func storePhotoForWidget(data: Data, id: UUID) -> String? {
         guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.adam.betterself") else { return nil }
 
-           let fileURL = containerURL.appendingPathComponent("\(id).png")
+        let fileURL = containerURL.appendingPathComponent("\(id).png")
 
-           // Resize image to reduce memory
-           if let uiImage = UIImage(data: data),
-              let resizedData = resizeImage(uiImage, targetSize: CGSize(width: 50, height: 50)) {
-               try? resizedData.write(to: fileURL)
-               return fileURL.absoluteString
-           }
-           return nil
+        // Resize image to reduce memory
+        if let uiImage = UIImage(data: data),
+           let resizedData = resizeImage(uiImage, targetSize: CGSize(width: 50, height: 50)) {
+            try? resizedData.write(to: fileURL)
+            return fileURL.absoluteString
+        }
+        return nil
     }
     func resizeImage(_ image: UIImage, targetSize: CGSize) -> Data? {
         let renderer = UIGraphicsImageRenderer(size: targetSize)
@@ -368,7 +370,7 @@ struct FoldersList: View {
 
 
     func addNotification(for reminder: Reminder) {
-     
+
     }
 
 

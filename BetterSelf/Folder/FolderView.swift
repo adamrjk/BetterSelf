@@ -46,6 +46,31 @@ struct FolderView: View {
             []
         }
     }
+    private var tutorialId: String {
+        switch TutorialManager.shared.folderViewStep {
+        case 0:
+            "Folder0"
+        case 1:
+            "Folder1"
+        case 2:
+            "Folder2"
+        default:
+            ""
+        }
+    }
+    private var previousId: String {
+        switch TutorialManager.shared.folderViewStep {
+        case 3:
+            ""
+        case 0:
+            "Home2"
+        case 1:
+            "AddFolder"
+        default:
+            ""
+        }
+    }
+
 
     var body: some View {
         NavigationStack {
@@ -76,18 +101,18 @@ struct FolderView: View {
                     }
                 }
                 .onAppear{
-
-                    if TutorialManager.shared.inTutorial && TutorialManager.shared.folderView0Done {
-                        TutorialManager.shared.endTutorial()
-                        TutorialManager.shared.folderViewStep = 1
-                    }
-
                     checkIfWelcome()
 
-
+                    if TutorialManager.shared.inTutorial {
+                        TutorialManager.shared.viewId("Folder")
+                        TutorialManager.shared.startTutorial("Folder")
+                    }
                 }
-                .onChange(of: TutorialManager.shared.folderViewStep){
-                    TutorialManager.shared.startTutorial(folderSteps)
+                .onChange(of: TutorialManager.shared.currentDone){
+                    if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
+                        TutorialManager.shared.startTutorial("Folder")
+                    }
+
                 }
                 .navigationTitle("BetterSelf")
                 .toolbar{
@@ -96,6 +121,9 @@ struct FolderView: View {
                             let folder = Folder(name: "")
                             modelContext.insert(folder)
                             newFolder = folder
+
+                            TutorialManager.shared.handleTargetViewClick(target: "FolderButton")
+
                         }
                         .tutorialIdentifier("FolderButton")
                         .buttonStyle(.plain)
@@ -116,15 +144,21 @@ struct FolderView: View {
                     SettingsView()
                         .onDisappear{
                             checkIfWelcome()
+
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.viewId("Folder")
+                                TutorialManager.shared.startTutorial("Folder")
+                            }
                         }
                 }
                 .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
                     AddFolderView(folder: folder)
                         .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
                         .presentationDetents([.medium, .large])
-                        .onDisappear{
+                        .onDisappear {
                             if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.folderViewStep = 2
+                                TutorialManager.shared.viewId("Folder")
+                                TutorialManager.shared.startTutorial("Folder")
                             }
                         }
 
@@ -133,6 +167,9 @@ struct FolderView: View {
                     RefuseLoadingView()
                         .presentationDetents([.height(300)])
                 }
+//                .sheet(isPresented: $TutorialManager.shared.){
+//                    
+//                }
 
 
                 .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
@@ -146,9 +183,23 @@ struct FolderView: View {
                 .navigationDestination(item: $selectedFolder) { folder in
                     if folder.name.isEmpty {
                         HomeView()
+                            .onDisappear{
+                                if TutorialManager.shared.inTutorial && TutorialManager.shared.isHomeView2 {
+                                    TutorialManager.shared.endTutorial()
+                                    TutorialManager.shared.viewId("Folder")
+                                    TutorialManager.shared.startTutorial("Folder")
+                                }
+                            }
                     }
                     else {
                         HomeView(folder: folder)
+                            .onDisappear{
+                                if TutorialManager.shared.inTutorial && TutorialManager.shared.isHomeView2 {
+                                    TutorialManager.shared.endTutorial()
+                                    TutorialManager.shared.viewId("Folder")
+                                    TutorialManager.shared.startTutorial("Folder")
+                                }
+                            }
                     }
                 }
                 .alert("Failed Authentication", isPresented: $showAlert){
@@ -157,16 +208,15 @@ struct FolderView: View {
 
         }
 
+
     }
 
     func checkIfWelcome(){
         if UserDefaults().bool(forKey: "Tutorial 1.3") {
         }
         else {
-            TutorialManager.shared.folderViewStep = 0
-            TutorialManager.shared.inTutorial = true
+            TutorialManager.shared.getStarted()
             UserDefaults().set(true, forKey: "Tutorial 1.3")
-
         }
 
 

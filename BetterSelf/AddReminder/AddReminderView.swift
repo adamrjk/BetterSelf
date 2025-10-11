@@ -147,7 +147,8 @@ struct AddReminderView: View {
             }
             .onAppear{
                 if TutorialManager.shared.inTutorial {
-                    TutorialManager.shared.startTutorialForSheet(StepStorage.AddReminderSteps)
+                    TutorialManager.shared.viewId("AddReminder")
+                    TutorialManager.shared.startTutorialForSheet( "AddReminder")
                 }
 
             }
@@ -161,6 +162,9 @@ struct AddReminderView: View {
                             refuseSaving.toggle()
                         }
                         else {
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.handleTargetViewClick(target: "SaveReminderButton")
+                            }
                             dismiss()
                         }
                     } label: {
@@ -231,11 +235,12 @@ struct AddReminderView: View {
         }
         .overlay{
             if TutorialManager.shared.inTutorial {
-                TutorialManager.shared.tutorialView()
+                TutorialManager.shared.tutorialView(viewId: "AddReminder")
                     .ignoresSafeArea(.all)
             }
 
         }
+//        .tutorialOverlay(viewId: "AddReminder")
 
 
     }

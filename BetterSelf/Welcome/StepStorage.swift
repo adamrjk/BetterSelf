@@ -34,7 +34,7 @@ struct StepStorage {
             title: "Let's make a Reminder",
             message: "Click on All Reminders to access your Reminders",
             buttonText: "Let's go!",
-            position: .topLow,
+            position: .topMiddle,
             targetViewId: "AllRemindersButton",
             showClickIndicator: true,
             clickIndicatorPosition: .center
@@ -201,7 +201,7 @@ struct StepStorage {
             title: "All Right let's see what else you can do",
             message: "Try swiping right on the Reminder. You can then delete the reminder if you want 😢 or you can move it to another folder(we'll go create one soon)",
             buttonText: "Next",
-            position: .bottom,
+            position: .middleLow,
             targetViewId: nil,
             showClickIndicator: false,
             expectsAction: true
@@ -211,7 +211,7 @@ struct StepStorage {
             title: "Pro Tip",
             message: "Notice that if you click the … and then Select Reminders, You can also delete or move multiple reminders at a time",
             buttonText: "Next",
-            position: .bottom,
+            position: .middleLow,
             targetViewId: nil,
             showClickIndicator: false,
             expectsAction: true
@@ -220,8 +220,8 @@ struct StepStorage {
             id: "HomeView2",
             title: "What else?",
             message: "Try swiping left on the Reminder and clicking the Pin Icon",
-            buttonText: "Ok",
-            position: .bottom,
+            buttonText: "Next",
+            position: .middleLow,
             targetViewId: nil,
             showClickIndicator: false,
             expectsAction: true
@@ -231,11 +231,12 @@ struct StepStorage {
             title: "Great I wonder what that button does",
             message: "Now Let's go back to our Folders, click the arrow at the top or Swipe Left on the Page",
             buttonText: "Ok",
-            position: .bottom,
+            position: .middleLow,
             targetViewId: nil,
             showClickIndicator: false,
             expectsAction: true
-        )
+        ),
+        TutorialStep(isEmpty: true)
 
     ]
 
@@ -245,7 +246,7 @@ struct StepStorage {
             title: "Notice your Reminder appeared under Pinned",
             message: "You can now access it easily, you'll get daily notifications and you'll be able to access it directly from the BetterSelf Widget!",
             buttonText: "Next",
-            position: .bottom,
+            position: .middleLow,
             targetViewId: nil,
             showClickIndicator: false,
             expectsAction: true
@@ -255,7 +256,7 @@ struct StepStorage {
             title: "Now let's make a Folder",
             message: "Click the Folder at the top right",
             buttonText: "Next",
-            position: .bottom,
+            position: .middleLow,
             targetViewId: "FolderButton",
             showClickIndicator: true,
             expectsAction: false
@@ -272,10 +273,10 @@ struct StepStorage {
             targetViewId: "FolderButton",
             showClickIndicator: false,
             expectsAction: true
-        )
+        ),
+        TutorialStep(isEmpty: true)
 
     ]
-    #warning("Make sure to add an step that invites user to go on Youtube and try sharing")
     static let folderViewSteps2 = [
         TutorialStep(
             id: "EndingTutorial",
@@ -285,9 +286,28 @@ struct StepStorage {
             position: .center,
             targetViewId: nil,
             showClickIndicator: false,
-            expectsAction: false,
-            lastStep: true
+            expectsAction: false
+        ),
+
+        TutorialStep(
+            id: "Sharing",
+            title: "Finally, try Sharing ",
+            message: "Try going on Youtube or any website, and sharing to BetterSelf",
+            buttonText: "Ok",
+            position: .center,
+            targetViewId: "FolderButton",
+            showClickIndicator: false,
+            expectsAction: true,
+            lastStep: true,
+            helperButtonText: "Watch a Tutorial"
         )
+
+
+
+
+
+
+
     ]
 
 

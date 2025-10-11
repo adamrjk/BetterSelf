@@ -9,10 +9,15 @@ import SwiftUI
 
 // MARK: - View Identifier Extension
 extension View {
+    @ViewBuilder
     func tutorialIdentifier(_ id: String) -> some View {
-        self.accessibilityIdentifier(id)
-            .trackView(id: id) // Automatically track view position
-            .tutorialHighlight(id: id) // Automatically add highlight capability
+        if TutorialManager.shared.inTutorial {
+            self.accessibilityIdentifier(id)
+                .trackView(id: id) // Track view position only during tutorial
+                .tutorialHighlight(id: id) // Add highlight capability only during tutorial
+        } else {
+            self.accessibilityIdentifier(id) // Always keep accessibility ID
+        }
     }
 }
 

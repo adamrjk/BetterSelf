@@ -113,6 +113,18 @@ struct ClickIndicator: View {
                 
                 indicatorPosition = CGPoint(x: x, y: y)
                 indicatorDirection = .down
+            } else if targetId == "CameraIconButton" {
+                // Special handling for CameraIconButton - it's in the center of screen in a card
+                let safeAreaTop = geometry.safeAreaInsets.top
+                let availableHeight = geometry.size.height - safeAreaTop - geometry.safeAreaInsets.bottom
+                let horizontalCenter = geometry.size.width / 2
+                
+                // Position at center of the card area (around 35-40% from top)
+                let x = horizontalCenter
+                let y = safeAreaTop + (availableHeight * 0.66) // Center of the main content card
+                
+                indicatorPosition = CGPoint(x: x, y: y)
+                indicatorDirection = .down
             } else if let targetPosition = viewFinder.getViewPosition(for: targetId) {
                 // Use ViewFinder for other buttons (works perfectly in regular views)
                 indicatorPosition = targetPosition.center

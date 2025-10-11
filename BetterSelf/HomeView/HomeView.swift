@@ -95,6 +95,34 @@ struct HomeView: View {
             []
         }
     }
+    var tutorialId: String {
+        switch TutorialManager.shared.homeViewStep {
+        case 0:
+            "Home0"
+
+        case 1:
+            "Home1"
+
+        case 2:
+            "Home2"
+        default:
+            ""
+        }
+    }
+    var previousId: String {
+        switch TutorialManager.shared.homeViewStep {
+        case 3:
+            "Folder0"
+
+        case 0:
+            "AddReminder"
+
+        case 1:
+            "Reminder"
+        default:
+            ""
+        }
+    }
 
 
     var body: some View {
@@ -121,8 +149,7 @@ struct HomeView: View {
                         ForEach(sortedReminders){ reminder in
                             Button {
                                 if TutorialManager.shared.inTutorial {
-                                    TutorialManager.shared.handleTargetViewClick(viewId: "ReminderButton")
-                                    TutorialManager.shared.HomeView1Done = true 
+                                    TutorialManager.shared.handleTargetViewClick(target: "ReminderButton")
                                 }
 
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube  {
@@ -136,7 +163,6 @@ struct HomeView: View {
 
                             }
                             .tutorialIdentifier("ReminderButton")
-
                             .swipeActions{
 
                                 Button("", systemImage: "trash"){
@@ -206,14 +232,18 @@ struct HomeView: View {
             }
         }
         .onAppear{
-            if TutorialManager.shared.inTutorial && !TutorialManager.shared.HomeView1Done{
-                TutorialManager.shared.folderView0Done = true
-                TutorialManager.shared.startTutorial(tutorialSteps)
+
+            if TutorialManager.shared.inTutorial {
+                TutorialManager.shared.viewId("Home")
+                TutorialManager.shared.startTutorial("Home")
             }
 
         }
-        .onChange(of: TutorialManager.shared.homeViewStep){
-            TutorialManager.shared.startTutorial(tutorialSteps)
+        .onChange(of: TutorialManager.shared.currentDone){
+            if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
+                TutorialManager.shared.viewId("Home")
+                TutorialManager.shared.startTutorial("Home")
+            }
         }
 
         .toolbar {
@@ -288,7 +318,7 @@ struct HomeView: View {
                     newReminder = reminder
                     addReminder.toggle()
                     if TutorialManager.shared.inTutorial {
-                        TutorialManager.shared.handleTargetViewClick(viewId: "PlusButton")
+                        TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
                     }
                 }
                 .tutorialIdentifier("PlusButton")
@@ -356,7 +386,8 @@ struct HomeView: View {
                 AddReminderView(reminder: reminder)
                     .onDisappear{
                         if TutorialManager.shared.inTutorial {
-                            TutorialManager.shared.homeViewStep = 1
+                            TutorialManager.shared.viewId("Home")
+                            TutorialManager.shared.startTutorial("Home")
                         }
                     }
             }
@@ -406,6 +437,7 @@ struct HomeView: View {
                 }
         }
         .navigationBarBackButtonHidden()
+
 
 
 

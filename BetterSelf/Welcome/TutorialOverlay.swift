@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct TutorialOverlay: View {
+
     @ObservedObject private var tutorialManager = TutorialManager.shared
     @Environment(\.colorScheme) var scheme
-    
+
+
     var body: some View {
-        if tutorialManager.isActive && tutorialManager.shouldRender, let currentStep = tutorialManager.currentStep {
+        ZStack {
+        if tutorialManager.isActive && tutorialManager.shouldRender, 
+           let currentStep = tutorialManager.currentStep,
+           !currentStep.isInvisible {
             ZStack {
                 // Only show dimming for NON-click steps AND when not expecting action
                 if !currentStep.showClickIndicator && !currentStep.expectsAction {
@@ -64,6 +69,14 @@ struct TutorialOverlay: View {
                 .allowsHitTesting(false)
             }
             .transition(.opacity)
+        }
+        }
+        .onChange(of: TutorialManager.shared.currentViewId){
+            TutorialManager.shared.check()
+        }
+        .sheet(isPresented: $tutorialManager.showHelperSheet) {
+            SharingTutorial()
+                .ignoresSafeArea()
         }
     }
     
@@ -133,13 +146,18 @@ struct TutorialOverlay: View {
     }
 }
 
-// MARK: - Manual Tutorial Overlay (ignores shouldRender flag)
+// MARK: - Manual Tutorial Overlay (ignores shouldRender flag, used in sheets)
 struct ManualTutorialOverlay: View {
+    let viewId: String
     @ObservedObject private var tutorialManager = TutorialManager.shared
     @Environment(\.colorScheme) var scheme
     
     var body: some View {
-        if tutorialManager.isActive, let currentStep = tutorialManager.currentStep {
+        ZStack {
+        if tutorialManager.isActive, 
+           let currentStep = tutorialManager.currentStep,
+           viewId == tutorialManager.currentViewId,
+           !currentStep.isInvisible {
             ZStack {
                 // Only show dimming for NON-click steps AND when not expecting action
                 if !currentStep.showClickIndicator && !currentStep.expectsAction {
@@ -191,6 +209,15 @@ struct ManualTutorialOverlay: View {
                 .allowsHitTesting(false)
             }
             .transition(.opacity)
+        }
+        }
+        .onChange(of: TutorialManager.shared.currentViewId){
+            TutorialManager.shared.check()
+        }
+        .sheet(isPresented: $tutorialManager.showHelperSheet) {
+            Text("Helper content will go here")
+                .padding()
+                .presentationDetents([.medium, .large])
         }
     }
     
@@ -260,6 +287,6 @@ struct ManualTutorialOverlay: View {
     }
 }
 
-#Preview {
-    TutorialOverlay()
-}
+//#Preview {
+//    TutorialOverlay()
+//}

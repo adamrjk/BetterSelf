@@ -12,12 +12,13 @@ extension View {
         self.overlay(
             TutorialOverlay()
                 .ignoresSafeArea()
+
         )
     }
     
     func tutorialClickable(id: String) -> some View {
         self.onTapGesture {
-            TutorialManager.shared.handleTargetViewClick(viewId: id)
+            TutorialManager.shared.handleTargetViewClick(target: id)
         }
     }
 }

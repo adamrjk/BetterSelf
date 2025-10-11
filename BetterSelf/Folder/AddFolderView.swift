@@ -84,14 +84,14 @@ struct AddFolderView: View {
             }
             .overlay{
                 if TutorialManager.shared.inTutorial {
-                    TutorialManager.shared.tutorialView()
+                    TutorialManager.shared.tutorialView(viewId: "AddFolder")
                 }
             }
             .onAppear{
-                if TutorialManager.shared.inTutorial {
-                    TutorialManager.shared.startTutorialForSheet(StepStorage.AddFolderSteps)
+                if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
+                    TutorialManager.shared.viewId("AddFolder")
+                    TutorialManager.shared.startTutorialForSheet("AddFolder")
                 }
-
             }
             .navigationTitle("New Folder")
             .toolbar {
@@ -103,6 +103,9 @@ struct AddFolderView: View {
 
                         }
                         else{
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.nextStep()
+                            }
                             folder.isChecked = true
                             dismiss()
                         }
@@ -145,6 +148,7 @@ struct AddFolderView: View {
             )
 
         }
+//        .tutorialOverlay(viewId: "AddFolder")
 
 
 

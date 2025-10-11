@@ -133,7 +133,6 @@ class CameraViewController: UIViewController {
         ])
         
         view.addSubview(recordButton)
-        print("Record button created and added to view")
         
         // Recording indicator
         recordingIndicator = UIView()
@@ -192,9 +191,6 @@ class CameraViewController: UIViewController {
     }
     
     @objc private func recordButtonTapped() {
-        print("Record button tapped! isRecording: \(isRecording)")
-        print("Button frame: \(recordButton.frame)")
-        print("Button bounds: \(recordButton.bounds)")
         if isRecording {
             stopRecording()
         } else {

@@ -108,9 +108,10 @@ struct ViewTracker: ViewModifier {
                             let frame = geometry.frame(in: .global)
                             viewFinder.updateViewPosition(id: id, frame: frame)
                         }
-                        .onChange(of: geometry.frame(in: .global)) { _, newFrame in
-                            viewFinder.updateViewPosition(id: id, frame: newFrame)
+                        .onChange(of: geometry.frame(in: .global)){
+                            viewFinder.updateViewPosition(id: id, frame: geometry.frame(in: .global))
                         }
+
                 }
             )
     }
