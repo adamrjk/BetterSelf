@@ -37,7 +37,7 @@ struct TutorialOverlay: View {
                         step: currentStep,
                         onNext: tutorialManager.nextStep,
                         onPrevious: tutorialManager.previousStep,
-                        onSkip: tutorialManager.endTutorial,
+                        onSkip: tutorialManager.tutorialIsDone,
                         isFirstStep: tutorialManager.currentStepIndex == 0,
                         isLastStep: tutorialManager.currentStepIndex == tutorialManager.steps.count - 1
                     )
@@ -45,8 +45,9 @@ struct TutorialOverlay: View {
                 }
                 // Tutorial bubble is INTERACTIVE - no allowsHitTesting(false) here
                 
-                // Progress indicator
+                // Progress indicator (bottom-right)
                 VStack {
+                    Spacer()
                     HStack {
                         Spacer()
                         Text("\(tutorialManager.currentStepIndex + 1) of \(tutorialManager.steps.count)")
@@ -56,10 +57,9 @@ struct TutorialOverlay: View {
                             .padding(.vertical, 6)
                             .background(.black.opacity(0.6))
                             .clipShape(Capsule())
-                            .padding(.top, 50)
+                            .padding(.bottom, 20)
                             .padding(.trailing, 20)
                     }
-                    Spacer()
                 }
                 .allowsHitTesting(false)
             }
@@ -77,7 +77,6 @@ struct TutorialOverlay: View {
         // Calculate available height (excluding safe areas)
         let availableHeight = screenHeight - safeAreaTop - safeAreaBottom
         let availableTop = safeAreaTop
-        let availableBottom = screenHeight - safeAreaBottom
         
         // Define position percentages relative to screen size
         let horizontalCenter = screenWidth / 2
@@ -165,7 +164,7 @@ struct ManualTutorialOverlay: View {
                         step: currentStep,
                         onNext: tutorialManager.nextStep,
                         onPrevious: tutorialManager.previousStep,
-                        onSkip: tutorialManager.endTutorial,
+                        onSkip: tutorialManager.tutorialIsDone,
                         isFirstStep: tutorialManager.currentStepIndex == 0,
                         isLastStep: tutorialManager.currentStepIndex == tutorialManager.steps.count - 1
                     )
@@ -173,8 +172,9 @@ struct ManualTutorialOverlay: View {
                 }
                 // Tutorial bubble is INTERACTIVE - no allowsHitTesting(false) here
                 
-                // Progress indicator
+                // Progress indicator (bottom-right)
                 VStack {
+                    Spacer()
                     HStack {
                         Spacer()
                         Text("\(tutorialManager.currentStepIndex + 1) of \(tutorialManager.steps.count)")
@@ -184,10 +184,9 @@ struct ManualTutorialOverlay: View {
                             .padding(.vertical, 6)
                             .background(.black.opacity(0.6))
                             .clipShape(Capsule())
-                            .padding(.top, 50)
+                            .padding(.bottom, 20)
                             .padding(.trailing, 20)
                     }
-                    Spacer()
                 }
                 .allowsHitTesting(false)
             }
@@ -205,7 +204,6 @@ struct ManualTutorialOverlay: View {
         // Calculate available height (excluding safe areas)
         let availableHeight = screenHeight - safeAreaTop - safeAreaBottom
         let availableTop = safeAreaTop
-        let availableBottom = screenHeight - safeAreaBottom
         
         // Define position percentages relative to screen size
         let horizontalCenter = screenWidth / 2

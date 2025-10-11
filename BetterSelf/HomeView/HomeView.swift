@@ -70,6 +70,7 @@ struct HomeView: View {
 
 
 
+
     @State private var sorting: Sorting
 
 
@@ -119,8 +120,11 @@ struct HomeView: View {
                     List(selection: $selection) {
                         ForEach(sortedReminders){ reminder in
                             Button {
-                                TutorialManager.shared.handleTargetViewClick(viewId: "ReminderButton")
-//                                TutorialManager.shared.homeViewStep = 2
+                                if TutorialManager.shared.inTutorial {
+                                    TutorialManager.shared.handleTargetViewClick(viewId: "ReminderButton")
+                                    TutorialManager.shared.HomeView1Done = true 
+                                }
+
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube  {
                                     refuseLoading.toggle()
                                 }
@@ -202,7 +206,11 @@ struct HomeView: View {
             }
         }
         .onAppear{
-            TutorialManager.shared.startTutorial(tutorialSteps)
+            if TutorialManager.shared.inTutorial && !TutorialManager.shared.HomeView1Done{
+                TutorialManager.shared.folderView0Done = true
+                TutorialManager.shared.startTutorial(tutorialSteps)
+            }
+
         }
         .onChange(of: TutorialManager.shared.homeViewStep){
             TutorialManager.shared.startTutorial(tutorialSteps)
@@ -211,10 +219,9 @@ struct HomeView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-
                     Menu {
 
-                        Picker("Sort By", selection: $sorting) {
+                        Picker("Sort", selection: $sorting) {
                             Text("Newest First")
                                 .tag( Sorting.dateNew)
 
@@ -231,7 +238,7 @@ struct HomeView: View {
                                 .foregroundStyle(color.itemColor(scheme))
                                 .padding(7)
 
-                            Text("Sort")
+                            Text("Sort By")
 
                         }
                     }
@@ -280,7 +287,9 @@ struct HomeView: View {
                     modelContext.insert(reminder)
                     newReminder = reminder
                     addReminder.toggle()
-                    TutorialManager.shared.handleTargetViewClick(viewId: "PlusButton")
+                    if TutorialManager.shared.inTutorial {
+                        TutorialManager.shared.handleTargetViewClick(viewId: "PlusButton")
+                    }
                 }
                 .tutorialIdentifier("PlusButton")
                 .buttonStyle(.plain)
@@ -345,6 +354,11 @@ struct HomeView: View {
         .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
             if let reminder = newReminder {
                 AddReminderView(reminder: reminder)
+                    .onDisappear{
+                        if TutorialManager.shared.inTutorial {
+                            TutorialManager.shared.homeViewStep = 1
+                        }
+                    }
             }
         }
         .sheet(isPresented: $refuseLoading){
@@ -384,6 +398,12 @@ struct HomeView: View {
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
         .navigationDestination(item: $selectedReminder) { reminder in
             ReminderView(reminder: reminder)
+                .onDisappear{
+                    if TutorialManager.shared.inTutorial{
+                        TutorialManager.shared.homeViewStep = 2
+                    }
+
+                }
         }
         .navigationBarBackButtonHidden()
 
@@ -425,11 +445,6 @@ struct HomeView: View {
 
 
     func deleteEmptyReminder() {
-
-        if welcome {
-            TutorialManager.shared.startTutorial(StepStorage.HomeViewSteps1)
-        }
-
         if let reminder = newReminder{
             guard reminder.isChecked == false else { return }
             if reminder.isEmpty {

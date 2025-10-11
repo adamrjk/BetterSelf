@@ -82,6 +82,17 @@ struct AddFolderView: View {
 
 //                #warning("Add the possibility to choose some reminders to immediately add.")
             }
+            .overlay{
+                if TutorialManager.shared.inTutorial {
+                    TutorialManager.shared.tutorialView()
+                }
+            }
+            .onAppear{
+                if TutorialManager.shared.inTutorial {
+                    TutorialManager.shared.startTutorialForSheet(StepStorage.AddFolderSteps)
+                }
+
+            }
             .navigationTitle("New Folder")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){

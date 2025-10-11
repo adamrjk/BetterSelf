@@ -167,7 +167,10 @@ struct FoldersList: View {
                                         // All Reminders folder
                                         Button {
                                             selectedFolder = Folder(name: "")
-                                            TutorialManager.shared.handleTargetViewClick(viewId: "AllRemindersButton")
+                                            if TutorialManager.shared.inTutorial {
+                                                TutorialManager.shared.handleTargetViewClick(viewId: "AllRemindersButton")
+                                            }
+
                                         } label: {
                                             FolderRowView(folder: nil)
                                                 .padding(.horizontal, 16)
@@ -224,7 +227,7 @@ struct FoldersList: View {
                                             .listRowSeparator(.hidden)
                                         }
                                         .frame(height: CGFloat(55 * folders.count))
-                                        .scrollDisabled(true)
+                                        .scrollDisabled(false)
                                         .listStyle(.plain)
 
 
@@ -257,7 +260,6 @@ struct FoldersList: View {
             }
 
             }
-        .scrollDisabled(welcome)
         .animation(.smooth, value: pinned)
         .alert("Are you Sure?", isPresented: $deleteAlert){
             Button("Delete", role: .destructive){

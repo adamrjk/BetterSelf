@@ -40,7 +40,18 @@ struct SettingsView: View {
 
             }
             .navigationTitle("Settings")
+            .onChange(of: tutorial, launchTutorial)
         }
+
+
+
+    }
+    func launchTutorial(){
+        if tutorial {
+            UserDefaults().set(false, forKey: "Tutorial 1.3")
+            TutorialManager.shared.folderViewStep = 3
+        }
+
 
 
 

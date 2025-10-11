@@ -18,6 +18,7 @@ struct TutorialStep {
     let showClickIndicator: Bool // Whether to show animated click indicator
     let clickIndicatorPosition: ClickIndicatorPosition? // Position of the click indicator
     let expectsAction: Bool // If true, keeps background at full brightness for user actions
+    let lastStep: Bool
 
 
 
@@ -31,7 +32,8 @@ struct TutorialStep {
         buttonText: String,
         position: TutorialPosition,
         targetViewId: String? = nil,
-        expectsAction: Bool = false
+        expectsAction: Bool = false,
+        lastStep: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -42,6 +44,7 @@ struct TutorialStep {
         self.showClickIndicator = false
         self.clickIndicatorPosition = nil
         self.expectsAction = expectsAction
+        self.lastStep = lastStep
     }
     
     // Full initializer with click indicator
@@ -54,7 +57,8 @@ struct TutorialStep {
         targetViewId: String? = nil,
         showClickIndicator: Bool,
         clickIndicatorPosition: ClickIndicatorPosition? = nil,
-        expectsAction: Bool = false
+        expectsAction: Bool = false,
+        lastStep: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -65,6 +69,7 @@ struct TutorialStep {
         self.showClickIndicator = showClickIndicator
         self.clickIndicatorPosition = clickIndicatorPosition
         self.expectsAction = expectsAction
+        self.lastStep = lastStep
     }
     
     /// Tutorial bubble positioning options that are relative to device screen size
@@ -112,7 +117,12 @@ struct TutorialStep {
 // MARK: - Tutorial Manager
 class TutorialManager: ObservableObject {
     static let shared = TutorialManager()
-    
+
+    @Published var inTutorial = false
+
+    @Published var folderView0Done = false
+    @Published var HomeView1Done = false
+
     @Published var isActive = false
     @Published var shouldRender = true // Controls whether tutorial renders as a view
     @Published var currentStepIndex = 0
@@ -120,6 +130,7 @@ class TutorialManager: ObservableObject {
 
     @Published var homeViewStep = 0
 
+    @Published var folderViewStep = 3
 
     private init() {}
     
@@ -152,10 +163,31 @@ class TutorialManager: ObservableObject {
         self.isActive = false
     }
     
+    // MARK: - Keyboard Handling for Text Field Tutorials
+    func handleKeyboardAppeared() {
+        // Hide tutorial when keyboard appears (user clicked text field) with animation
+        withAnimation(.easeInOut(duration: 0.3)) {
+            hideTutorial()
+        }
+    }
+    
+    func handleKeyboardDismissed() {
+        // Show next tutorial step when keyboard is dismissed (action completed) with animation
+        nextStep()
+        withAnimation(.easeInOut(duration: 0.4)) {
+            showTutorial()
+        }
+    }
+    
     func nextStep() {
         if currentStepIndex < steps.count - 1 {
             currentStepIndex += 1
         } else {
+            if let step = currentStep {
+                if step.lastStep {
+                    inTutorial = false
+                }
+            }
             endTutorial()
         }
     }
@@ -188,7 +220,12 @@ class TutorialManager: ObservableObject {
         // Auto-advance to next step
         nextStep()
     }
-    
+
+    func tutorialIsDone(){
+        endTutorial()
+        inTutorial = false
+    }
+
     
     var currentStep: TutorialStep? {
         guard currentStepIndex < steps.count else { return nil }

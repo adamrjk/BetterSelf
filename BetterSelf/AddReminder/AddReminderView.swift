@@ -135,12 +135,20 @@ struct AddReminderView: View {
                     .padding(.top, 20)
                 }
             }
-            .overlay{
-                TutorialManager.shared.tutorialView()
-
+            .onChange(of: keyboard){
+                if TutorialManager.shared.inTutorial {
+                    if keyboard {
+                        TutorialManager.shared.handleKeyboardAppeared()
+                    }
+                    else {
+                        TutorialManager.shared.handleKeyboardDismissed()
+                    }
+                }
             }
             .onAppear{
-                TutorialManager.shared.startTutorialForSheet(StepStorage.AddReminderSteps)
+                if TutorialManager.shared.inTutorial {
+                    TutorialManager.shared.startTutorialForSheet(StepStorage.AddReminderSteps)
+                }
 
             }
             .animation(.smooth, value: keyboard)
@@ -153,13 +161,10 @@ struct AddReminderView: View {
                             refuseSaving.toggle()
                         }
                         else {
-                            if welcome{
-                                TutorialManager.shared.homeViewStep = 1
-                            }
                             dismiss()
                         }
                     } label: {
-//                        HStack {
+                        HStack {
                             Text("Save")
 //                                .frame(width: 50)
 //                                .font(.headline)
@@ -167,7 +172,7 @@ struct AddReminderView: View {
 //                                .padding(7)
 //                                .background(color.cardBackground(scheme))
 //                                .clipShape(.capsule)
-//                        }
+                        }
                     }
                     .tutorialIdentifier("SaveReminderButton")
 //                    .buttonStyle(.plain)
@@ -222,6 +227,13 @@ struct AddReminderView: View {
             //                }
             //            }
 
+
+        }
+        .overlay{
+            if TutorialManager.shared.inTutorial {
+                TutorialManager.shared.tutorialView()
+                    .ignoresSafeArea(.all)
+            }
 
         }
 
@@ -292,8 +304,6 @@ struct AddReminderView: View {
 
         }
     }
-
-
 
 
 

@@ -123,15 +123,18 @@ struct ContentView: View {
             checkIfWelcome()
             signInAnonymously()
             checkAndScheduleDailyNotification()
+            
+
+
         }
     }
 
     func checkIfWelcome(){
-        if UserDefaults.standard.bool(forKey: "Welcome") {
+        if UserDefaults.standard.bool(forKey: "Welcome 1.3") {
         }
         else {
             welcome = true
-            UserDefaults.standard.set(true, forKey: "Welcome")
+            UserDefaults.standard.set(true, forKey: "Welcome 1.3")
         }
 
 

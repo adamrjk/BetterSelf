@@ -42,7 +42,9 @@ struct ReminderView: View {
             }
         }
         .onAppear{
-            TutorialManager.shared.startTutorial(StepStorage.reminderSteps)
+            if TutorialManager.shared.inTutorial {
+                TutorialManager.shared.startTutorial(StepStorage.reminderSteps)
+            }
         }
         .navigationBarBackButtonHidden()
         .navigationTitle(reminder.title)

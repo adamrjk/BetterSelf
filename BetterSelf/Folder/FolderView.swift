@@ -27,20 +27,31 @@ struct FolderView: View {
     @State private var selectedFolder: Folder?
     @Binding var notifReminder: Reminder?
 
-    @State private var grayOut = true
-
     @Environment(\.colorScheme) var scheme
 
     @State private var settings = false
+
+    @State private var welcome = true
+
+
+    private var folderSteps: [TutorialStep] {
+        switch TutorialManager.shared.folderViewStep {
+        case 0:
+            StepStorage.folderViewSteps0
+        case 1:
+            StepStorage.folderViewSteps1
+        case 2:
+            StepStorage.folderViewSteps2
+        default:
+            []
+        }
+    }
 
     var body: some View {
         NavigationStack {
             GeometryReader { proxy in
 
                 ZStack {
-
-
-
                     ZStack {
                         color.mainGradient(scheme)
                             .ignoresSafeArea()
@@ -65,8 +76,18 @@ struct FolderView: View {
                     }
                 }
                 .onAppear{
-                    TutorialManager.shared.startTutorial(StepStorage.folderViewSteps)
 
+                    if TutorialManager.shared.inTutorial && TutorialManager.shared.folderView0Done {
+                        TutorialManager.shared.endTutorial()
+                        TutorialManager.shared.folderViewStep = 1
+                    }
+
+                    checkIfWelcome()
+
+
+                }
+                .onChange(of: TutorialManager.shared.folderViewStep){
+                    TutorialManager.shared.startTutorial(folderSteps)
                 }
                 .navigationTitle("BetterSelf")
                 .toolbar{
@@ -76,6 +97,7 @@ struct FolderView: View {
                             modelContext.insert(folder)
                             newFolder = folder
                         }
+                        .tutorialIdentifier("FolderButton")
                         .buttonStyle(.plain)
 
                     }
@@ -92,11 +114,19 @@ struct FolderView: View {
                 }
                 .sheet(isPresented: $settings){
                     SettingsView()
+                        .onDisappear{
+                            checkIfWelcome()
+                        }
                 }
                 .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
                     AddFolderView(folder: folder)
                         .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
                         .presentationDetents([.medium, .large])
+                        .onDisappear{
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.folderViewStep = 2
+                            }
+                        }
 
                 }
                 .sheet(isPresented: $refuseLoading){
@@ -128,6 +158,20 @@ struct FolderView: View {
         }
 
     }
+
+    func checkIfWelcome(){
+        if UserDefaults().bool(forKey: "Tutorial 1.3") {
+        }
+        else {
+            TutorialManager.shared.folderViewStep = 0
+            TutorialManager.shared.inTutorial = true
+            UserDefaults().set(true, forKey: "Tutorial 1.3")
+
+        }
+
+
+    }
+
 
     func deleteEmptyFolder() {
         if let folder = newFolder {
