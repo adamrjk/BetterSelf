@@ -14,25 +14,25 @@ struct StepStorage {
         TutorialStep(
             id: "welcome",
             title: "Welcome to BetterSelf!",
-            message: "Let's take a quick tour of your new learning companion.",
-            buttonText: "Let's go!",
+            message: "Let's take a quick tour of your new learning companion",
+            buttonText: "Begin",
             position: .center,
             targetViewId: nil,
             showClickIndicator: false
         ),
         TutorialStep(
             id: "Folders",
-            title: "Here is the Main Space",
-            message: "You have Pinned Reminders, which we'll try later and Folders to organize your Reminders",
-            buttonText: "Let's go!",
+            title: "Here's Your Main Space",
+            message: "Manage Folders and access Pinned reminders",
+            buttonText: "Next",
             position: .center,
             targetViewId: nil,
             showClickIndicator: false
         ),
         TutorialStep(
             id: "accessingReminders",
-            title: "Let's make a Reminder",
-            message: "Click on All Reminders to access your Reminders",
+            title: "All Reminders",
+            message: "Tap All Reminders to view everything you’ve added",
             buttonText: "Let's go!",
             position: .topMiddle,
             targetViewId: "AllRemindersButton",
@@ -44,8 +44,8 @@ struct StepStorage {
     static let HomeViewSteps0 = [
         TutorialStep(
             id: "AllReminders",
-            title: "This stores all your Reminders",
-            message: "All the Reminders you add will show here or inside another Folder",
+            title: "The All Reminders Folder",
+            message: "Every reminder you create shows here",
             buttonText: "Next",
             position: .center,
             targetViewId: nil,
@@ -54,8 +54,8 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "ClickingPlus",
-            title: "Let's add your first Reminder ",
-            message: "Click the + at the top right to add a Reminder",
+            title: "Add your first Reminder ",
+            message: "Tap the + at the top right",
             buttonText: "Next",
             position: .center,
             targetViewId: "PlusButton",
@@ -68,17 +68,18 @@ struct StepStorage {
     static let AddReminderSteps = [
         TutorialStep(
             id: "AddingFirst",
-            title: "There are three types of Reminder",
-            message: "InstantInsight: a Video with a Description \nEchoSnap: a Photo with a description \n TimeLessLetter: Just Text for journaling or quotes",
+            title: "Choose a Type",
+            message: "🎥 InstantInsight\n📷 EchoSnap\n✍️ TimelessLetter",
             buttonText: "Next",
-            position: .center,
+            position: .top,
             targetViewId: nil,
-            showClickIndicator: false
+            showClickIndicator: false,
+            expectsAction: true
         ),
         TutorialStep(
             id: "Storing Links",
-            title: "You can also store links",
-            message: "Youtube Videos and Web Articles are another Reminder Type. You can enter the link manually or share directly from the Youtube app or a web browser",
+            title: "Save Links Too",
+            message: "Add Youtube videos and web articles by pasting the link below or sharing it from another app\nMore on that soon✨",
             buttonText: "Next",
             position: .center,
             targetViewId: nil,
@@ -86,8 +87,8 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "AddingVideo",
-            title: "Let's add an InstantInsight",
-            message: "Click this Button to select a Video from your Library",
+            title: "Add an InstantInsight",
+            message: "Tap the button and select a video",
             buttonText: "Next",
             position: .middleHigh,
             targetViewId: "CameraIconButton",
@@ -97,43 +98,46 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "AddingDescription",
-            title: "Your Video is Added!",
-            message: "It might take a moment to load \nMeanwhile swipe to the right and Add a Description",
+            title: "Add a Description",
+            message: "Swipe right and describe your video",
             buttonText: "Next",
             position: .middleHigh,
             targetViewId: nil,
             showClickIndicator: false,
-            expectsAction: true
+            expectsAction: true,
+            hideNextButton: true
 
         ),
 
         TutorialStep(
             id: "AddingTitle",
-            title: "Good now add a Title",
-            message: "",
+            title: "Add a Title",
+            message: "Give your Reminder a clear name",
             buttonText: "Next",
             position: .center,
             targetViewId: nil,
             showClickIndicator: false,
-            expectsAction: true
+            expectsAction: true,
+            hideNextButton: true
         ),
         TutorialStep(
             id: "SavingReminder",
-            title: "Great now Save your Reminder",
-            message: "Click the Save button at the top Right",
+            title: "Save it",
+            message: "Tap Save at the top Right",
             buttonText: "Next",
             position: .center,
             targetViewId: "SaveReminderButton",
             showClickIndicator: true,
-            clickIndicatorPosition: .topRight
+            clickIndicatorPosition: .topRight,
+            expectsAction: true
         )
     ]
 
     static let HomeViewSteps1 = [
         TutorialStep(
             id: "BackToHomeView",
-            title: "Well Done, you've just added your first Reminder!",
-            message: "It might take a few seconds for the video to load at the first time. The indicators on the right show you if the video is added or not",
+            title: "Nice work 🎉",
+            message: "You’ve added your first Reminder!\nThe video may take a few seconds to load. Check the icons on the right to see its status",
             buttonText: "Next",
             position: .center,
             targetViewId: nil,
@@ -142,8 +146,8 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "DiscoveringButtons",
-            title: "Before watching your Reminder. Let's see what else you can do",
-            message: "Look at the top, the camera Icon is for recording Yourself, the Arrows are for Sorting and Selecting. Feel free to try them out!",
+            title: "Explore the Top Bar",
+            message: "🎥 Record yourself\n ⋯ Sort and Select\nTry them out whenever you want!",
             buttonText: "Next",
             position: .center,
             targetViewId: nil,
@@ -152,8 +156,8 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "AccessingReminder",
-            title: "Hope you add fun! Now click on your Reminder",
-            message: "Notice first the camera icon on the right, it shows that a video is available. Now Click on it",
+            title: "Open Your Reminder",
+            message: "See the camera icon on the right? That means a video’s ready. Tap your Reminder to view it.",
             buttonText: "Next",
             position: .center,
             targetViewId: "FirstReminderButton",
@@ -165,8 +169,8 @@ struct StepStorage {
     static let reminderSteps = [
         TutorialStep(
             id: "ViewingReminder",
-            title: "Here we are, viewing your Reminder!",
-            message: "You'll see this can look very different depending on the Reminder Type. I hope you'll enjoy discovering all those styles",
+            title: "Your Reminder 🎬",
+            message: "Reminders look different depending on type. Enjoy discovering all styles!",
             buttonText: "Next",
             position: .center,
             targetViewId: nil,
@@ -175,8 +179,9 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "ExplainingReminderView",
-            title: "But the goal is the same",
-            message: "The Main Thing you see is the central element of your Reminder. Then at the top you have an Edit Button if you'd like to change something, and sometimes you can have a Details Button to access the Description or the link in your Reminder. Feel free to try those out!",
+            title: "What you can do here",
+
+            message: "The main element changes with the reminder type. Use Edit to update your Reminder and ℹ️ to read more or open a link",
             buttonText: "Next",
             position: .center,
             targetViewId: nil,
@@ -185,8 +190,8 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "ViewingVideo",
-            title: "Now of course, the central thing here is this Video",
-            message: "Enjoy watching it and come back to your Reminders by swiping or clicking the arrow at the top to continue the visit",
+            title: "Watch & Continue",
+            message: "Enjoy your video, then swipe or tap the top arrow to continue the tour",
             buttonText: "Ok",
             position: .center,
             targetViewId: nil,
@@ -198,8 +203,8 @@ struct StepStorage {
     static let homeViewSteps2 = [
         TutorialStep(
             id: "HomeView2",
-            title: "All Right let's see what else you can do",
-            message: "Try swiping right on the Reminder. You can then delete the reminder if you want 😢 or you can move it to another folder(we'll go create one soon)",
+            title: "What else?",
+            message: "Swipe right on a reminder to delete it 😢 or move it to a Folder -> we’ll make one soon!",
             buttonText: "Next",
             position: .middleLow,
             targetViewId: nil,
@@ -209,7 +214,7 @@ struct StepStorage {
         TutorialStep(
             id: "Noticing Selection",
             title: "Pro Tip",
-            message: "Notice that if you click the … and then Select Reminders, You can also delete or move multiple reminders at a time",
+            message: "Tap ⋯ then Select Reminders to delete or move several at once",
             buttonText: "Next",
             position: .middleLow,
             targetViewId: nil,
@@ -218,8 +223,8 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "HomeView2",
-            title: "What else?",
-            message: "Try swiping left on the Reminder and clicking the Pin Icon",
+            title: "Pinning a Reminder",
+            message: "Swipe left on a reminder and tap the 📌 Pin icon",
             buttonText: "Next",
             position: .middleLow,
             targetViewId: nil,
@@ -228,8 +233,8 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "BackToFolders",
-            title: "Great I wonder what that button does",
-            message: "Now Let's go back to our Folders, click the arrow at the top or Swipe Left on the Page",
+            title: "Back to Folders",
+            message: "Tap the top arrow or swipe left to return to your Folders",
             buttonText: "Ok",
             position: .middleLow,
             targetViewId: nil,
@@ -243,8 +248,8 @@ struct StepStorage {
     static let folderViewSteps1 = [
         TutorialStep(
             id: "BackToFolders",
-            title: "Notice your Reminder appeared under Pinned",
-            message: "You can now access it easily, you'll get daily notifications and you'll be able to access it directly from the BetterSelf Widget!",
+            title: "Pinned Reminder 📌",
+            message: "Your reminder now appears under Pinned. You can now access it anytime from the widget and get daily notifications!",
             buttonText: "Next",
             position: .middleLow,
             targetViewId: nil,
@@ -253,8 +258,8 @@ struct StepStorage {
         ),
         TutorialStep(
             id: "AddingFolder",
-            title: "Now let's make a Folder",
-            message: "Click the Folder at the top right",
+            title: "Create a Folder 📁",
+            message: "Tap the folder button at the top right",
             buttonText: "Next",
             position: .middleLow,
             targetViewId: "FolderButton",
@@ -266,13 +271,13 @@ struct StepStorage {
     static let AddFolderSteps = [
         TutorialStep(
             id: "NewFolder",
-            title: "Here we are",
-            message: "You can add a Name and notice you can lock it with FaceID for privacy",
+            title: "Name Your Folder",
+            message: "Give your folder a name. You can also lock it with FaceID for extra privacy.\nTap Save once you're done to continue the tour",
             buttonText: "Ok",
             position: .top,
             targetViewId: "FolderButton",
             showClickIndicator: false,
-            expectsAction: true
+            expectsAction: false
         ),
         TutorialStep(isEmpty: true)
 
@@ -280,8 +285,8 @@ struct StepStorage {
     static let folderViewSteps2 = [
         TutorialStep(
             id: "EndingTutorial",
-            title: "Now you know exactly how to use BetterSelf",
-            message: "Use this app to store what you learn, it'll remind you of it and ensure you keep it in mind. Let BetterSelf be your second brain, your companion",
+            title: "All Set",
+            message: "Now you know how to use BetterSelf. Store what you learn and let it remind you. Your second brain is ready!",
             buttonText: "Ok",
             position: .center,
             targetViewId: nil,
@@ -291,15 +296,16 @@ struct StepStorage {
 
         TutorialStep(
             id: "Sharing",
-            title: "Finally, try Sharing ",
-            message: "Try going on Youtube or any website, and sharing to BetterSelf",
+            title: "Try Sharing ✨",
+            message: "From YouTube or any website, share content to BetterSelf",
             buttonText: "Ok",
             position: .center,
             targetViewId: "FolderButton",
             showClickIndicator: false,
-            expectsAction: true,
+            expectsAction: false,
             lastStep: true,
-            helperButtonText: "Watch a Tutorial"
+            helperButtonText: "Watch Tutorial",
+            hideNextButton: true
         )
 
 

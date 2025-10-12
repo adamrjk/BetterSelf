@@ -157,17 +157,18 @@ struct AddingVideoView: View {
         if selectedItem != nil {
             viewState = .loading
             isLoading = true
+            TutorialManager.shared.handleTargetViewClick(target: "CameraIconButton")
             Task {
                 do {
                     if let videoData = try await selectedItem?.loadTransferable(type: Data.self) {
                         if let uIImage = await generateThumbnail(from: videoData) {
-                            TutorialManager.shared.handleTargetViewClick(target: "CameraIconButton")
+
                             thumbnail = uIImage.jpegData(compressionQuality: 0.8)
                             self.thumbnailImage = Image(uiImage: uIImage)
                             self.viewState = .showingThumbnail
                         }
-                        
-                        
+
+
                         // Upload video in background
                         await uploadVideoToFirebase(videoData: videoData)
                     } else {

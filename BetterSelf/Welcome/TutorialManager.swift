@@ -21,6 +21,7 @@ struct TutorialStep {
     let lastStep: Bool
     let helperButtonText: String? // Optional: text for helper button that opens sheet
     let isInvisible: Bool // If true, this step doesn't show anything
+    let hideNextButton: Bool // If true, hides the Next button
 
 
 
@@ -36,7 +37,8 @@ struct TutorialStep {
         targetViewId: String? = nil,
         expectsAction: Bool = false,
         lastStep: Bool = false,
-        helperButtonText: String? = nil
+        helperButtonText: String? = nil,
+        hideNextButton: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -50,6 +52,7 @@ struct TutorialStep {
         self.lastStep = lastStep
         self.helperButtonText = helperButtonText
         self.isInvisible = false
+        self.hideNextButton = hideNextButton
     }
     
     // Full initializer with click indicator
@@ -64,7 +67,8 @@ struct TutorialStep {
         clickIndicatorPosition: ClickIndicatorPosition? = nil,
         expectsAction: Bool = false,
         lastStep: Bool = false,
-        helperButtonText: String? = nil
+        helperButtonText: String? = nil,
+        hideNextButton: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -78,6 +82,7 @@ struct TutorialStep {
         self.lastStep = lastStep
         self.helperButtonText = helperButtonText
         self.isInvisible = false
+        self.hideNextButton = hideNextButton
     }
     
     // Simple initializer for invisible/empty step
@@ -94,6 +99,7 @@ struct TutorialStep {
         self.lastStep = false
         self.helperButtonText = nil
         self.isInvisible = isEmpty
+        self.hideNextButton = false
     }
     
     /// Tutorial bubble positioning options that are relative to device screen size

@@ -139,6 +139,9 @@ struct SettingsView: View {
     }
     func launchTutorial(){
         if tutorial {
+            if TutorialManager.shared.inTutorial {
+                TutorialManager.shared.tutorialIsDone()
+            }
             UserDefaults().set(false, forKey: "Tutorial \(NotificationManager.shared.version)")
             dismiss()
         }

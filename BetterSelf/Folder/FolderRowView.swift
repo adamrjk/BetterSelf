@@ -9,21 +9,9 @@ import SwiftData
 import SwiftUI
 
 struct FolderRowView: View {
-    @Query var reminders: [Reminder]
-
-    var unlockedReminders: [Reminder]{
-        reminders.filter{
-            $0.isLocked == false
-        }
-    }
-
     let folder: Folder?
-    
-    
-    var count: Int {
-        folder?.reminders.count ?? unlockedReminders.count
-    }
 
+    let count: Int
     @EnvironmentObject var color: ColorManager
 
 
@@ -70,5 +58,5 @@ struct FolderRowView: View {
 }
 
 #Preview {
-    FolderRowView(folder: .example)
+    FolderRowView(folder: .example, count: 10)
 }

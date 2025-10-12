@@ -196,6 +196,11 @@ struct HomeView: View {
                 TutorialManager.shared.startTutorial("Home")
             }
         }
+        .onChange(of: TutorialManager.shared.currentStepIndex){
+            if TutorialManager.shared.inTutorial && TutorialManager.shared.currentViewId == "Home" && TutorialManager.shared.currentStepIndex == 2 {
+                sorting == .dateNew
+            }
+        }
 
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -377,6 +382,11 @@ struct HomeView: View {
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
         .navigationDestination(item: $selectedReminder) { reminder in
             ReminderView(reminder: reminder)
+                .onDisappear{
+                    TutorialManager.shared.viewId("Home")
+                    TutorialManager.shared.startTutorial("Home")
+
+                }
         }
 
         .navigationBarBackButtonHidden()

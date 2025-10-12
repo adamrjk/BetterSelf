@@ -17,6 +17,16 @@ struct MoveToFolder: View {
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
            sort: \Folder.date) var folders: [Folder]
 
+    @Query(filter: #Predicate<Reminder> {
+            $0.isChecked == true
+        }, sort: \Reminder.date) var allReminders: [Reminder]
+
+    var unlockedReminders: [Reminder]{
+        allReminders.filter{
+            $0.isLocked == false
+        }
+    }
+
     var body: some View {
         NavigationStack{
             ZStack {
@@ -67,7 +77,7 @@ struct MoveToFolder: View {
                             }
                             dismiss()
                         } label: {
-                            FolderRowView(folder: folder)
+                            FolderRowView(folder: folder, count: getCount(folder))
 
                         }
                         .buttonStyle(.plain)
@@ -91,6 +101,18 @@ struct MoveToFolder: View {
 
         }
 
+    }
+
+    func getCount(_ folder: Folder?) -> Int {
+        if let folder = folder {
+            let id = folder.persistentModelID
+            return unlockedReminders.filter({
+                $0.folder?.persistentModelID == id
+            }).count
+        }
+        else {
+            return unlockedReminders.count
+        }
     }
 
 }

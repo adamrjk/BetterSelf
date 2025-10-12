@@ -131,6 +131,12 @@ struct AddReminderView: View {
                     .padding(.top, 20)
                 }
             }
+            .onChange(of: TutorialManager.shared.currentStepIndex){
+                if TutorialManager.shared.inTutorial && TutorialManager.shared.currentViewId == "AddReminder" && TutorialManager.shared.currentStepIndex == 2 {
+                    reminder.type = .InstantInsight
+                    selectedPage = .main
+                }
+            }
             .onChange(of: keyboard){
                 if TutorialManager.shared.inTutorial {
                     if keyboard {
@@ -157,13 +163,13 @@ struct AddReminderView: View {
                         if reminder.isEmpty{
                             refuseSaving.toggle()
                         }
-                        else if TutorialManager.shared.inTutorial && (reminder.title.isEmpty || reminder.text.isEmpty || reminder.firebaseVideoURL == nil ) {
+                        else if TutorialManager.shared.inTutorial && (reminder.title.isEmpty || reminder.text.isEmpty || !reminder.isLoading ) {
                             refuseSaving.toggle()
                         }
                         else {
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.handleTargetViewClick(target: "SaveReminderButton")
+                            if TutorialManager.shared.inTutorial && TutorialManager.shared.currentViewId == "AddReminder"{
                                 TutorialManager.shared.endTutorial()
+
                             }
                             dismiss()
                         }

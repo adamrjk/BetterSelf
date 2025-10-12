@@ -110,6 +110,12 @@ struct ReminderView: View {
         }
         .sheet(isPresented: $edit){
             AddReminderView(reminder: reminder)
+                .onDisappear{
+                    if TutorialManager.shared.inTutorial {
+                        TutorialManager.shared.viewId("Reminder")
+                        TutorialManager.shared.startTutorial("Reminder")
+                    }
+                }
         }
         .sheet(isPresented: $detailSheet){
             if reminder.type == .InstantInsight {

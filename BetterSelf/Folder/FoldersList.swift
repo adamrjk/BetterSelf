@@ -61,181 +61,14 @@ struct FoldersList: View {
     @EnvironmentObject var color: ColorManager
 
     var body: some View {
-
         ScrollView {
             VStack(spacing: 0){
-
                 if isSearching || !searchText.isEmpty {
-
-                    ForEach(filteredReminders){ reminder in
-                        Button {
-                            if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
-                                refuseLoading.toggle()
-                            }
-                            else {
-                                selectedReminder = reminder
-                            }
-
-                        } label: {
-                            ReminderRowView(reminder: reminder, isPreview: true)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 7)
-                        }
-                    }
+                    searchResultsView
                 }
                 else {
-                    // Pinned Section with Card Design
-                    VStack(alignment: .leading, spacing: 0) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Pinned")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
-                                .padding(.horizontal, 20)
-                                .padding(.top, 16)
-
-                            if pinned.isEmpty {
-                                VStack(spacing: 8) {
-                                    Text("Choose up to 3 Reminders for Quick Access")
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                        .padding(.horizontal, 20)
-                                        .padding(.top, 16)
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.vertical, 20)
-                            } else {
-                                ForEach(pinned) { reminder in
-                                    Button {
-                                        if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
-                                            refuseLoading.toggle()
-                                        }
-                                        else {
-                                            selectedReminder = reminder
-                                        }
-                                    } label: {
-                                        ReminderRowView(reminder: reminder, isPreview: true)
-                                    }
-                                    .padding(.horizontal, 16)
-                                }
-                            }
-                        }
-                        .padding(.bottom, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
-                                .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
-                                .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                        )
-                        .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
-                        .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 5)
-
-
-
-
-
-                    ZStack {
-                        // Folders Section with Card Design
-                        VStack(alignment: .leading, spacing: 0) {
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text("Folders")
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                    .padding(.horizontal, 20)
-                                    .padding(.top, 16)
-                                    .padding(.bottom, 12)
-
-
-                                VStack(spacing: 0) {
-
-
-                                    // All Reminders folder
-                                    Button {
-                                        if TutorialManager.shared.inTutorial {
-                                            TutorialManager.shared.handleTargetViewClick(target: "AllRemindersButton")
-                                        }
-                                        selectedFolder = Folder(name: "")
-
-
-                                    } label: {
-                                        FolderRowView(folder: nil)
-                                            .padding(.horizontal, 16)
-                                            .padding(.vertical, 12)
-                                            .opacity(1)
-                                    }
-                                    .tutorialIdentifier("AllRemindersButton")
-
-                                    if !folders.isEmpty {
-                                        Divider()
-                                            .padding(.top, 6)
-                                    }
-
-                                    List {
-                                        // Individual folders
-                                        ForEach(folders) { folder in
-                                            if folder.faceID && folder.isLocked {
-                                                Button {
-                                                    authenticate(folder)
-                                                } label: {
-                                                    FolderRowView(folder: folder)
-                                                        .padding(.horizontal, 16)
-                                                        .padding(.vertical, 12)
-                                                    if folder != folders.last {
-                                                        Divider()
-                                                    }
-                                                }
-                                            } else {
-                                                Button {
-                                                    selectedFolder = folder
-                                                } label: {
-                                                    FolderRowView(folder: folder)
-                                                        .padding(.horizontal, 16)
-                                                        .padding(.vertical, 12)
-                                                    if folder != folders.last {
-                                                        Divider()
-                                                    }
-
-                                                }
-                                                .swipeActions{
-                                                    Button("", systemImage: "trash"){
-                                                        folderToDelete = folder
-                                                        deleteAlert.toggle()
-                                                    }
-                                                    .tint(.red)
-
-
-                                                }
-                                            }
-
-                                        }
-                                        .listRowInsets(EdgeInsets())
-                                        .listRowBackground(Color.clear)
-                                        .listRowSeparator(.hidden)
-                                    }
-                                    .frame(height: CGFloat(55 * folders.count))
-                                    .scrollDisabled(false)
-                                    .listStyle(.plain)
-
-
-                                }
-                            }
-                        }
-
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
-                                .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
-                                .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                        )
-                        .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
-                        .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
+                    pinnedSectionView
+                    foldersSectionView
                 }
             }
 
@@ -258,6 +91,177 @@ struct FoldersList: View {
             }
         }
     }
+    
+    // MARK: - View Components
+    
+    @ViewBuilder
+    private var searchResultsView: some View {
+        ForEach(filteredReminders){ reminder in
+            Button {
+                if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
+                    refuseLoading.toggle()
+                }
+                else {
+                    selectedReminder = reminder
+                }
+            } label: {
+                ReminderRowView(reminder: reminder, isPreview: true)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 7)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var pinnedSectionView: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Pinned")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 16)
+
+                if pinned.isEmpty {
+                    VStack(spacing: 8) {
+                        Text("Choose up to 3 Reminders for Quick Access")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 16)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 20)
+                } else {
+                    ForEach(pinned) { reminder in
+                        Button {
+                            if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
+                                refuseLoading.toggle()
+                            }
+                            else {
+                                selectedReminder = reminder
+                            }
+                        } label: {
+                            ReminderRowView(reminder: reminder, isPreview: true)
+                        }
+                        .padding(.horizontal, 16)
+                    }
+                }
+            }
+            .padding(.bottom, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
+                    .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+                    .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
+            )
+            .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+            .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 5)
+    }
+    
+    @ViewBuilder
+    private var foldersSectionView: some View {
+        ZStack {
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Folders")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
+                        .padding(.bottom, 12)
+
+                    VStack(spacing: 0) {
+                        // All Reminders folder
+                        Button {
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.handleTargetViewClick(target: "AllRemindersButton")
+                            }
+                            selectedFolder = Folder(name: "")
+                        } label: {
+                            FolderRowView(folder: nil, count: getCount())
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .opacity(1)
+                        }
+                        .tutorialIdentifier("AllRemindersButton")
+
+                        if !folders.isEmpty {
+                            Divider()
+                                .padding(.top, 6)
+                        }
+
+                        foldersListView
+                    }
+                }
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
+                    .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+                    .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
+            )
+            .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+            .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+    }
+    
+    @ViewBuilder
+    private var foldersListView: some View {
+        List {
+            ForEach(folders) { folder in
+                if folder.faceID && folder.isLocked {
+                    Button {
+                        authenticate(folder)
+                    } label: {
+                        FolderRowView(folder: folder, count: getCount(folder))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                        if folder != folders.last {
+                            Divider()
+                        }
+                    }
+
+                } else {
+                    Button {
+                        selectedFolder = folder
+                    } label: {
+                        FolderRowView(folder: folder, count: getCount(folder))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+
+                        if folder != folders.last {
+                            Divider()
+                        }
+                    }
+                    .swipeActions{
+                        Button("", systemImage: "trash"){
+                            folderToDelete = folder
+                            deleteAlert.toggle()
+                        }
+                        .tint(.red)
+                    }
+
+
+                }
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+        }
+        .frame(height: CGFloat(55 * folders.count))
+        .scrollDisabled(false)
+        .listStyle(.plain)
+    }
+    
+    // MARK: - Functions
 
     func deleteFolder(_ folder: Folder) {
         // Extract URLs before deletion
@@ -274,6 +278,18 @@ struct FoldersList: View {
 
     func deleteVideo(_ url: String) async {
         FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { _ in }
+    }
+
+    func getCount(_ folder: Folder? = nil) -> Int {
+        if let folder = folder {
+            let id = folder.persistentModelID
+            return unlockedReminders.filter({
+                $0.folder?.persistentModelID == id
+            }).count
+        }
+        else {
+            return unlockedReminders.count
+        }
     }
 
     func authenticate(_ folder: Folder) {

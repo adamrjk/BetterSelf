@@ -89,8 +89,8 @@ struct TutorialBubble: View {
                     .background(Color(.systemGray5))
                     .clipShape(Capsule())
                     
-                    // Only show Next button if it's NOT a click indicator step
-                    if !step.showClickIndicator {
+                    // Only show Next button if it's NOT a click indicator step and hideNextButton is false
+                    if !step.showClickIndicator && !step.hideNextButton {
                         Button(step.buttonText) {
                             onNext()
                         }
