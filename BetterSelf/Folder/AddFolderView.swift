@@ -88,7 +88,7 @@ struct AddFolderView: View {
                 }
             }
             .onAppear{
-                if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
+                if TutorialManager.shared.inTutorial {
                     TutorialManager.shared.viewId("AddFolder")
                     TutorialManager.shared.startTutorialForSheet("AddFolder")
                 }

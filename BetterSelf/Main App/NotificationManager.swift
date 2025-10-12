@@ -21,7 +21,6 @@ class NotificationManager: ObservableObject {
     @Published var widgetReminderId: String?
     @Published var version = "1.3"
 
-
     static let shared = NotificationManager()
 
     private init() {}
@@ -29,7 +28,8 @@ class NotificationManager: ObservableObject {
 
     
     // Schedules 7 days of notifications for up to 3 pinned reminders
-    // Smart clearing: Only removes future notifications, keeps today's intact
+    // Smart clearing: Only removes future notifications (tomorrow onwards), keeps today's intact
+    // Scheduling: Starts from tomorrow to avoid duplicating today's notifications
     func scheduleBulkNotifications(for reminders: [Reminder]) {
         let center = UNUserNotificationCenter.current()
         
@@ -90,32 +90,19 @@ class NotificationManager: ObservableObject {
         // Take up to 3 reminders
         let selectedReminders = Array(reminders.prefix(3))
         
-        print("📅 Scheduling notifications for \(selectedReminders.count) reminders over 7 days (including today)")
+        print("📅 Scheduling notifications for \(selectedReminders.count) reminders over 7 days (starting tomorrow)")
         
         let now = Date()
-        let currentHour = Calendar.current.component(.hour, from: now)
         
-        // Schedule for each day (0 = today, 1 = tomorrow, ... 6 = 6 days from now)
-        for dayOffset in 0...6 {
+        // Schedule for each day (1 = tomorrow, 2 = day after, ... 7 = 7 days from now)
+        // This preserves today's notifications that were scheduled yesterday
+        for dayOffset in 1...7 {
             guard let targetDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: now) else {
                 continue
             }
             
             // Get random times for this day (morning, afternoon, evening spread)
-            let allTimes = getRandomTimesForDay(count: notificationsPerDay)
-            
-            // For today (dayOffset 0), filter out times that have already passed
-            let validTimes: [(hour: Int, minute: Int)]
-            if dayOffset == 0 {
-                validTimes = allTimes.filter { $0.hour > currentHour }
-                if validTimes.isEmpty {
-                    print("⏭️ Skipping today - all time slots have passed")
-                    continue
-                }
-                print("📍 Today: Scheduling \(validTimes.count) remaining notifications")
-            } else {
-                validTimes = allTimes
-            }
+            let validTimes = getRandomTimesForDay(count: notificationsPerDay)
             
             // Schedule notification for each reminder at different times
             for (index, reminder) in selectedReminders.enumerated() {
@@ -133,7 +120,7 @@ class NotificationManager: ObservableObject {
                 content.userInfo = ["reminderID": reminder.id.uuidString]
                 
                 let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-//                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: false)
+//                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
 
                 // Unique identifier: reminderID_dayOffset_index
                 let identifier = "\(reminder.id.uuidString)_day\(dayOffset)_\(index)"

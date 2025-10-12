@@ -10,9 +10,10 @@ import FirebaseAuth
 import SwiftData
 import SwiftUI
 
+
 struct ContentView: View {
     @EnvironmentObject var notificationManager: NotificationManager
-    @State private var notifReminder: Reminder?
+    @State private var notifReminder: NavigableReminder?
 
     @Environment(\.modelContext) var modelContext
     @Query(filter: #Predicate<Reminder> {
@@ -96,13 +97,12 @@ struct ContentView: View {
 
 
     func checkIfWelcome(){
-//        if UserDefaults.standard.bool(forKey: "Welcome \(notificationManager.version)") {
-//        }
-//        else {
-//            welcome = true
-//            UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
-//        }
-        welcome = true
+        if UserDefaults.standard.bool(forKey: "Welcome \(notificationManager.version)") {
+        }
+        else {
+            welcome = true
+            UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
+        }
     }
     
     // MARK: - Navigation Handlers
@@ -110,12 +110,18 @@ struct ContentView: View {
     private func handleNotificationNavigation() {
         guard let reminderID = notificationManager.reminderID else { return }
         
-        let reminder = reminders.first(where: { reminder in
+        guard let reminder = reminders.first(where: { reminder in
             reminder.id.uuidString == reminderID
-        })
+        }) else { return }
+        
         tabPage = 0
-        notifReminder = reminder
-        notificationManager.shouldNavigateToReminder = false
+        notifReminder = nil  // Dismiss current
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            notifReminder = NavigableReminder(reminder: reminder)  // New wrapper = new navigation
+            notificationManager.shouldNavigateToReminder = false
+        }
     }
     
     private func handleSharedLinkNavigation() {
@@ -135,8 +141,13 @@ struct ContentView: View {
         reminder.isShared = true
         
         tabPage = 0
-        notifReminder = reminder
-        notificationManager.sharedReminder = false
+        notifReminder = nil
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            notifReminder = NavigableReminder(reminder: reminder)
+            notificationManager.sharedReminder = false
+        }
     }
     
     private func handleWidgetNavigation() {
@@ -145,16 +156,23 @@ struct ContentView: View {
             return
         }
         
-        let reminder = reminders.first(where: { reminder in
+        guard let reminder = reminders.first(where: { reminder in
             reminder.id.uuidString == id
-        })
+        }) else { return }
+        
         tabPage = 0
-        notifReminder = reminder
-        notificationManager.widgetReminder = false
+        notifReminder = nil
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            notifReminder = NavigableReminder(reminder: reminder)
+            notificationManager.widgetReminder = false
+        }
     }
     
-    // Schedules 7 days of notifications every time the app launches
-    // Always reschedules to keep content fresh with current pinned reminders
+    // Schedules 7 days of notifications every time the app launches (starting from tomorrow)
+    // Keeps today's notifications intact to avoid duplicates
+    // Always reschedules tomorrow onwards to keep content fresh with current pinned reminders
     private func scheduleBulkNotifications() {
         let remindersToSchedule: [Reminder]
         

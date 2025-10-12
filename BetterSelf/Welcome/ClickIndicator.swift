@@ -77,7 +77,7 @@ struct ClickIndicator: View {
     }
     
     private var indicatorColor: Color {
-        scheme == .light ? .blue : .yellow
+        scheme == .light ? .darkPurple : .yellow
     }
     
     private var handIcon: String {
@@ -224,7 +224,7 @@ struct ArrowIndicator: View {
     }
     
     private var arrowColor: Color {
-        scheme == .light ? .blue : .yellow
+        scheme == .light ? .darkPurple : .yellow
     }
     
     private var arrowIcon: String {

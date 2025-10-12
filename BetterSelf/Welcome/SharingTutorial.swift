@@ -28,7 +28,7 @@ struct SharingTutorial: View {
                             HStack {
                                 Image(systemName: "square.and.arrow.up")
                                     .font(.subheadline)
-                                    .foregroundColor(scheme == .light ? .blue : .yellow)
+                                    .foregroundColor(scheme == .light ? .darkPurple : .creamyYellow)
 
                                 Text("Watch how to share videos directly to BetterSelf")
                                     .font(.subheadline)
@@ -108,9 +108,8 @@ struct StepRow: View {
         HStack(spacing: 12) {
             Text("\(number)")
                 .font(.subheadline)
-                .foregroundColor(.white)
                 .frame(width: 20, height: 20)
-                .background(scheme == .light ? Color.blue : Color.yellow)
+                .background(scheme == .light ? Color.darkPurpleMainGradient : Color.blackGradient)
                 .clipShape(Circle())
             
             Text(text)

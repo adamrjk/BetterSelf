@@ -19,7 +19,7 @@ extension Color {
         endPoint: .bottomTrailing
     )
 
-    static let darkPurple = Color(red: 0.5, green: 0, blue: 0.5)
+    static let darkPurple = Color(red: 0.802,green:  0.624,blue:  0.641)
 
     static let darkPurpleMainGradient = LinearGradient(
         colors: [
@@ -129,9 +129,8 @@ extension Color {
 
     static let blackGradient = LinearGradient(
         colors: [
-            .black,
-            .black
-
+            Color(red: 0.06, green: 0.06, blue: 0.06),  // #0f0f0f
+            Color(red: 0.10, green: 0.10, blue: 0.10)   // #1a1a1a
         ],
         startPoint: .top,
         endPoint: .bottom

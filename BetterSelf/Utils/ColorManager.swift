@@ -38,6 +38,14 @@ class ColorManager: ObservableObject {
     }
 
 
+    func buttonGradient(_ scheme: ColorScheme) -> LinearGradient {
+        scheme == .light
+            ? Color.blackGradient
+            : Color.creamyYellowGradient
+        
+    }
+
+
 
 
 

@@ -96,3 +96,12 @@ enum ReminderType: String, Codable, CaseIterable {
     case TimeLessLetter = "TimeLessLetter"
 }
 
+
+struct NavigableReminder: Identifiable, Equatable, Hashable {
+    let id = UUID()  // Always unique
+    let reminder: Reminder
+
+    static func == (lhs: NavigableReminder, rhs: NavigableReminder) -> Bool {
+        lhs.id == rhs.id
+    }
+}

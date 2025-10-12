@@ -25,7 +25,7 @@ struct FolderView: View {
     @State private var refuseLoading = false
     @State private var selectedReminder: Reminder?
     @State private var selectedFolder: Folder?
-    @Binding var notifReminder: Reminder?
+    @Binding var notifReminder: NavigableReminder?
 
     @Environment(\.colorScheme) var scheme
     @State private var settings = false
@@ -133,9 +133,8 @@ struct FolderView: View {
                 .navigationDestination(item: $selectedReminder) { reminder in
                     ReminderView(reminder: reminder)
                 }
-                .navigationDestination(item: $notifReminder){ reminder in
-                    ReminderView(reminder: reminder)
-
+                .navigationDestination(item: $notifReminder){ navReminder in
+                    ReminderView(reminder: navReminder.reminder)
                 }
                 .navigationDestination(item: $selectedFolder) { folder in
                     if folder.name.isEmpty {
@@ -180,7 +179,7 @@ struct FolderView: View {
         }
 
     }
-    init(notifReminder: Binding<Reminder?>){
+    init(notifReminder: Binding<NavigableReminder?>){
         _notifReminder = notifReminder
     }
 

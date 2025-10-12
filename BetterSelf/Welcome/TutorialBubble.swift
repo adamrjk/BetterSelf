@@ -132,7 +132,7 @@ struct TutorialBubble: View {
     }
     
     private var bubbleColor: Color {
-        scheme == .light ? .blue : .yellow
+        scheme == .light ? .darkPurple : .yellow
     }
     
     // MARK: - Arrow Logic
