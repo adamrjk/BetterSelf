@@ -11,7 +11,7 @@ struct ReminderRowView: View {
     @State var reminder: Reminder
     
     @State var isPreview: Bool
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @Environment(\.colorScheme) var scheme
 
 

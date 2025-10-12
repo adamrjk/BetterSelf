@@ -58,7 +58,7 @@ struct FoldersList: View {
         return pinned
     }
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     var body: some View {
 
@@ -309,7 +309,7 @@ struct FoldersList: View {
                 if let photo = reminder.photo {
                     photoURL = storePhotoForWidget(data: photo, id: UUID())
                 }
-                let snapShot = ReminderSnapShot(id: reminder.id, title: reminder.title, text: reminder.text, photoURL: photoURL, link: reminder.link, isFront: reminder.isFront)
+                let snapShot = ReminderSnapShot(id: reminder.id, title: reminder.title, text: reminder.text, photoURL: photoURL, link: reminder.link, isFront: reminder.isFront, isYoutube: reminder.isYoutube)
                 pinnedReminders.append(snapShot)
             }
         }

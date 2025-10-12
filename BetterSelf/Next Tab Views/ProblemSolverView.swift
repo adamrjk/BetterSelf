@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProblemSolverView: View {
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @Environment(\.colorScheme) var scheme
 
     var body: some View {

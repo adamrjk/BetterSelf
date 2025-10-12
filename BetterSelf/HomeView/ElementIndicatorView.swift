@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ElementIndicatorView: View {
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @State var systemName: String
     
     var body: some View {

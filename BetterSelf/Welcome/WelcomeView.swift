@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @Environment(\.dismiss) var dismiss
 
 
@@ -131,7 +131,7 @@ struct FeatureRow: View {
     let text: String
     let scheme: ColorScheme
 
-    var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
@@ -149,7 +149,7 @@ struct FeatureRow: View {
 
 struct Questions: View{
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     let onDismiss: () -> Void
 
@@ -280,7 +280,7 @@ struct Questions: View{
 
 struct SettingGoals: View {
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     let onDismiss: () -> Void
     
     @State private var selectedGoals: Set<String> = []
@@ -399,7 +399,7 @@ struct GoalButton: View {
     let isSelected: Bool
     let scheme: ColorScheme
     let action: () -> Void
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     var unselectedGradient: LinearGradient {
         LinearGradient(
@@ -455,7 +455,7 @@ struct GoalButton: View {
 
 struct GettingStarted: View {
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     let onDismiss: () -> Void
 
     let features: [(icon: String, text: String)] = [

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AdaptiveGlassModifier: ViewModifier {
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     let scheme: ColorScheme
 
     func body(content: Content) -> some View {
@@ -35,7 +35,7 @@ extension View {
 
 
 struct ToolBarButtonModifier: ViewModifier{
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     let scheme: ColorScheme
 
     func body(content: Content) -> some View {

@@ -11,7 +11,7 @@ import YouTubePlayerKit
 struct YoutubeView: View {
     @State private var startTime = false
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     
     //    @State var videoURL: String
     @Binding var time: Int //in Seconds

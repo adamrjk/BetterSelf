@@ -18,7 +18,7 @@ struct HomeView: View {
 
 
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     let folder: Folder?
 
@@ -105,7 +105,7 @@ struct HomeView: View {
                                 }
                                 else {
                                     if TutorialManager.shared.inTutorial {
-                                        TutorialManager.shared.handleTargetViewClick(target: "ReminderButton")
+                                        TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
                                     }
                                     selectedReminder = reminder
                                 }
@@ -113,7 +113,7 @@ struct HomeView: View {
                                 ReminderRowView(reminder: reminder, isPreview: false)
 
                             }
-                            .tutorialIdentifier("ReminderButton")
+                            .tutorialIdentifier(isFirstId(reminder))
                             .swipeActions{
 
                                 Button("", systemImage: "trash"){
@@ -335,6 +335,7 @@ struct HomeView: View {
                 AddReminderView(reminder: reminder)
                     .onDisappear{
                         if TutorialManager.shared.inTutorial {
+                            sorting = .dateNew
                             TutorialManager.shared.viewId("Home")
                             TutorialManager.shared.startTutorial("Home")
                         }
@@ -559,6 +560,21 @@ struct HomeView: View {
                 print("Firebase upload failed: \(error.localizedDescription)")
             }
         }
+    }
+
+    func isFirstId(_ reminder: Reminder) -> String {
+        if let first = sortedReminders.first {
+            reminder.id == first.id  ? "FirstReminderButton" : "RemindersButton"
+        }
+        else {
+            "RemindersButton"
+        }
+
+
+
+
+
+
     }
 
 }

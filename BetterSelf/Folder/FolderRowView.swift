@@ -24,7 +24,7 @@ struct FolderRowView: View {
         folder?.reminders.count ?? unlockedReminders.count
     }
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
 
     var body: some View {

@@ -30,7 +30,10 @@ struct ContentView: View {
     @State private var tabPage: Int = 0
 
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
+
+
+    @StateObject var tutorialManager = TutorialManager.shared
 
     @State private var welcome = false
 
@@ -93,12 +96,13 @@ struct ContentView: View {
 
 
     func checkIfWelcome(){
-        if UserDefaults.standard.bool(forKey: "Welcome \(notificationManager.version)") {
-        }
-        else {
-            welcome = true
-            UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
-        }
+//        if UserDefaults.standard.bool(forKey: "Welcome \(notificationManager.version)") {
+//        }
+//        else {
+//            welcome = true
+//            UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
+//        }
+        welcome = true
     }
     
     // MARK: - Navigation Handlers

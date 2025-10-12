@@ -16,7 +16,7 @@ class UploadManager: ObservableObject {
 
     @Published var activeUploads: [String: UploadStatus] = [:]
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     private init() {}
 

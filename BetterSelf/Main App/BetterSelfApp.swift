@@ -44,6 +44,7 @@ struct BetterSelfApp: App {
             ContentView()
                 .tutorialOverlay()
                 .environmentObject(NotificationManager.shared)
+                .environmentObject(ColorManager.shared)
                 .onOpenURL { url in
                     if url.absoluteString.localizedStandardContains("url") {
                         NotificationManager.shared.sharedReminder = true

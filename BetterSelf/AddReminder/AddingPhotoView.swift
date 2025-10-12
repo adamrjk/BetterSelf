@@ -14,7 +14,7 @@ struct AddingPhotoView: View {
     
     @Environment(\.colorScheme) var scheme
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @State private var image: Image?
     @Binding private var photo: Data?
 

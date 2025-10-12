@@ -11,7 +11,7 @@ struct AddingVideoView: View {
     
     @Environment(\.colorScheme) var scheme
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @StateObject private var uploadManager = UploadManager.shared
 
     enum ViewState {
@@ -109,7 +109,6 @@ struct AddingVideoView: View {
                                 //delete video
                                 firebaseVideoURL = nil
                                 thumbnail = nil
-
                                 viewState = .idle
 
                             } label: {
@@ -155,26 +154,28 @@ struct AddingVideoView: View {
 
 
     func loadVideo() {
-        viewState = .loading
-        isLoading = true
-        Task {
-            do {
-                if let videoData = try await selectedItem?.loadTransferable(type: Data.self) {
-                    if let uIImage = await generateThumbnail(from: videoData) {
-                        TutorialManager.shared.handleTargetViewClick(target: "CameraIconButton")
-                        thumbnail = uIImage.jpegData(compressionQuality: 0.8)
-                        self.thumbnailImage = Image(uiImage: uIImage)
-                        self.viewState = .showingThumbnail
+        if selectedItem != nil {
+            viewState = .loading
+            isLoading = true
+            Task {
+                do {
+                    if let videoData = try await selectedItem?.loadTransferable(type: Data.self) {
+                        if let uIImage = await generateThumbnail(from: videoData) {
+                            TutorialManager.shared.handleTargetViewClick(target: "CameraIconButton")
+                            thumbnail = uIImage.jpegData(compressionQuality: 0.8)
+                            self.thumbnailImage = Image(uiImage: uIImage)
+                            self.viewState = .showingThumbnail
+                        }
+                        
+                        
+                        // Upload video in background
+                        await uploadVideoToFirebase(videoData: videoData)
+                    } else {
+                        print("Video loading failed")
                     }
-
-
-                    // Upload video in background
-                    await uploadVideoToFirebase(videoData: videoData)
-                } else {
-                    print("Video loading failed")
+                } catch {
+                    print("Loading Failed \(error.localizedDescription)")
                 }
-            } catch {
-                print("Loading Failed \(error.localizedDescription)")
             }
         }
     }
@@ -238,7 +239,7 @@ struct AddingVideoView: View {
     struct VideoLoadingView: View {
 
         @Environment(\.colorScheme) var scheme
-        @StateObject var color = ColorManager.shared
+        @EnvironmentObject var color: ColorManager
 
         var body: some View {
             VStack(alignment: .center, spacing: 8) {

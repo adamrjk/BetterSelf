@@ -10,7 +10,7 @@ import SwiftUI
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dismiss
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @Environment(\.colorScheme) var scheme
 
     @State private var name = ""
@@ -167,7 +167,7 @@ enum AppearanceMode: String, CaseIterable {
 struct AppearancePicker: View {
     @Binding var selectedMode: AppearanceMode
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
 
     var body: some View {

@@ -18,7 +18,7 @@ struct AddFolderView: View {
 
     @Environment(\.colorScheme) var scheme
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
 
     var body: some View {

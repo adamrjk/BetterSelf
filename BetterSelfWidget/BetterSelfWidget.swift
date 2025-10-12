@@ -69,13 +69,9 @@ struct BetterSelfWidgetEntryView : View {
                     .bold()
                     .padding(.bottom, 3)
 
-
                 VStack {
                     Spacer()
                     ForEach(entry.reminders){ reminder in
-//                        Button{
-//                            
-//                        } label:{
                         if let url = URL(string: "betterself://home?reminder=\(reminder.id.uuidString)") {
                             Link(destination: url){
                                 HStack {
@@ -83,7 +79,7 @@ struct BetterSelfWidgetEntryView : View {
                                         image
                                             .resizable()
                                             .rotation3DEffect(.degrees(reminder.isFront ? 180 : 0), axis: (x: 0, y: 1, z: 0))
-                                            .scaledToFill()
+                                            .scaledToFit()
                                             .frame(width: 20, height:  20)
 
                                             .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
@@ -93,6 +89,9 @@ struct BetterSelfWidgetEntryView : View {
                                             )
                                             .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
                                     }
+//                                    else if reminder.isYoutube {
+//                                        Thumbnail(videoURL: reminder.link)
+//                                    }
                                     Text(reminder.title)
                                         .font(.footnote)
                                     

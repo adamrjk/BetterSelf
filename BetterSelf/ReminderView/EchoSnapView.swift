@@ -11,7 +11,7 @@ struct EchoSnapView: View {
     @State var reminder: Reminder
 
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     
 

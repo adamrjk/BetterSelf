@@ -11,7 +11,7 @@ import SwiftUI
 struct MoveToFolder: View {
     @Environment(\.dismiss) var dismiss
     let reminders: [Reminder]
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @Environment(\.colorScheme) var scheme
 
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},

@@ -16,7 +16,7 @@ struct TutorialBubble: View {
     let isLastStep: Bool
     
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @State private var isVisible = false
     
     var body: some View {

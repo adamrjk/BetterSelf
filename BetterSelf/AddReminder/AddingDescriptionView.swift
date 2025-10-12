@@ -14,7 +14,7 @@ struct AddingDescriptionView: View {
     @Binding var text: String
     @FocusState.Binding var keyboard: Bool
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     @Environment(\.colorScheme) var scheme
 

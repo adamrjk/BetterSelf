@@ -9,7 +9,7 @@ import SwiftUI
 
 struct YouTubeThumbnailView: View {
     @Environment(\.colorScheme) var scheme
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     let videoURL: String
     
 
@@ -75,10 +75,6 @@ struct YouTubeThumbnailView: View {
                             .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
                             .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
 
-
-
-
-
                     }
 
                     else {
@@ -93,8 +89,6 @@ struct YouTubeThumbnailView: View {
                             )
                             .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
                     }
-
-
                 case .failure:
                     EmptyView()
                 @unknown default:

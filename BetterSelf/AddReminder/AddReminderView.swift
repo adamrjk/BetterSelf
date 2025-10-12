@@ -16,7 +16,7 @@ struct AddReminderView: View {
 
     @Bindable var reminder: Reminder
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     @State private var refuseSaving = false
     @State private var startTime = false
@@ -163,6 +163,7 @@ struct AddReminderView: View {
                         else {
                             if TutorialManager.shared.inTutorial {
                                 TutorialManager.shared.handleTargetViewClick(target: "SaveReminderButton")
+                                TutorialManager.shared.endTutorial()
                             }
                             dismiss()
                         }
@@ -215,7 +216,8 @@ struct AddReminderView: View {
 
             }
             .sheet(isPresented: $refuseSaving){
-                RefuseView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
+                RefuseView(title: TutorialManager.shared.inTutorial ? "" : "Your Reminder is empty" ,
+                           description: TutorialManager.shared.inTutorial ? tutorialRefuse : "Add a Description, a Photo, a Video or a Link to create your Reminder")
                     .presentationDetents([.height(300)])
             }
             .onChange(of: reminder.isYoutube){ oldV, newV in
@@ -304,6 +306,9 @@ struct AddReminderView: View {
         reminder.type = .InstantInsight
         selectedPage = .main
     }
+
+
+    let tutorialRefuse = "Please follow the instructions or skip the Tutorial"
 }
 
 #Preview {

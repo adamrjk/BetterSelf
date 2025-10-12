@@ -19,7 +19,7 @@ struct SharedLinkView: View {
 
     @Binding var time: Int
     let text: String
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @Environment(\.colorScheme) var scheme
 
     var isSheet: Bool

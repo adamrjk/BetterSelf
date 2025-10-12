@@ -77,6 +77,13 @@
 			);
 			target = 6633FB462E81431A00720B21 /* BetterSelfWidgetExtension */;
 		};
+		6665DE072E9B9838001D5655 /* Exceptions for "BetterSelfWidget" folder in "BetterSelf" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Thumbnail.swift,
+			);
+			target = 666F96BF2E4F775D007AE674 /* BetterSelf */;
+		};
 		666EFD252E77D07600F853D3 /* Exceptions for "BetterSelfSharing" folder in "BetterSelfSharing" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -97,6 +104,7 @@
 		6633FB4D2E81431A00720B21 /* BetterSelfWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				6665DE072E9B9838001D5655 /* Exceptions for "BetterSelfWidget" folder in "BetterSelf" target */,
 				6633FB612E81431B00720B21 /* Exceptions for "BetterSelfWidget" folder in "BetterSelfWidgetExtension" target */,
 			);
 			path = BetterSelfWidget;

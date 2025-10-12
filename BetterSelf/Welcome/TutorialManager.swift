@@ -158,7 +158,7 @@ class TutorialManager: ObservableObject {
     
     // Returns the tutorial view itself for manual overlay (used in sheets)
     func tutorialView(viewId: String) -> some View {
-        ManualTutorialOverlay(viewId: viewId)
+        ManualTutorialOverlay()
     }
 
 

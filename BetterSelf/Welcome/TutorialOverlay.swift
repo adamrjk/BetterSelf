@@ -148,7 +148,6 @@ struct TutorialOverlay: View {
 
 // MARK: - Manual Tutorial Overlay (ignores shouldRender flag, used in sheets)
 struct ManualTutorialOverlay: View {
-    let viewId: String
     @ObservedObject private var tutorialManager = TutorialManager.shared
     @Environment(\.colorScheme) var scheme
     
@@ -156,7 +155,6 @@ struct ManualTutorialOverlay: View {
         ZStack {
         if tutorialManager.isActive, 
            let currentStep = tutorialManager.currentStep,
-           viewId == tutorialManager.currentViewId,
            !currentStep.isInvisible {
             ZStack {
                 // Only show dimming for NON-click steps AND when not expecting action

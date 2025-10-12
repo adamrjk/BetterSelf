@@ -12,7 +12,7 @@ struct TimeLessLetterView: View {
     @State var isSheet = false
 
     @State var reminder: Reminder
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
 
     @Environment(\.colorScheme) var scheme
@@ -49,7 +49,7 @@ struct TimeLessLetterView: View {
 struct DescriptionView: View {
     let text: String
     let isYoutube: Bool
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @Environment(\.colorScheme) var scheme
 
     var body: some View{

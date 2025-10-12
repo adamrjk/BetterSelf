@@ -84,6 +84,7 @@ struct ReminderSnapShot: Codable, Identifiable{
     var photoURL: String?
     var link: String
     var isFront: Bool
+    var isYoutube: Bool
 
 
 }

@@ -14,7 +14,7 @@ struct RefuseView: View {
 
     let title: String
     let description: String
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     var body: some View {
         ZStack {

@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SharingTutorial: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
     @Environment(\.colorScheme) var scheme
     
     var body: some View {

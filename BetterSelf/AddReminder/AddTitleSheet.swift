@@ -14,7 +14,7 @@ struct AddTitleSheet: View {
 
     @Environment(\.dismiss) var dismiss
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     @FocusState var keyboard: Bool
     @Binding var title: String

@@ -15,7 +15,7 @@ struct FolderView: View {
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
            sort: \Folder.date) var folders: [Folder]
 
-    @StateObject var color = ColorManager.shared
+    @EnvironmentObject var color: ColorManager
 
     @Environment(\.scenePhase) var scenePhase
 
@@ -59,6 +59,11 @@ struct FolderView: View {
                 .onAppear{
                     checkIfWelcome()
 
+                    if TutorialManager.shared.inTutorial && TutorialManager.shared.isHomeView2 {
+                        TutorialManager.shared.endTutorial()
+
+                    }
+
                     if TutorialManager.shared.inTutorial {
                         TutorialManager.shared.viewId("Folder")
                         TutorialManager.shared.startTutorial("Folder")
@@ -66,6 +71,7 @@ struct FolderView: View {
                 }
                 .onChange(of: TutorialManager.shared.currentDone){
                     if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
+                        TutorialManager.shared.viewId("Folder")
                         TutorialManager.shared.startTutorial("Folder")
                     }
 
@@ -134,23 +140,10 @@ struct FolderView: View {
                 .navigationDestination(item: $selectedFolder) { folder in
                     if folder.name.isEmpty {
                         HomeView()
-                            .onDisappear{
-                                if TutorialManager.shared.inTutorial && TutorialManager.shared.isHomeView2 {
-                                    TutorialManager.shared.endTutorial()
-                                    TutorialManager.shared.viewId("Folder")
-                                    TutorialManager.shared.startTutorial("Folder")
-                                }
-                            }
+
                     }
                     else {
                         HomeView(folder: folder)
-                            .onDisappear{
-                                if TutorialManager.shared.inTutorial && TutorialManager.shared.isHomeView2 {
-                                    TutorialManager.shared.endTutorial()
-                                    TutorialManager.shared.viewId("Folder")
-                                    TutorialManager.shared.startTutorial("Folder")
-                                }
-                            }
                     }
                 }
                 .alert("Failed Authentication", isPresented: $showAlert){

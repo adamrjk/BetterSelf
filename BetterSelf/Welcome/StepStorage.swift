@@ -37,7 +37,7 @@ struct StepStorage {
             position: .topMiddle,
             targetViewId: "AllRemindersButton",
             showClickIndicator: true,
-            clickIndicatorPosition: .center
+            clickIndicatorPosition: nil
         )
     ]
 
@@ -156,7 +156,7 @@ struct StepStorage {
             message: "Notice first the camera icon on the right, it shows that a video is available. Now Click on it",
             buttonText: "Next",
             position: .center,
-            targetViewId: "ReminderButton",
+            targetViewId: "FirstReminderButton",
             showClickIndicator: true,
             clickIndicatorPosition: nil
         )
