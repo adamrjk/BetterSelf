@@ -45,9 +45,6 @@ struct FoldersList: View {
         }
     }
 
-    @State private var welcome = true
-
-
     var pinned: [Reminder] {
         var pinned = unlockedReminders.filter{ $0.pinned}
         pinned = pinned.sorted{ $0.datePinned < $1.datePinned }
@@ -60,13 +57,8 @@ struct FoldersList: View {
         }
         return pinned
     }
-
     @Environment(\.colorScheme) var scheme
     @StateObject var color = ColorManager.shared
-
-
-
-
 
     var body: some View {
 
@@ -88,10 +80,7 @@ struct FoldersList: View {
                             ReminderRowView(reminder: reminder, isPreview: true)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 7)
-
                         }
-
-
                     }
                 }
                 else {
@@ -233,8 +222,6 @@ struct FoldersList: View {
 
 
                                 }
-
-
                             }
                         }
 
@@ -249,14 +236,6 @@ struct FoldersList: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 10)
-
-
-
-
-
-
-
-
                 }
             }
 

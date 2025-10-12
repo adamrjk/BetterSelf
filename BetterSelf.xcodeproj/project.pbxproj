@@ -10,12 +10,10 @@
 		6633FB4A2E81431A00720B21 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6633FB492E81431A00720B21 /* WidgetKit.framework */; };
 		6633FB4C2E81431A00720B21 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6633FB4B2E81431A00720B21 /* SwiftUI.framework */; };
 		6633FB5D2E81431B00720B21 /* BetterSelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6633FB472E81431A00720B21 /* BetterSelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		664AABF62E8006C300A829E1 /* Aespa in Frameworks */ = {isa = PBXBuildFile; productRef = 664AABF52E8006C300A829E1 /* Aespa */; };
 		666EFD212E77D07600F853D3 /* BetterSelfSharing.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 666EFD172E77D07600F853D3 /* BetterSelfSharing.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68C2E5453DB00C80E8F /* FirebaseAnalytics */; };
 		6678C68F2E5454D200C80E8F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68E2E5454D200C80E8F /* FirebaseStorage */; };
 		6678C6992E545CDB00C80E8F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C6982E545CDB00C80E8F /* FirebaseCore */; };
-		668A86372E81134A003D8DE7 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 668A86362E81134A003D8DE7 /* YouTubeiOSPlayerHelper */; };
 		668A864A2E811B23003D8DE7 /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 668A86492E811B23003D8DE7 /* YouTubePlayerKit */; };
 		66A705112E79C5750007E1FE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 66A705102E79C5750007E1FE /* FirebaseAuth */; };
 /* End PBXBuildFile section */
@@ -147,10 +145,8 @@
 				668A864A2E811B23003D8DE7 /* YouTubePlayerKit in Frameworks */,
 				6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */,
 				6678C6992E545CDB00C80E8F /* FirebaseCore in Frameworks */,
-				664AABF62E8006C300A829E1 /* Aespa in Frameworks */,
 				6678C68F2E5454D200C80E8F /* FirebaseStorage in Frameworks */,
 				66A705112E79C5750007E1FE /* FirebaseAuth in Frameworks */,
-				668A86372E81134A003D8DE7 /* YouTubeiOSPlayerHelper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,8 +255,6 @@
 				6678C68E2E5454D200C80E8F /* FirebaseStorage */,
 				6678C6982E545CDB00C80E8F /* FirebaseCore */,
 				66A705102E79C5750007E1FE /* FirebaseAuth */,
-				664AABF52E8006C300A829E1 /* Aespa */,
-				668A86362E81134A003D8DE7 /* YouTubeiOSPlayerHelper */,
 				668A86492E811B23003D8DE7 /* YouTubePlayerKit */,
 			);
 			productName = BetterSelf;
@@ -299,8 +293,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				664AABF42E8006C300A829E1 /* XCRemoteSwiftPackageReference "Aespa" */,
-				668A86352E81134A003D8DE7 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
 				668A86482E811B23003D8DE7 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -752,28 +744,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		664AABF42E8006C300A829E1 /* XCRemoteSwiftPackageReference "Aespa" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/enebin/Aespa.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.5.3;
-			};
-		};
 		6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 12.1.0;
-			};
-		};
-		668A86352E81134A003D8DE7 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/youtube/youtube-ios-player-helper";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.4;
 			};
 		};
 		668A86482E811B23003D8DE7 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
@@ -787,11 +763,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		664AABF52E8006C300A829E1 /* Aespa */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 664AABF42E8006C300A829E1 /* XCRemoteSwiftPackageReference "Aespa" */;
-			productName = Aespa;
-		};
 		6678C68C2E5453DB00C80E8F /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -806,11 +777,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
-		};
-		668A86362E81134A003D8DE7 /* YouTubeiOSPlayerHelper */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 668A86352E81134A003D8DE7 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
-			productName = YouTubeiOSPlayerHelper;
 		};
 		668A86492E811B23003D8DE7 /* YouTubePlayerKit */ = {
 			isa = XCSwiftPackageProductDependency;

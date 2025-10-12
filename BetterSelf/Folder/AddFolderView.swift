@@ -116,7 +116,7 @@ struct AddFolderView: View {
             }
             .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
             .sheet(isPresented: $refuseSaving){
-                RefuseSavingView(title: "This Folder name is not valid", description: "The name cannot be empty nor identical to another folder")
+                RefuseView(title: "This Folder name is not valid", description: "The name cannot be empty nor identical to another folder")
                     .presentationDetents([.height(300)])
             }
             .overlay(
@@ -148,10 +148,6 @@ struct AddFolderView: View {
             )
 
         }
-//        .tutorialOverlay(viewId: "AddFolder")
-
-
-
     }
 }
 #Preview {

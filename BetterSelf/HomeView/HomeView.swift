@@ -20,8 +20,6 @@ struct HomeView: View {
     @Environment(\.colorScheme) var scheme
     @StateObject var color = ColorManager.shared
 
-    //    @StateObject var cameraManager = CameraManager()
-
     let folder: Folder?
 
     @Query var reminders: [Reminder]
@@ -66,10 +64,6 @@ struct HomeView: View {
             filteredReminders.sorted{ $0.title < $1.title}
         }
     }
-
-    @State private var welcome = true
-
-
     @State private var sorting: Sorting
 
 
@@ -104,14 +98,15 @@ struct HomeView: View {
                     List(selection: $selection) {
                         ForEach(sortedReminders){ reminder in
                             Button {
-                                if TutorialManager.shared.inTutorial {
-                                    TutorialManager.shared.handleTargetViewClick(target: "ReminderButton")
-                                }
 
-                                if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube  {
+
+                                if reminder.isLoading && reminder.firebaseVideoURL == nil {
                                     refuseLoading.toggle()
                                 }
                                 else {
+                                    if TutorialManager.shared.inTutorial {
+                                        TutorialManager.shared.handleTargetViewClick(target: "ReminderButton")
+                                    }
                                     selectedReminder = reminder
                                 }
                             } label: {
@@ -347,7 +342,7 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $refuseLoading){
-            RefuseLoadingView()
+            RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
                 .presentationDetents([.height(300)])
         }
 
@@ -375,27 +370,15 @@ struct HomeView: View {
                 MoveToFolder(reminders: reminders)
 
             }
-
-
         }
         .navigationTitle(folder?.name ?? "All Reminders")
 
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
         .navigationDestination(item: $selectedReminder) { reminder in
             ReminderView(reminder: reminder)
-//                .onDisappear{
-//                    if TutorialManager.shared.inTutorial{
-//                        TutorialManager.shared.homeViewStep = 2
-//                    }
-//
-//                }
         }
 
         .navigationBarBackButtonHidden()
-
-
-
-
     }
 
     func move() {
@@ -430,7 +413,6 @@ struct HomeView: View {
 
     }
 
-
     func deleteEmptyReminder() {
         if let reminder = newReminder{
             guard reminder.isChecked == false else { return }
@@ -444,8 +426,6 @@ struct HomeView: View {
         }
 
     }
-
-
 
 
     func deleteReminder(at offsets: IndexSet) {
@@ -470,10 +450,6 @@ struct HomeView: View {
         }
         modelContext.delete(reminder)
     }
-
-
-
-
 
 
 

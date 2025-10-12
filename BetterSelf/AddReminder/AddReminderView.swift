@@ -26,10 +26,6 @@ struct AddReminderView: View {
 
     @Environment(\.colorScheme) var scheme
 
-    @State private var welcome = true
-
-
-
     var body: some View {
         NavigationStack {
             ZStack {
@@ -158,7 +154,10 @@ struct AddReminderView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
-                        if reminder.isEmpty {
+                        if reminder.isEmpty{
+                            refuseSaving.toggle()
+                        }
+                        else if TutorialManager.shared.inTutorial && (reminder.title.isEmpty || reminder.text.isEmpty || reminder.firebaseVideoURL == nil ) {
                             refuseSaving.toggle()
                         }
                         else {
@@ -216,31 +215,21 @@ struct AddReminderView: View {
 
             }
             .sheet(isPresented: $refuseSaving){
-                RefuseSavingView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
+                RefuseView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
                     .presentationDetents([.height(300)])
             }
             .onChange(of: reminder.isYoutube){ oldV, newV in
                 if newV {
                     youtubeHandling()
                 }
-
             }
-            //            .onChange(of: reminder.type) { _, newType in
-            //                if newType == .TimeLessLetter && selectedPage == .description {
-            //                    selectedPage = .main
-            //                }
-            //            }
-
-
         }
         .overlay{
             if TutorialManager.shared.inTutorial {
                 TutorialManager.shared.tutorialView(viewId: "AddReminder")
                     .ignoresSafeArea(.all)
             }
-
         }
-//        .tutorialOverlay(viewId: "AddReminder")
 
 
     }
@@ -310,22 +299,11 @@ struct AddReminderView: View {
         }
     }
 
-
-
-
     func youtubeHandling(){
         startTime = true
         reminder.type = .InstantInsight
         selectedPage = .main
-
-
-
-
-
-
     }
-
-
 }
 
 #Preview {

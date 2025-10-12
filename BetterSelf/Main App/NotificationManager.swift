@@ -24,8 +24,6 @@ class NotificationManager: ObservableObject {
 
     static let shared = NotificationManager()
 
-
-
     private init() {}
 
 

@@ -19,8 +19,6 @@ struct AddingDescriptionView: View {
     @Environment(\.colorScheme) var scheme
 
 
-
-
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             CleanText("Description")

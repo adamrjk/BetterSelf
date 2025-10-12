@@ -143,36 +143,18 @@ class TutorialManager: ObservableObject {
     static let shared = TutorialManager()
 
     @Published var inTutorial = false
-
-    @Published var folderView0Done = false
     @Published var HomeView1Done = false
 
     @Published var isActive = false
     @Published var shouldRender = true // Controls whether tutorial renders as a view
     @Published var currentStepIndex = 0
     @Published var steps: [TutorialStep] = []
-
-    @Published var homeViewStep = 3
-
-    @Published var folderViewStep = 3
     
     @Published var showHelperSheet = false // Controls helper sheet visibility
- 
-    @Published var tutorialId = ""
     @Published var currentDone = true
     @Published var currentViewId = "" // Tracks which view the tutorial is currently running in
 
     private init() {}
-    
-    func startTutorial(_ tutorialSteps: [TutorialStep], _ tutorialId: String, viewId: String) {
-        self.steps = tutorialSteps
-        self.currentStepIndex = 0
-        self.isActive = true
-        self.shouldRender = true
-        self.tutorialId = tutorialId
-        self.currentViewId = viewId
-        currentDone = false
-    }
     
     // Returns the tutorial view itself for manual overlay (used in sheets)
     func tutorialView(viewId: String) -> some View {
@@ -199,7 +181,6 @@ class TutorialManager: ObservableObject {
             self.currentStepIndex = 0
             self.isActive = true // Tutorial is active and running
             self.shouldRender = false // But don't render as a view
-            self.tutorialId = tutorialId
             self.currentViewId = viewId
             currentDone = false
         }
@@ -219,19 +200,6 @@ class TutorialManager: ObservableObject {
         else {
             showTutorial()
         }
-
-    }
-
-
-    // Initialize tutorial for sheet but don't render it automatically
-    func startTutorialForSheet(_ tutorialSteps: [TutorialStep], _ tutorialId: String, viewId: String) {
-        self.steps = tutorialSteps
-        self.currentStepIndex = 0
-        self.isActive = true // Tutorial is active and running
-        self.shouldRender = false // But don't render as a view
-        self.tutorialId = tutorialId
-        self.currentViewId = viewId
-        currentDone = false
     }
     
     // Manually show/hide the tutorial
@@ -247,7 +215,6 @@ class TutorialManager: ObservableObject {
         self.currentViewId = id
     }
 
-    // MARK: - Keyboard Handling for Text Field Tutorials
     func handleKeyboardAppeared() {
         // Hide tutorial when keyboard appears (user clicked text field) with animation
         withAnimation(.easeInOut(duration: 0.3)) {
@@ -272,8 +239,6 @@ class TutorialManager: ObservableObject {
                     inTutorial = false
                 }
             }
-
-
             endTutorial()
         }
     }

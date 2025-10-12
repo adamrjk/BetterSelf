@@ -201,7 +201,6 @@ class CameraManager: NSObject {
     private var recordingCompletion: ((URL?) -> Void)?
 }
 
-// MARK: - AVCaptureFileOutputRecordingDelegate
 extension CameraManager: AVCaptureFileOutputRecordingDelegate {
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
         if let error = error {

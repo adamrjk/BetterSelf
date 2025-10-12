@@ -1,5 +1,5 @@
 //
-//  RefuseLoadingView.swift
+//  RefuseSavingView.swift
 //  BetterSelf
 //
 //  Created by Adam Damou on 20/08/2025.
@@ -7,11 +7,14 @@
 
 import SwiftUI
 
-struct RefuseLoadingView: View {
-    @Environment(\.dismiss) var dismiss
-    @StateObject var color = ColorManager.shared
-    @Environment(\.colorScheme) var scheme
+struct RefuseView: View {
 
+    @Environment(\.colorScheme) var scheme
+    @Environment(\.dismiss) var dismiss
+
+    let title: String
+    let description: String
+    @StateObject var color = ColorManager.shared
 
     var body: some View {
         ZStack {
@@ -21,10 +24,10 @@ struct RefuseLoadingView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 40) {
-                Text("You cannot access this Reminder yet")
+                Text(title)
                     .font(.headline)
 
-                Text("The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
+                Text(description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -36,7 +39,7 @@ struct RefuseLoadingView: View {
                 .padding()
                 .buttonStyle(.borderedProminent)
                 .frame(width: 100)
-                .background(Color(.systemGray6))
+                .background(color.cardBackground(scheme))
                 .clipShape(
                     RoundedRectangle(cornerRadius: 14)
 
@@ -50,5 +53,5 @@ struct RefuseLoadingView: View {
 }
 
 #Preview {
-    RefuseLoadingView()
+    RefuseView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
 }

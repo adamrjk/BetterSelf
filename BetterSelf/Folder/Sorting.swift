@@ -11,7 +11,4 @@ enum Sorting: String, Codable, CaseIterable {
     case dateOld = "Oldest First"
     case dateNew = "Newest First"
     case name = "By Name"
-
-
-
 }

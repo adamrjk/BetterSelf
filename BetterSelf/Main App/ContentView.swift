@@ -29,8 +29,6 @@ struct ContentView: View {
     
     @State private var tabPage: Int = 0
 
-    @StateObject var tutorialManager = TutorialManager.shared
-
     @Environment(\.colorScheme) var scheme
     @StateObject var color = ColorManager.shared
 
@@ -151,8 +149,6 @@ struct ContentView: View {
         notificationManager.widgetReminder = false
     }
     
-    // MARK: - Notifications
-    
     // Schedules 7 days of notifications every time the app launches
     // Always reschedules to keep content fresh with current pinned reminders
     private func scheduleBulkNotifications() {
@@ -168,9 +164,7 @@ struct ContentView: View {
             NotificationManager.shared.scheduleBulkNotifications(for: remindersToSchedule)
         }
     }
-    
-    // MARK: - Firebase
-    
+
     private func signInAnonymously() {
         Auth.auth().signInAnonymously { _ , error in
             if let error = error {

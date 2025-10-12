@@ -28,10 +28,7 @@ struct FolderView: View {
     @Binding var notifReminder: Reminder?
 
     @Environment(\.colorScheme) var scheme
-
     @State private var settings = false
-
-    @State private var welcome = true
 
 
     var body: some View {
@@ -57,10 +54,6 @@ struct FolderView: View {
                                     }
                                 }
                             }
-
-
-                        //                                            Color.gray.opacity(grayOut ? 0.3 : 0.0)
-                        //                                                .ignoresSafeArea()
                     }
                 }
                 .onAppear{
@@ -77,13 +70,6 @@ struct FolderView: View {
                     }
 
                 }
-//                .onChange(of: TutorialManager.shared.inTutorial){
-//                    if TutorialManager.shared.inTutorial {
-//                        TutorialManager.shared.viewId("Folder")
-//                        TutorialManager.shared.startTutorial("Folder")
-//
-//                    }
-//                }
                 .navigationTitle("BetterSelf")
                 .toolbar{
                     ToolbarItem(placement: .topBarTrailing){
@@ -134,14 +120,9 @@ struct FolderView: View {
 
                 }
                 .sheet(isPresented: $refuseLoading){
-                    RefuseLoadingView()
+                    RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
                         .presentationDetents([.height(300)])
                 }
-//                .sheet(isPresented: $TutorialManager.shared.){
-//                    
-//                }
-
-
                 .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
                 .navigationDestination(item: $selectedReminder) { reminder in
                     ReminderView(reminder: reminder)
@@ -191,7 +172,6 @@ struct FolderView: View {
 
 
     }
-
 
     func deleteEmptyFolder() {
         if let folder = newFolder {

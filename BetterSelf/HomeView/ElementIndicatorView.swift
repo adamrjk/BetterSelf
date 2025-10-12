@@ -9,14 +9,9 @@ import SwiftUI
 
 struct ElementIndicatorView: View {
     @Environment(\.colorScheme) var scheme
-
     @StateObject var color = ColorManager.shared
-
-
-
-
-
     @State var systemName: String
+    
     var body: some View {
         Image(systemName: systemName)
             .font(.caption)

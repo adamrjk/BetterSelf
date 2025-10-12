@@ -9,9 +9,6 @@ import SwiftUI
 
 struct TimeLessLetterView: View {
     @Environment(\.dismiss) var dismiss
-
-
-
     @State var isSheet = false
 
     @State var reminder: Reminder
@@ -46,9 +43,6 @@ struct TimeLessLetterView: View {
             }
 
         }
-
-
-
     }
 }
 

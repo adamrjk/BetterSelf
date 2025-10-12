@@ -246,9 +246,6 @@ struct AddingVideoView: View {
                     .font(.system(size: 40, weight: .semibold))
                     .foregroundStyle(color.itemColor(scheme))
 
-
-
-
                 Text("Video Reminder")
                     .font(.headline)
                 CleanText("Add a Video that reminds you of this idea")
