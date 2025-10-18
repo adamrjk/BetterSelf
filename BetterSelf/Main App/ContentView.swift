@@ -38,15 +38,30 @@ struct ContentView: View {
 
     @State private var welcome = false
 
+    @Environment(\.horizontalSizeClass) var sizeClass
+
     var body: some View {
             TabView(selection: $tabPage) {
-                FolderView(notifReminder: $notifReminder)
-                    .tag(0)
-                    .tabItem{
-                        Label("Reminders", systemImage: "list.bullet")
-                        
-                    }
-                    .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
+                if sizeClass == .regular {
+                    SplitView(notifReminder: $notifReminder)
+                        .tag(0)
+                        .tabItem{
+                            Label("Reminders", systemImage: "list.bullet")
+
+                        }
+                        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
+                }
+                else  {
+                    FolderView(notifReminder: $notifReminder)
+                        .tag(0)
+                        .tabItem{
+                            Label("Reminders", systemImage: "list.bullet")
+
+                        }
+                        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
+
+                }
+
                 
                 
                 ProblemSolverView()

@@ -36,7 +36,7 @@ struct SettingsView: View {
 
                         } label: {
                             HStack {
-                                Image(systemName: "paint.palette")
+                                Image(systemName: "paintpalette")
                                     .font(.title)
                                     .foregroundStyle(color.itemColor(scheme))
                                     .padding()

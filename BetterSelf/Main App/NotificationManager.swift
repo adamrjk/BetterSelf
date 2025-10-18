@@ -133,9 +133,9 @@ class NotificationManager: ObservableObject {
                         let dateFormatter = DateFormatter()
                         dateFormatter.dateStyle = .short
                         dateFormatter.timeStyle = .short
-                        if let scheduledDate = Calendar.current.date(from: dateComponents) {
-//                            print("✅ Scheduled: \(reminder.title) at \(dateFormatter.string(from: scheduledDate))")
-                        }
+//                        if let scheduledDate = Calendar.current.date(from: dateComponents) {
+////                            print("✅ Scheduled: \(reminder.title) at \(dateFormatter.string(from: scheduledDate))")
+//                        }
                     }
                 }
             }
