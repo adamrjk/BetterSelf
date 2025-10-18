@@ -6,6 +6,7 @@
 //
 
 import LocalAuthentication
+import AVKit
 import SwiftData
 import SwiftUI
 
@@ -19,17 +20,28 @@ struct FolderView: View {
 
     @Environment(\.scenePhase) var scenePhase
 
+    @StateObject private var uploadManager = UploadManager.shared
+
     @State private var newFolder: Folder?
+    @State private var addFolder = false
     @State private var searchText = ""
     @State private var showAlert = false
     @State private var refuseLoading = false
     @State private var selectedReminder: Reminder?
     @State private var selectedFolder: Folder?
     @Binding var notifReminder: NavigableReminder?
+    @State private var addReminder = false
 
     @Environment(\.colorScheme) var scheme
     @State private var settings = false
 
+    @State private var newReminder: Reminder?
+
+    @State private var recordedVideoURL: URL?
+    @State private var isFront: Bool?
+    @State private var videoRecorded = false
+    @State private var title = ""
+    @State private var videoRecorder = false
 
     var body: some View {
         NavigationStack {
@@ -83,10 +95,12 @@ struct FolderView: View {
                             let folder = Folder(name: "")
                             modelContext.insert(folder)
                             newFolder = folder
-
+                            addFolder.toggle()
                             TutorialManager.shared.handleTargetViewClick(target: "FolderButton")
 
+
                         }
+                        .foregroundStyle(color.button(scheme))
                         .tutorialIdentifier("FolderButton")
                         .buttonStyle(.plain)
 
@@ -97,10 +111,38 @@ struct FolderView: View {
 
                             settings.toggle()
                         }
+                        .foregroundStyle(color.button(scheme))
+                        .padding(8)
+                        .buttonStyle(.plain)
 
                     }
 
+                    ToolbarItem(placement: .topBarLeading){
+                        Button("Quick Add", systemImage: "video.fill.badge.plus"){
+                            videoRecorder.toggle()
+                        }
+                        .foregroundStyle(color.button(scheme))
+                        .padding(8)
+                        .buttonStyle(.plain)
+                    }
 
+
+                }
+                .sheet(isPresented: $videoRecorder) {
+                    CustomCameraView(
+                        isPresented: $videoRecorder,
+                        onVideoRecorded: { url, isFront in
+                            recordedVideoURL = url
+                            self.isFront = isFront
+                            videoRecorded.toggle()
+                        }
+                    )
+                    .ignoresSafeArea()
+
+                }
+                .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
+                    AddTitleSheet(title: $title)
+                        .presentationDetents([.height(300)])
                 }
                 .sheet(isPresented: $settings){
                     SettingsView()
@@ -113,18 +155,32 @@ struct FolderView: View {
                             }
                         }
                 }
-                .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
-                    AddFolderView(folder: folder)
-                        .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
-                        .presentationDetents([.medium, .large])
-                        .onDisappear {
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.viewId("Folder")
-                                TutorialManager.shared.startTutorial("Folder")
+                .sheet(isPresented: $addFolder, onDismiss: deleteEmptyFolder){
+                    if let folder = newFolder {
+                        AddFolderView(folder: folder)
+                            .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
+                            .presentationDetents([.medium, .large])
+                            .onDisappear {
+                                if TutorialManager.shared.inTutorial {
+                                    TutorialManager.shared.viewId("Folder")
+                                    TutorialManager.shared.startTutorial("Folder")
+                                }
                             }
-                        }
+                    }
 
                 }
+                .sheet(isPresented: $addReminder){
+                    if let reminder = newReminder {
+                        AddReminderView(reminder: reminder)
+                            .onDisappear{
+                                if TutorialManager.shared.inTutorial {
+                                    TutorialManager.shared.viewId("Folder")
+                                    TutorialManager.shared.startTutorial("Folder")
+                                }
+                            }
+                    }
+                }
+
                 .sheet(isPresented: $refuseLoading){
                     RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
                         .presentationDetents([.height(300)])
@@ -148,11 +204,67 @@ struct FolderView: View {
                 .alert("Failed Authentication", isPresented: $showAlert){
                 }
             }
+            .overlay(
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button{
+                            let reminder = Reminder(title: "", text: "", link: "")
+                            modelContext.insert(reminder)
+                            newReminder = reminder
+                            addReminder.toggle()
+                        }label: {
+
+                            Image(systemName: "plus")
+                                .font(.title2)
+                                .foregroundStyle(scheme == .light
+                                                 ? .black
+                                                 : .black)
+                                .padding(20)
+//                                .clipShape(.circl)
+//                                .adaptiveGlass(scheme)
+
+
+                        }
+                        .adaptiveTranslucent(scheme == .light
+                                    ? .white
+                                    : .creamyYellow
+                        )
+                        .clipShape(.circle)
+
+
+
+
+
+
+
+                    }
+                    .padding(.trailing, 10)
+                }
+            )
+
 
         }
 
 
     }
+
+    func saveReminder() {
+            let reminder = Reminder(
+                title: title,
+                text: "",
+                link: ""
+            )
+            if let front = self.isFront {
+                reminder.isFront = front
+            }
+            reminder.isChecked = true
+            modelContext.insert(reminder)
+
+            uploadManager.loadVideo(reminder, recordedVideoURL: recordedVideoURL)
+
+        }
 
     func checkIfWelcome(){
         if UserDefaults().bool(forKey: "Tutorial \(NotificationManager.shared.version)") {
@@ -183,7 +295,8 @@ struct FolderView: View {
         _notifReminder = notifReminder
     }
 
-    
+
+
 
 
 

@@ -257,7 +257,7 @@ struct FoldersList: View {
             .listRowSeparator(.hidden)
         }
         .frame(height: CGFloat(55 * folders.count))
-        .scrollDisabled(false)
+        .scrollDisabled(true)
         .listStyle(.plain)
     }
     

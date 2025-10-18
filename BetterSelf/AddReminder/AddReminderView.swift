@@ -155,7 +155,6 @@ struct AddReminderView: View {
 
             }
             .animation(.smooth, value: keyboard)
-            //            .animation(.smooth, value: reminder.type)
             .navigationTitle("New Reminder")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
@@ -176,16 +175,12 @@ struct AddReminderView: View {
                     } label: {
                         HStack {
                             Text("Save")
-//                                .frame(width: 50)
-//                                .font(.headline)
-//                                .foregroundStyle(.primary)
-//                                .padding(7)
-//                                .background(color.cardBackground(scheme))
-//                                .clipShape(.capsule)
+                                .bold()
+                                .foregroundStyle(color.button(scheme))
                         }
                     }
                     .tutorialIdentifier("SaveReminderButton")
-//                    .buttonStyle(.plain)
+                    .buttonStyle(.plain)
                 }
             }
             .overlay(
@@ -214,7 +209,7 @@ struct AddReminderView: View {
                         .padding(.bottom, 8)  // ← This adds 8 points of space below the button
                     }
                 }
-            )
+            )  
             .sheet(isPresented: $startTime){
                 StartTimeView(time: $reminder.time){ _ in
                 }

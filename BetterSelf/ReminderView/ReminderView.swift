@@ -62,8 +62,10 @@ struct ReminderView: View {
                         Image(systemName: "chevron.left")
                     }
                     .bold()
-
+                    .foregroundStyle(color.button(scheme))
+                    .padding(8)
                 }
+                .buttonStyle(.plain)
             }
 
             ToolbarItem(placement: .topBarTrailing){
@@ -72,7 +74,12 @@ struct ReminderView: View {
                 } label: {
                     Text("Edit")
                         .bold()
+
                 }
+                .padding(8)
+                .foregroundStyle(color.button(scheme))
+                .buttonStyle(.plain)
+
             }
 
 
@@ -83,8 +90,10 @@ struct ReminderView: View {
                             detailSheet.toggle()
                         }
                         .font(.headline)
-                        .buttonStyle(.plain)
+                        .foregroundStyle(color.button(scheme))
                         .padding(8)
+                        .buttonStyle(.plain)
+
                     }
                 }
 
@@ -96,8 +105,9 @@ struct ReminderView: View {
                         detailSheet.toggle()
                     }
                     .font(.headline)
-                    .buttonStyle(.plain)
+                    .foregroundStyle(color.button(scheme))
                     .padding(8)
+                    .buttonStyle(.plain)
                 }
             }
 

@@ -15,6 +15,24 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconName</key>
+			<string>AppIcon</string>
+		</dict>
+	</dict>
+	<key>CFBundleAlternateIcons</key>
+	<dict>
+		<key>AlternateIconName</key>
+		<dict>
+			<key>CFBundleIconName</key>
+			<string>AlternateIconSet1</string>
+			<key>CFBundleIConName</key>
+			<string>AlternateIconSet2</string>
+		</dict>
+	</dict>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

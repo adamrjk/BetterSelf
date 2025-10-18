@@ -77,7 +77,7 @@ class NotificationManager: ObservableObject {
             
             // Log remaining notifications
             center.getPendingNotificationRequests { remainingRequests in
-                print("🗑️ Smart clear complete. Remaining notifications: \(remainingRequests.count)")
+//                print("🗑️ Smart clear complete. Remaining notifications: \(remainingRequests.count)")
             }
         }
     }
@@ -90,7 +90,7 @@ class NotificationManager: ObservableObject {
         // Take up to 3 reminders
         let selectedReminders = Array(reminders.prefix(3))
         
-        print("📅 Scheduling notifications for \(selectedReminders.count) reminders over 7 days (starting tomorrow)")
+//        print("📅 Scheduling notifications for \(selectedReminders.count) reminders over 7 days (starting tomorrow)")
         
         let now = Date()
         
@@ -134,7 +134,7 @@ class NotificationManager: ObservableObject {
                         dateFormatter.dateStyle = .short
                         dateFormatter.timeStyle = .short
                         if let scheduledDate = Calendar.current.date(from: dateComponents) {
-                            print("✅ Scheduled: \(reminder.title) at \(dateFormatter.string(from: scheduledDate))")
+//                            print("✅ Scheduled: \(reminder.title) at \(dateFormatter.string(from: scheduledDate))")
                         }
                     }
                 }
@@ -142,9 +142,9 @@ class NotificationManager: ObservableObject {
         }
         
         // Log total scheduled
-        center.getPendingNotificationRequests { requests in
-            print("📊 Total pending notifications: \(requests.count)")
-        }
+//        center.getPendingNotificationRequests { requests in
+//            print("📊 Total pending notifications: \(requests.count)")
+//        }
     }
     
     /// Generates random times spread throughout the day (morning, afternoon, evening)

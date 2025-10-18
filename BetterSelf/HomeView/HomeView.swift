@@ -162,19 +162,15 @@ struct HomeView: View {
                         Button("Delete"){
                             deleteAlert.toggle()
                         }
-                        .buttonStyle(.plain)
-                        .padding()
-                        .clipShape(.capsule)
                         .adaptiveGlass(scheme)
+                        .buttonStyle(.plain)
 
                         Spacer()
 
 
                         Button("Move", action: move)
-                            .buttonStyle(.plain)
-                            .padding()
-                            .clipShape(.capsule)
                             .adaptiveGlass(scheme)
+                            .buttonStyle(.plain)
                     }
                     .padding(.horizontal, 5)
                 }
@@ -198,10 +194,51 @@ struct HomeView: View {
         }
         .onChange(of: TutorialManager.shared.currentStepIndex){
             if TutorialManager.shared.inTutorial && TutorialManager.shared.currentViewId == "Home" && TutorialManager.shared.currentStepIndex == 2 {
-                sorting == .dateNew
+                sorting = .dateNew
             }
         }
+        .overlay(
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
 
+                    if editMode?.wrappedValue == .inactive {
+                        Button{
+                            let reminder = Reminder(title: "", text: "", link: "", folder: folder)
+                            modelContext.insert(reminder)
+                            newReminder = reminder
+                            addReminder.toggle()
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
+                            }
+                        }label: {
+
+                            Image(systemName: "plus")
+                                .font(.title2)
+                                .foregroundStyle(scheme == .light
+                                                 ? .black
+                                                 : .black)
+                                .padding(20)
+                        }
+                        .tutorialIdentifier("PlusButton")
+                        .adaptiveTranslucent(scheme == .light
+                                             ? .white
+                                             : .creamyYellow
+                        )
+                        .clipShape(.circle)
+                    }
+
+
+
+
+
+
+
+                }
+                .padding(.trailing, 10)
+            }
+        )
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
@@ -242,8 +279,6 @@ struct HomeView: View {
                                 .buttonStyle(.plain)
                                 .foregroundStyle(color.button(scheme))
                                 .padding(8)
-                            //                .background(newCardBackground)
-                            //                .clipShape(.capsule)
 
                             Text("Select Reminders")
                         }
@@ -254,62 +289,32 @@ struct HomeView: View {
 
 
 
-                }label: {
+                } label: {
                     Image(systemName: "ellipsis")
                         .font(.subheadline)
                         .foregroundStyle(color.button(scheme))
-                        .padding(7)
-                    //                        .background(
-                    //                            Circle()
-                    //                                .fill(newCardBackground)
-                    //                        )
+                        .padding(8)
                 }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Add Reminder", systemImage: "plus"){
-                    let reminder = Reminder(title: "", text: "", link: "", folder: folder)
-                    modelContext.insert(reminder)
-                    newReminder = reminder
-                    addReminder.toggle()
-                    if TutorialManager.shared.inTutorial {
-                        TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
-                    }
-                }
-                .tutorialIdentifier("PlusButton")
                 .buttonStyle(.plain)
-                .foregroundStyle(color.button(scheme))
-                .padding(7)
-                //                .background(newCardBackground)
-                .clipShape(.capsule)
             }
-
             ToolbarItem(placement: .topBarLeading){
                 Button("Go Back", systemImage: "chevron.left"){
                     dismiss()
 
                 }
-                .padding(.trailing)
+                .foregroundStyle(color.button(scheme))
+                .padding(8)
                 .font(.headline)
                 .buttonStyle(.plain)
-                .foregroundStyle(color.button(scheme))
-                .padding(7)
-                //                .background(newCardBackground)
-                .clipShape(.capsule)
-
-
-
 
             }
             ToolbarItem(placement: .topBarLeading){
                 Button("Quick Add", systemImage: "video.fill.badge.plus"){
                     videoRecorder.toggle()
                 }
-                .font(.caption)
                 .buttonStyle(.plain)
                 .foregroundStyle(color.button(scheme))
                 .padding(8)
-                //                .background(newCardBackground)
-                //                .clipShape(.capsule)
             }
 
 
@@ -390,6 +395,22 @@ struct HomeView: View {
         }
 
         .navigationBarBackButtonHidden()
+    }
+
+    func saveReminder() {
+        let reminder = Reminder(
+            title: title,
+            text: "",
+            link: ""
+        )
+        if let front = self.isFront {
+            reminder.isFront = front
+        }
+        reminder.isChecked = true
+        modelContext.insert(reminder)
+
+        uploadManager.loadVideo(reminder, recordedVideoURL: recordedVideoURL)
+
     }
 
     func move() {
@@ -511,66 +532,10 @@ struct HomeView: View {
             UserDefaults.standard.set(data, forKey: "AllRemindersSorting")
         }
     }
-    func saveReminder() {
-        let reminder = Reminder(
-            title: title,
-            text: "",
-            link: ""
-        )
-        if let front = self.isFront {
-            reminder.isFront = front
-        }
-        reminder.isChecked = true
-        modelContext.insert(reminder)
 
-        loadVideo(reminder)
+    
 
-    }
-
-
-    func loadVideo(_ reminder: Reminder) {
-        Task {
-            if let url = recordedVideoURL {
-                // Generate thumbnail immediately
-                if let thumbnail = await generateThumbnail(from: url) {
-                    reminder.photo = thumbnail.jpegData(compressionQuality: 0.8)
-                }
-
-                // Upload video in background
-                await uploadVideoToFirebase(videoURL: url, reminder: reminder)
-            }
-        }
-    }
-
-    // Generate thumbnail from video URL
-    private func generateThumbnail(from videoURL: URL) async -> UIImage? {
-        let asset = AVURLAsset(url: videoURL)
-        let generator = AVAssetImageGenerator(asset: asset)
-        generator.appliesPreferredTrackTransform = true
-
-        // Get thumbnail at 0.1 seconds (very fast)
-        let time = CMTime(seconds: 0.1, preferredTimescale: 600)
-
-        do {
-            let cgImage = try await generator.image(at: time).image
-            return UIImage(cgImage: cgImage)
-        } catch {
-            print("Thumbnail generation error: \(error)")
-            return nil
-        }
-    }
-
-    func uploadVideoToFirebase(videoURL: URL, reminder: Reminder) async {
-        uploadManager.startUpload(videoURL: videoURL){ result in
-            switch result {
-            case .success(let firebaseURL):
-                reminder.firebaseVideoURL = firebaseURL
-
-            case .failure(let error):
-                print("Firebase upload failed: \(error.localizedDescription)")
-            }
-        }
-    }
+    
 
     func isFirstId(_ reminder: Reminder) -> String {
         if let first = sortedReminders.first {

@@ -70,6 +70,7 @@ struct ContentView: View {
                 //                }
                 //                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
             }
+            .tint(color.button(scheme))
             .sheet(isPresented: $welcome){
                 WelcomeView()
             }
@@ -102,6 +103,7 @@ struct ContentView: View {
         else {
             welcome = true
             UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
+            UserDefaults.standard.set("AlternateIconSet1", forKey: "CurrentAppIcon")
         }
     }
     

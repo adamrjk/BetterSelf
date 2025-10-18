@@ -82,12 +82,14 @@ struct YoutubeView: View {
                         } label: {
                             Image(systemName: "timer")
                                 .foregroundColor(.primary)
-                                .padding()
+                                .font(.title2)
+//                                .padding(5)
                                 .adaptiveGlass(scheme)
-                                .clipShape(Circle())
                         }
-                        .padding()
+                        .buttonStyle(.plain)
+
                     }
+                    .padding(.trailing)
 
                 }
 

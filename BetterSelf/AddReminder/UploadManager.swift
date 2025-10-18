@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AVKit
 import FirebaseStorage
 import SwiftUI
 
@@ -19,6 +20,53 @@ class UploadManager: ObservableObject {
     @EnvironmentObject var color: ColorManager
 
     private init() {}
+
+
+    func uploadVideoToFirebase(videoURL: URL, reminder: Reminder) async {
+        startUpload(videoURL: videoURL){ result in
+            switch result {
+            case .success(let firebaseURL):
+                reminder.firebaseVideoURL = firebaseURL
+
+            case .failure(let error):
+                print("Firebase upload failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func loadVideo(_ reminder: Reminder, recordedVideoURL: URL?) {
+            Task {
+                if let url = recordedVideoURL {
+                    // Generate thumbnail immediately
+                    if let thumbnail = await generateThumbnail(from: url) {
+                        reminder.photo = thumbnail.jpegData(compressionQuality: 0.8)
+                    }
+
+                    // Upload video in background
+                    await uploadVideoToFirebase(videoURL: url, reminder: reminder)
+                }
+            }
+        }
+
+    // Generate thumbnail from video URL
+    func generateThumbnail(from videoURL: URL) async -> UIImage? {
+        let asset = AVURLAsset(url: videoURL)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+
+        // Get thumbnail at 0.1 seconds (very fast)
+        let time = CMTime(seconds: 0.1, preferredTimescale: 600)
+
+        do {
+            let cgImage = try await generator.image(at: time).image
+            return UIImage(cgImage: cgImage)
+        } catch {
+            print("Thumbnail generation error: \(error)")
+            return nil
+        }
+    }
+
+
 
     func startUpload(
         videoURL: URL,

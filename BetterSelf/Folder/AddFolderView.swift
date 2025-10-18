@@ -111,7 +111,10 @@ struct AddFolderView: View {
                         }
                     } label: {
                         Text("Save")
+                            .foregroundStyle(color.button(scheme))
                     }
+                    .padding(8)
+                    .buttonStyle(.plain)
                 }
             }
             .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)

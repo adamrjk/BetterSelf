@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+
+
+
 struct AdaptiveGlassModifier: ViewModifier {
     @EnvironmentObject var color: ColorManager
     let scheme: ColorScheme
@@ -14,12 +17,17 @@ struct AdaptiveGlassModifier: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 26, *) {
             content
+                .padding()
+                .clipShape(.capsule)
                 .glassEffect(.regular, in: .buttonBorder)
+
         } else {
             content
                 .padding()
-                .background(color.cardBackground(scheme))
+                .background(.regularMaterial)
                 .clipShape(.capsule)
+
+
         }
     }
 }
@@ -34,26 +42,26 @@ extension View {
 //}
 
 
-struct ToolBarButtonModifier: ViewModifier{
+
+struct AdaptiveTranslucentModifier: ViewModifier {
     @EnvironmentObject var color: ColorManager
-    let scheme: ColorScheme
+//    let scheme: ColorScheme
+    let background: Color
 
     func body(content: Content) -> some View {
         if #available(iOS 26, *) {
             content
-
+                .glassEffect(.regular.tint(background.opacity(0.9)).interactive())
+                 .padding()
         } else {
             content
-//                .padding()
-                .background(color.itemColor(scheme))
-//                .clipShape(.capsule)
-                .buttonStyle(.plain)
+                .background(background)
         }
     }
-
 }
+
 extension View {
-    func toolbarButton(_ scheme: ColorScheme) -> some View {
-        self.modifier(ToolBarButtonModifier(scheme: scheme))
+    func adaptiveTranslucent(_ a: Color) -> some View {
+        self.modifier(AdaptiveTranslucentModifier(background: a))
     }
 }
