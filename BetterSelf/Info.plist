@@ -2,16 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleAlternateIcons</key>
-	<dict>
-		<key>AlternateIconName</key>
-		<dict>
-			<key>CFBundleIConName</key>
-			<string>AlternateIconSet2</string>
-			<key>CFBundleIconName</key>
-			<string>AlternateIconSet1</string>
-		</dict>
-	</dict>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
