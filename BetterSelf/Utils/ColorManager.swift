@@ -12,85 +12,143 @@ class ColorManager: ObservableObject {
 
     static let shared = ColorManager()
 
+    @Published var theme: Theme
 
-    func mainGradient(_ scheme: ColorScheme) ->  LinearGradient {
-        scheme == .light
-        ? Color.creamyYellowGradient
-        : Color.purpleMainGradient
+
+    init(){
+        self.theme = .yellowPurple
+    }
+
+    init(theme: Theme){
+        self.theme = theme
+    }
+
+    func changeTheme(_ theme: Theme){
+        self.theme = theme
+    }
+
+
+
+
+
+
+    func mainGradient(_ scheme: ColorScheme) -> LinearGradient {
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
+            ? Color.creamyYellowGradient
+            : Color.purpleMainGradient
+        case .blackWhite:
+            return scheme == .light
+            ? Color.whiteBackgroundGradient
+            : Color.blackGradient
+        }
     }
 
     func overlayGradient(_ scheme: ColorScheme) -> RadialGradient {
-        scheme == .light
-        ? Color.overlayCreamyYellowGradient
-        : Color.purpleOverlayGradient
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
+            ? Color.overlayCreamyYellowGradient
+            : Color.purpleOverlayGradient
+        case .blackWhite:
+            return scheme == .light
+            ? Color.whiteOverlayGradient
+            : Color.blackOverlayGradient
+        }
+    }
+
+    func cardBackground(_ scheme: ColorScheme) ->  LinearGradient {
+
+        switch theme {
+        case .yellowPurple:
+            scheme == .light
+            ? Color.whiteBackgroundGradient
+            : Color.systemGrayGradient
+        case .blackWhite:
+            scheme == .light
+            ? Color.systemGrayGradient
+            : Color.blackGradient
+
+        }
 
     }
+
     func itemColor(_ scheme: ColorScheme) -> LinearGradient {
-        scheme == .light
-        ? Color.darkPurpleMainGradient
-        : Color.creamyYellowGradient
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
+            ? Color.darkPurpleMainGradient
+            : Color.creamyYellowGradient
+        case .blackWhite:
+            return scheme == .light
+            ? Color.blackGradient
+            : Color.creamyYellowGradient
+        }
     }
 
     func itemShadow(_ scheme: ColorScheme) -> Color {
-        scheme == .light
-        ? .darkPurple
-        : .creamyYellow
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
+            ? .darkPurple
+            : .creamyYellow
+        case .blackWhite:
+            return scheme == .light
+            ? .gray.opacity(0.25)
+            : .white.opacity(0.3)
+        }
     }
-
 
     func buttonGradient(_ scheme: ColorScheme) -> LinearGradient {
-        scheme == .light
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
             ? Color.blackGradient
             : Color.creamyYellowGradient
-        
+        case .blackWhite:
+            return scheme == .light
+            ? Color.grayButtonGradient          // Custom for blackWhite theme
+            : Color.whiteButtonGradient         // Custom for blackWhite theme
+        }
     }
 
-
-
-
-
     func shadow(_ scheme: ColorScheme) -> Color {
-        scheme == .light
-        ? .black
-        : .purple
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
+            ? .black
+            : .purple
+        case .blackWhite:
+            return scheme == .light
+            ? .black
+            : .white
+        }
     }
 
     func button(_ scheme: ColorScheme) -> Color {
-        scheme == .light
-        ? .black
-        : .creamyYellow
-
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
+            ? .black
+            : .creamyYellow
+        case .blackWhite:
+            return scheme == .light
+            ? .black
+            : .white
+        }
     }
 
     func text(_ scheme: ColorScheme) -> Color {
-        scheme == .light
-        ? .white
-        : .black
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
+            ? .white
+            : .black
+        case .blackWhite:
+            return scheme == .light
+            ? .white
+            : .black
+        }
     }
-
-
-
-//    func cardBackground(_ scheme: ColorScheme) ->  LinearGradient {
-//         LinearGradient(
-//            colors: [
-//                scheme == .light ? Color("CreamyYellow1") : Color(.systemGray6),
-//                scheme == .light ? Color("CreamyYellow2")  : Color(.systemGray6)
-//            ],
-//            startPoint: .top,
-//            endPoint: .bottom
-//        )
-//    }
-    func cardBackground(_ scheme: ColorScheme) ->  LinearGradient {
-        scheme == .light
-        ? Color.whiteBackgroundGradient
-        : LinearGradient(
-            colors: [
-                 Color(.systemGray6),
-                 Color(.systemGray6)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
 }

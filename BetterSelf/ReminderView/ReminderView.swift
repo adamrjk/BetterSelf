@@ -16,6 +16,7 @@ struct ReminderView: View {
     @Environment(\.colorScheme) var scheme
     @EnvironmentObject var color: ColorManager
 
+    let onExpandDetail: (() -> Void)?
 
     @State private var edit = false
     @State private var detailSheet = false
@@ -56,10 +57,14 @@ struct ReminderView: View {
 
             ToolbarItem(placement: .topBarLeading) {
                 Button{
-                    dismiss()
+                    if UIDevice.current.userInterfaceIdiom == .pad, let expand = onExpandDetail {
+                        expand()
+                    } else {
+                        dismiss()
+                    }
                 } label: {
                     HStack {
-                        Image(systemName: "chevron.left")
+                        Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "arrow.down.right.and.arrow.up.left" : "chevron.left")
                     }
                     .bold()
                     .foregroundStyle(color.button(scheme))
@@ -113,6 +118,7 @@ struct ReminderView: View {
 
         }
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
+        .toolbar(removing: .sidebarToggle)
         .sheet(isPresented: $reminder.isShared){
             AddTitleSheet(title: $reminder.title)
                 .presentationDetents([.height(300)])
@@ -147,8 +153,9 @@ struct ReminderView: View {
 
 
     }
-    init(reminder: Reminder) {
+    init(reminder: Reminder, onExpandDetail: (() -> Void)? = nil) {
         _reminder = State(initialValue: reminder)
+        self.onExpandDetail = onExpandDetail
     }
 
 

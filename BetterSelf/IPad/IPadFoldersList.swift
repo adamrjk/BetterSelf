@@ -134,19 +134,23 @@ struct IPadFoldersList: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 20)
                 } else {
-                    ForEach(pinned) { reminder in
-                        Button {
-                            if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
-                                refuseLoading.toggle()
+                    LazyVGrid(columns: [
+                        GridItem(.adaptive(minimum: 320, maximum: 480), spacing: 16)
+                    ], spacing: 12) {
+                        ForEach(pinned) { reminder in
+                            Button {
+                                if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
+                                    refuseLoading.toggle()
+                                }
+                                else {
+                                    selectedReminder = reminder
+                                }
+                            } label: {
+                                ReminderRowView(reminder: reminder, isPreview: true)
                             }
-                            else {
-                                selectedReminder = reminder
-                            }
-                        } label: {
-                            ReminderRowView(reminder: reminder, isPreview: true)
                         }
-                        .padding(.horizontal, 16)
                     }
+                    .padding(.horizontal, 16)
                 }
             }
             .padding(.bottom, 8)

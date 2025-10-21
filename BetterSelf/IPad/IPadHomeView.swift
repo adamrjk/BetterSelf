@@ -11,7 +11,7 @@ import SwiftData
 
 
 
-struct HomeView: View {
+struct IPadHomeView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
     @Environment(\.editMode) var editMode
@@ -21,8 +21,8 @@ struct HomeView: View {
     @EnvironmentObject var color: ColorManager
 
     let folder: Folder?
-    let onSelectReminder: ((Reminder) -> Void)?
-    let onToggleSidebar: (() -> Void)?
+//    let onSelectReminder: ((Reminder) -> Void)?
+//    let onToggleSidebar: (() -> Void)?
 
     @Query var reminders: [Reminder]
 
@@ -30,7 +30,7 @@ struct HomeView: View {
 
     @State private var searchText = ""
     @State private var addReminder = false
-    @State private var selectedReminder: Reminder?
+    @Binding var selectedReminder: Reminder?
     @State private var remindersToMove: [Reminder]?
     @State private var newReminder: Reminder?
     @State private var videoRecorder = false
@@ -40,7 +40,7 @@ struct HomeView: View {
     @State private var deleteAlert = false
     @State private var reminderToDelete: Reminder?
 
-    
+
     var unlockedReminders: [Reminder]{
         reminders.filter{
             $0.isLocked == false
@@ -108,9 +108,9 @@ struct HomeView: View {
                                     if TutorialManager.shared.inTutorial {
                                         TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
                                     }
-                                    if let handler = onSelectReminder, UIDevice.current.userInterfaceIdiom == .pad {
-                                        handler(reminder)
-                                    } else {
+//                                    if let handler = onSelectReminder, UIDevice.current.userInterfaceIdiom == .pad {
+//                                        handler(reminder)
+                                    else {
                                         selectedReminder = reminder
                                     }
                                 }
@@ -291,6 +291,21 @@ struct HomeView: View {
 
                     }
 
+                    Button {
+                        videoRecorder.toggle()
+                    } label: {
+                        Image(systemName: "video.fill.badge.plus")
+                            .font(.subheadline)
+                            .buttonStyle(.plain)
+                            .foregroundStyle(color.button(scheme))
+                            .padding(8)
+
+                        Text("Record Video")
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(color.button(scheme))
+                    .padding(8)
+
 
 
 
@@ -301,27 +316,6 @@ struct HomeView: View {
                         .padding(8)
                 }
                 .buttonStyle(.plain)
-            }
-
-                ToolbarItem(placement: .topBarLeading){
-                    Button("Go Back", systemImage: "chevron.left"){
-                        dismiss()
-
-                    }
-                    .foregroundStyle(color.button(scheme))
-                    .padding(8)
-                    .font(.headline)
-                    .buttonStyle(.plain)
-
-                }
-            
-            ToolbarItem(placement: .topBarLeading){
-                Button("Quick Add", systemImage: "video.fill.badge.plus"){
-                    videoRecorder.toggle()
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(color.button(scheme))
-                .padding(8)
             }
 
 
@@ -347,7 +341,14 @@ struct HomeView: View {
         } message: {
             Text("You won't be able to restore this Reminder")
         }
-        .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
+        // iPhone/compact: use sheet; iPad: use full-screen cover (edge-to-edge)
+        .sheet(
+            isPresented: .init(
+                get: { addReminder && UIDevice.current.userInterfaceIdiom != .pad },
+                set: { addReminder = $0 }
+            ),
+            onDismiss: deleteEmptyReminder
+        ){
             if let reminder = newReminder {
                 AddReminderView(reminder: reminder)
                     .onDisappear{
@@ -357,6 +358,32 @@ struct HomeView: View {
                             TutorialManager.shared.startTutorial("Home")
                         }
                     }
+            }
+        }
+        .sheet(
+            isPresented: .init(
+                get: { addReminder && UIDevice.current.userInterfaceIdiom == .pad },
+                set: { addReminder = $0 }
+            ),
+            onDismiss: deleteEmptyReminder
+        ){
+            if let reminder = newReminder {
+                if #available(iOS 18.0, *) {
+                    AddReminderView(reminder: reminder)
+                        .presentationDetents([.height(800)])
+                        .presentationSizing(.page)
+
+                        .presentationDragIndicator(.visible)
+                        .onDisappear{
+                            if TutorialManager.shared.inTutorial {
+                                sorting = .dateNew
+                                TutorialManager.shared.viewId("Home")
+                                TutorialManager.shared.startTutorial("Home")
+                            }
+                        }
+                } else {
+                    // Fallback on earlier versions
+                }
             }
         }
         .sheet(isPresented: $refuseLoading){
@@ -392,14 +419,14 @@ struct HomeView: View {
         .navigationTitle(folder?.name ?? "All Reminders")
 
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-        .navigationDestination(item: $selectedReminder) { reminder in
-            ReminderView(reminder: reminder)
-                .onDisappear{
-                    TutorialManager.shared.viewId("Home")
-                    TutorialManager.shared.startTutorial("Home")
-
-                }
-        }
+//        .navigationDestination(item: $selectedReminder) { reminder in
+//            ReminderView(reminder: reminder)
+//                .onDisappear{
+//                    TutorialManager.shared.viewId("Home")
+//                    TutorialManager.shared.startTutorial("Home")
+//
+//                }
+//        }
 
         .navigationBarBackButtonHidden()
     }
@@ -498,10 +525,11 @@ struct HomeView: View {
 
 
 
-    init(folder: Folder? = nil, onSelectReminder: ((Reminder) -> Void)? = nil, onToggleSidebar: (() -> Void)? = nil) {
+    init(folder: Folder? = nil, selectedReminder: Binding<Reminder?>) {
         self.folder = folder
-        self.onSelectReminder = onSelectReminder
-        self.onToggleSidebar = onToggleSidebar
+//        self.onSelectReminder = onSelectReminder
+//        self.onToggleSidebar = onToggleSidebar
+        _selectedReminder = selectedReminder
 
         var AllRemindersSorting = Sorting.dateOld
         if self.folder == nil {
@@ -542,9 +570,9 @@ struct HomeView: View {
         }
     }
 
-    
 
-    
+
+
 
     func isFirstId(_ reminder: Reminder) -> String {
         if let first = sortedReminders.first {

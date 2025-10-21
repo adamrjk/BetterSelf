@@ -120,16 +120,6 @@ struct IPadFolderView: View {
 
                     }
 
-                    ToolbarItem(placement: .topBarLeading){
-                        Button("Quick Add", systemImage: "video.fill.badge.plus"){
-                            videoRecorder.toggle()
-                        }
-                        .foregroundStyle(color.button(scheme))
-                        .padding(8)
-                        .buttonStyle(.plain)
-                    }
-
-
                 }
                 .sheet(isPresented: $videoRecorder) {
                     CustomCameraView(
@@ -207,46 +197,6 @@ struct IPadFolderView: View {
                 .alert("Failed Authentication", isPresented: $showAlert){
                 }
             }
-            .overlay(
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        Button{
-                            let reminder = Reminder(title: "", text: "", link: "")
-                            modelContext.insert(reminder)
-                            newReminder = reminder
-                            addReminder.toggle()
-                        }label: {
-
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .foregroundStyle(scheme == .light
-                                                 ? .black
-                                                 : .black)
-                                .padding(20)
-//                                .clipShape(.circl)
-//                                .adaptiveGlass(scheme)
-
-
-                        }
-                        .adaptiveTranslucent(scheme == .light
-                                    ? .white
-                                    : .creamyYellow
-                        )
-                        .clipShape(.circle)
-
-
-
-
-
-
-
-                    }
-                    .padding(.trailing, 10)
-                }
-            )
-
 
         }
 

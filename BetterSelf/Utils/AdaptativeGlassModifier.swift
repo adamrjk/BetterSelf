@@ -52,7 +52,6 @@ struct AdaptiveTranslucentModifier: ViewModifier {
         if #available(iOS 26, *) {
             content
                 .glassEffect(.regular.tint(background.opacity(0.9)).interactive())
-                 .padding()
         } else {
             content
                 .background(background)

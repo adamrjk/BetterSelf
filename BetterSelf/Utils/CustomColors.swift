@@ -31,17 +31,39 @@ extension Color {
         endPoint: .bottomTrailing
     )
 
+    static let systemGrayGradient = LinearGradient(
+        colors: [
+            Color(.systemGray6),
+            Color(.systemGray6)
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
+
+    static let whiteItemGradient: LinearGradient =
+            LinearGradient(
+                colors: [
+                    Color.white,
+                    Color.white.opacity(0.9),
+                    Color.white.opacity(0.8)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+
     static let whiteBackgroundGradient: LinearGradient =
-        LinearGradient(
-            colors: [
-                Color(red: 1.0, green: 0.98, blue: 0.90),
-                Color(red: 1.0, green: 0.96, blue: 0.85),
-                Color(red: 1.0, green: 0.94, blue: 0.80)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    
+            LinearGradient(
+                colors: [
+                    Color.white.opacity(0.3),
+                    Color.white.opacity(0.2),
+                    Color.white.opacity(0.15)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
 
     static let purpleOverlayGradient = RadialGradient(
         colors: [
@@ -144,6 +166,60 @@ extension Color {
         center: .topLeading,
         startRadius: 0,
         endRadius: 400
+    )
+
+    // Overlay for light mode in Black & White theme
+    static let whiteOverlayGradient = RadialGradient(
+        colors: [
+            Color.white.opacity(0.25),
+            Color.clear
+        ],
+        center: .topLeading,
+        startRadius: 0,
+        endRadius: 400
+    )
+
+    // Overlay for dark mode in Black & White theme
+    static let blackOverlayGradient = RadialGradient(
+        colors: [
+            Color.black.opacity(0.25),
+            Color.clear
+        ],
+        center: .topLeading,
+        startRadius: 0,
+        endRadius: 400
+    )
+
+    // Item/background accents for Black & White theme (light mode)
+    static let grayItemGradient = LinearGradient(
+        colors: [
+            Color(white: 0.95),
+            Color(white: 0.90)
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
+
+
+    // Button fills for Black & White theme (light mode)
+    static let grayButtonGradient = LinearGradient(
+        colors: [
+            Color(white: 0.20),
+            Color(white: 0.15)
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
+    // Button fills for Black & White theme (dark mode)
+    static let whiteButtonGradient = LinearGradient(
+        colors: [
+            Color.white.opacity(0.95),
+            Color.white.opacity(0.85)
+        ],
+        startPoint: .top,
+        endPoint: .bottom
     )
 
 

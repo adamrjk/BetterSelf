@@ -38,6 +38,8 @@ struct ContentView: View {
 
     @State private var welcome = false
 
+    @State private var preferredScheme: ColorScheme?
+
     @Environment(\.horizontalSizeClass) var sizeClass
 
     var body: some View {
@@ -106,12 +108,35 @@ struct ContentView: View {
             }
             .onAppear {
                 checkIfWelcome()
+                getSchemeAndTheme()
                 signInAnonymously()
                 scheduleBulkNotifications()
             }
         }
 
+    func getSchemeAndTheme(){
+        if let modeStr = UserDefaults.standard.value(forKey: "ThemeMode") as? String,
+            let mode = ThemeMode(rawValue: modeStr) {
+                AppearanceController.shared.apply(mode)
+        }
+        else {
+            UserDefaults.standard.set("Sync Theme", forKey: "ThemeMode")
+            AppearanceController.shared.apply(.auto)
+        }
 
+        if let themeStr = UserDefaults.standard.value(forKey: "Theme") as? String,
+           let theme = Theme(rawValue: themeStr) {
+            color.changeTheme(theme)
+        }
+        else {
+            color.changeTheme(.yellowPurple)
+            UserDefaults.standard.set(Theme.yellowPurple.rawValue, forKey: "Theme")
+
+        }
+
+
+
+    }
     func checkIfWelcome(){
         if UserDefaults.standard.bool(forKey: "Welcome \(notificationManager.version)") {
         }
@@ -213,6 +238,14 @@ struct ContentView: View {
     }
 
 }
+
+extension View {
+    @ViewBuilder
+    func preferredColorSchemeIfSet(_ scheme: ColorScheme?) -> some View {
+        if let scheme { self.preferredColorScheme(scheme) } else { self }
+    }
+}
+
 
 #Preview {
     ContentView()

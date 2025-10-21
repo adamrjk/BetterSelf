@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct FolderRowView: View {
+    @Environment(\.colorScheme) var scheme
     let folder: Folder?
 
     let count: Int
@@ -18,7 +19,7 @@ struct FolderRowView: View {
     var body: some View {
         HStack {
             Image(systemName: "folder.fill")
-                .foregroundColor(.primary)
+                .foregroundStyle(color.button(scheme))
                 .font(.title3)
             Text(folder?.name ?? "All Reminders")
                 .foregroundColor(.primary)
