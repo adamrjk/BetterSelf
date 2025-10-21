@@ -145,6 +145,13 @@ struct HomeView: View {
 
                                 }
                                 .tint(.orange)
+
+                                ShareLink(item: "Hello World") {
+                                    Image(systemName: "square.and.arrow.up")
+                                }
+//                                Button("", systemImage: "square.and.arrow.up"){
+//
+//                                }
                             }
                             .tag(reminder)
 
