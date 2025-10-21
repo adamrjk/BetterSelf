@@ -1,5 +1,5 @@
 import Foundation
-import FirebaseFirestore 
+import FirebaseFirestore
 
 final class FirestoreService: ObservableObject {
     static let shared = FirestoreService()
@@ -98,6 +98,14 @@ final class FirestoreService: ObservableObject {
         } else {
             return try await addDocument(to: collectionPath, data: jsonDict)
         }
+    }
+
+
+    func encode(_ reminder: Reminder) -> String {
+
+        
+
+
     }
 }
 
