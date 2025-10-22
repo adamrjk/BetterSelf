@@ -47,14 +47,14 @@ struct BetterSelfApp: App {
                 .environmentObject(ColorManager.shared)
                 .onOpenURL { url in
                     print("Just received a URL: \(url)")
-                    if url.absoluteString.localizedStandardContains("url") {
-                        NotificationManager.shared.linkReminder = true
-                    }
-                    else if url.absoluteString.localizedStandardContains("share"){
+                    if url.absoluteString.localizedStandardContains("share"){
                         guard let range = url.absoluteString.range(of: "share/") else { return }
                         NotificationManager.shared.reminderID = String(url.absoluteString[range.upperBound...])
-                        NotificationManager.shared.sharedReminder = true 
+                        NotificationManager.shared.sharedReminder = true
 
+                    }
+                    else if url.absoluteString.localizedStandardContains("url") {
+                        NotificationManager.shared.linkReminder = true
                     }
                     else {
                         guard let range = url.absoluteString.range(of: "reminder=") else { return }

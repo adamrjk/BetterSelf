@@ -10,7 +10,7 @@ import SwiftUI
 struct AppIconView: View {
     let appIcons = [
         ("BetterSelf", "AlternateIconSet1"),
-        ("Dark", "AlternateIconSet2")
+        ("Light", "AlternateIconSet2")
     ]
 
     @Environment(\.colorScheme) var scheme
