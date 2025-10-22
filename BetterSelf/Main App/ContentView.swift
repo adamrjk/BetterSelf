@@ -15,6 +15,8 @@ struct ContentView: View {
     @EnvironmentObject var notificationManager: NotificationManager
     @State private var notifReminder: NavigableReminder?
 
+    @StateObject var firestore = FirestoreService.shared
+
     @Environment(\.modelContext) var modelContext
     @Query(filter: #Predicate<Reminder> {
         $0.isChecked == true
@@ -96,9 +98,16 @@ struct ContentView: View {
                     handleNotificationNavigation()
                 }
             }
-            .onChange(of: notificationManager.sharedReminder) {
-                if notificationManager.sharedReminder {
+            .onChange(of: notificationManager.linkReminder) {
+                if notificationManager.linkReminder {
                     handleSharedLinkNavigation()
+                }
+            }
+            .onChange(of: notificationManager.sharedReminder){
+                if notificationManager.sharedReminder{
+                    Task { @MainActor in
+                      await handleSharedReminderCreation()
+                    }
                 }
             }
             .onChange(of: notificationManager.widgetReminder) {
@@ -165,7 +174,29 @@ struct ContentView: View {
             notificationManager.shouldNavigateToReminder = false
         }
     }
-    
+
+
+    private func handleSharedReminderCreation() async {
+        if let docId = notificationManager.reminderID,
+           let reminder = try? await firestore.receiveReminder(docId) {
+
+            modelContext.insert(reminder)
+            reminder.isChecked = true
+            tabPage = 0
+            notifReminder = nil
+
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                notifReminder = NavigableReminder(reminder: reminder)
+                notificationManager.sharedReminder = false
+            }
+
+        }
+
+
+    }
+
+
     private func handleSharedLinkNavigation() {
         guard let url = UserDefaults(suiteName: "group.adam.betterself")?.value(forKey: "incomingURL") as? String else {
             notificationManager.sharedReminder = false

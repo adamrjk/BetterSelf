@@ -74,6 +74,10 @@ class Reminder {
         link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be")
     }
 
+    var shareLink: URL {
+        URL(string: "betterself://share/\(id.uuidString)")!
+    }
+
 
 }
 
@@ -105,6 +109,34 @@ struct NavigableReminder: Identifiable, Equatable, Hashable {
         lhs.id == rhs.id
     }
 }
+
+
+
+class SharedReminder: Codable {
+    var id: UUID
+    var title: String
+    var type: String
+    var text: String
+    var photo: String
+    var video: String
+    var link: String
+    var time: Int
+    var isFront: Bool
+
+    init(id: UUID, title: String, type: String, text: String, photo: String?, video: String?, link: String, time: Int, isFront: Bool) {
+        self.id = id
+        self.title = title
+        self.type = type
+        self.text = text
+        self.photo = photo ?? ""
+        self.video = video ?? ""
+        self.link = link
+        self.time = time
+        self.isFront = isFront
+    }
+}
+
+
 
 
 

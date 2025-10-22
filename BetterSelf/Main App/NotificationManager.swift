@@ -17,6 +17,7 @@ class NotificationManager: ObservableObject {
     @Published var reminderID: String?
     @Published var shouldNavigateToReminder = false
     @Published var sharedReminder = false
+    @Published var linkReminder = false
     @Published var widgetReminder = false
     @Published var widgetReminderId: String?
     @Published var version = "1.3"

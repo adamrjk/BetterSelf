@@ -74,6 +74,8 @@ struct HomeView: View {
     @State private var isFront: Bool?
     @State private var videoRecorded = false
     @State private var title = ""
+    @State private var isPresentingShare = false
+    @State private var pendingShareURL: URL?
 
 
     var body: some View {
@@ -146,12 +148,20 @@ struct HomeView: View {
                                 }
                                 .tint(.orange)
 
-                                ShareLink(item: "Hello World") {
+                                Button {
+                                    Task {
+                                        do {
+                                            _ = try await FirestoreService.shared.storeReminder(reminder)
+                                            pendingShareURL = reminder.shareLink
+                                            isPresentingShare = true
+                                        } catch {
+                                            print("Share prepare failed: \(error)")
+                                        }
+                                    }
+                                } label: {
                                     Image(systemName: "square.and.arrow.up")
                                 }
-//                                Button("", systemImage: "square.and.arrow.up"){
-//
-//                                }
+                                .tint(.green)
                             }
                             .tag(reminder)
 
@@ -364,6 +374,11 @@ struct HomeView: View {
                             TutorialManager.shared.startTutorial("Home")
                         }
                     }
+            }
+        }
+        .sheet(isPresented: $isPresentingShare){
+            if let url = pendingShareURL {
+                ShareSheet(activityItems: [url])
             }
         }
         .sheet(isPresented: $refuseLoading){

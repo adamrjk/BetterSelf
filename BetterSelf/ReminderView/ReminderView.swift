@@ -22,6 +22,8 @@ struct ReminderView: View {
     @State private var detailSheet = false
     @State var reminder: Reminder
 
+    @State private var pendingShareURL: URL?
+    @State private var isPresentingShare = false
 
 
     var body: some View {
@@ -73,16 +75,35 @@ struct ReminderView: View {
                 .buttonStyle(.plain)
             }
 
-            ToolbarItem(placement: .topBarTrailing){
+            ToolbarItem(placement: .topBarLeading){
                 Button {
                     edit.toggle()
                 } label: {
-                    Text("Edit")
+                    Label("Edit", systemImage: "pencil")
                         .bold()
+                        .foregroundStyle(color.button(scheme))
+                        .padding(8)
 
                 }
-                .padding(8)
-                .foregroundStyle(color.button(scheme))
+                .buttonStyle(.plain)
+
+            }
+            ToolbarItem(placement: .topBarTrailing){
+                Button {
+                    Task {
+                        do {
+                            _ = try await FirestoreService.shared.storeReminder(reminder)
+                            pendingShareURL = reminder.shareLink
+                            isPresentingShare = true
+                        } catch {
+                            print("Share prepare failed: \(error)")
+                        }
+                    }
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundStyle(color.itemColor(scheme))
+                        .padding(8)
+                }
                 .buttonStyle(.plain)
 
             }
@@ -119,6 +140,11 @@ struct ReminderView: View {
         }
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
         .toolbar(removing: .sidebarToggle)
+        .sheet(isPresented: $isPresentingShare){
+            if let url = pendingShareURL {
+                ShareSheet(activityItems: [url])
+            }
+        }
         .sheet(isPresented: $reminder.isShared){
             AddTitleSheet(title: $reminder.title)
                 .presentationDetents([.height(300)])
