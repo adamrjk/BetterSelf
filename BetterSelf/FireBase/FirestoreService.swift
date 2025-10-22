@@ -10,7 +10,7 @@ final class FirestoreService: ObservableObject {
     
     @discardableResult
     func storeReminder(_ reminder: Reminder) async throws -> String {
-        guard let jsonString = encode(reminder) else {
+        guard let jsonString = await encode(reminder) else {
             throw NSError(domain: "FirestoreService", code: -10, userInfo: [NSLocalizedDescriptionKey: "Failed to encode reminder to JSON string"])
         }
 
@@ -23,23 +23,36 @@ final class FirestoreService: ObservableObject {
             throw NSError(domain: "FirestoreService", code: -12, userInfo: [NSLocalizedDescriptionKey: "Encoded JSON is not an object"])
         }
 
+        let id = reminder.shareID ?? generateShortID()
+        reminder.shareID = id
+
         let documentId = try await addDocument(
             to: "sharedReminders",
-            withId: reminder.id.uuidString,
+            withId: id,
             data: jsonDict,
             addTimestamps: true,
             ttlDays: 90
         )
 
         // Build internal deep link for the newly created shared reminder
-        let link = "betterself://share/\(documentId)"
+        let link = "https://bettermyself.app/share/\(documentId)"
         return link
     }
 
+    func generateShortID(length: Int = 6) -> String {
+        let chars = Array("abcdefghijklmnopqrstuvwxyz0123456789")
+        var result = ""
+        for _ in 0..<length {
+            result.append(chars.randomElement()!)
+        }
+        return result
+    }
 
+
+    @MainActor
     func receiveReminder(_ docId: String) async throws -> Reminder? {
         let data = try await fetchJSON(id: docId)
-        return decode(data)
+    return await decode(data)
     }
 
 
@@ -202,24 +215,25 @@ final class FirestoreService: ObservableObject {
     }
 
 
-    func encode(_ reminder: Reminder) -> String? {
+    func encode(_ reminder: Reminder) async -> String? {
         var photoURL = ""
         if let data = reminder.photo {
-            Task { @MainActor in
-                UploadManager.shared.startUpload(imageData: data, completion: { result in
-                    switch result {
-                    case .success(let url):
-                        photoURL = url
-                    case .failure(let err):
-                        print("Upload failed:", err)
-                    }
-
-                })
+            if let url = await uploadImageAndGetURL(data) {
+                photoURL = url
             }
         }
 
-        let shared =  SharedReminder(id: reminder.id, title: reminder.title, type: reminder.type.rawValue, text: reminder.text, photo: photoURL,
-                                     video: reminder.firebaseVideoURL, link: reminder.link,time: reminder.time, isFront: reminder.isFront)
+        let shared =  SharedReminder(
+            id: reminder.id,
+            title: reminder.title,
+            type: reminder.type.rawValue,
+            text: reminder.text,
+            photo: photoURL,
+            video: reminder.firebaseVideoURL,
+            link: reminder.link,
+            time: reminder.time,
+            isFront: reminder.isFront
+        )
 
         if let encoded = try? JSONEncoder().encode(shared){
             if let json = String(data: encoded, encoding: .utf8){
@@ -236,30 +250,41 @@ final class FirestoreService: ObservableObject {
             print("Failed encoding")
             return nil
         }
-
+        
     }
 
-    func decode(_ data: Data) -> Reminder? {
+    private func uploadImageAndGetURL(_ data: Data) async -> String? {
+        return await withCheckedContinuation { (continuation: CheckedContinuation<String?, Never>) in
+            // Ensure startUpload (which mutates @Published state) runs on the main thread
+            DispatchQueue.main.async {
+                UploadManager.shared.startUpload(imageData: data) { result in
+                    switch result {
+                    case .success(let url):
+                        continuation.resume(returning: url)
+                    case .failure:
+                        continuation.resume(returning: nil)
+                    }
+                }
+            }
+        }
+    }
 
-        guard let decoded = try? JSONDecoder().decode(SharedReminder.self, from: data) else {
+
+
+@MainActor
+func decode(_ data: Data) async -> Reminder? {
+
+    guard let decoded = try? JSONDecoder().decode(SharedReminder.self, from: data) else {
             print("Failed to decode")
             return nil
         }
 
         let shared: SharedReminder = decoded
 
-
-        var photoData: Data?
-        if !shared.photo.isEmpty {
-            UploadManager.shared.fetchImageData(from: shared.photo) { result in
-                switch result {
-                case .success(let data):
-                    photoData = data
-                case .failure(let err):
-                    print("Image fetch failed:", err)
-                }
-            }
-        }
+    var photoData: Data?
+    if !shared.photo.isEmpty {
+        photoData = await fetchImageData(shared.photo)
+    }
         let reminder = Reminder(title: shared.title, type: ReminderType(rawValue: shared.type) ?? .InstantInsight, text: shared.text,
                                 photo:  photoData, firebaseVideoURL: shared.video == "" ? nil : shared.video, link: shared.link)
         reminder.isFront = shared.isFront
@@ -271,6 +296,19 @@ final class FirestoreService: ObservableObject {
 
 
 
+    }
+}
+
+private func fetchImageData(_ url: String) async -> Data? {
+    return await withCheckedContinuation { (continuation: CheckedContinuation<Data?, Never>) in
+        UploadManager.shared.fetchImageData(from: url) { result in
+            switch result {
+            case .success(let data):
+                continuation.resume(returning: data)
+            case .failure:
+                continuation.resume(returning: nil)
+            }
+        }
     }
 }
 

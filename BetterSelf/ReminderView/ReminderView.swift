@@ -93,7 +93,7 @@ struct ReminderView: View {
                     Task {
                         do {
                             _ = try await FirestoreService.shared.storeReminder(reminder)
-                            pendingShareURL = reminder.shareLink
+                            pendingShareURL = getLink(reminder)
                             isPresentingShare = true
                         } catch {
                             print("Share prepare failed: \(error)")
@@ -178,6 +178,26 @@ struct ReminderView: View {
 
 
 
+    }
+
+    func getLink(_ reminder: Reminder) -> URL {
+        if reminder.shareID != nil {
+            return reminder.shareLink
+        }
+        else {
+            reminder.shareID = generateShortID()
+            return reminder.shareLink
+        }
+
+
+    }
+    func generateShortID(length: Int = 6) -> String {
+        let chars = Array("abcdefghijklmnopqrstuvwxyz0123456789")
+        var result = ""
+        for _ in 0..<length {
+            result.append(chars.randomElement()!)
+        }
+        return result
     }
     init(reminder: Reminder, onExpandDetail: (() -> Void)? = nil) {
         _reminder = State(initialValue: reminder)

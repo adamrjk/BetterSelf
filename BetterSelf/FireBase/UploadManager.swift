@@ -46,6 +46,26 @@ class UploadManager: ObservableObject {
             }
         }
 
+
+    func uploadImage(_ data: Data, _ shared: SharedReminder) async {
+        Task { @MainActor in
+            UploadManager.shared.startUpload(imageData: data, completion: { result in
+                switch result {
+                case .success(let url):
+                    print(url)
+                    shared.photo = url
+                case .failure(let err):
+                    print("Upload failed:", err)
+                }
+            })
+        }
+    }
+
+
+
+
+
+
     // Generate thumbnail from video URL
     func generateThumbnail(from videoURL: URL) async -> UIImage? {
         let asset = AVURLAsset(url: videoURL)
