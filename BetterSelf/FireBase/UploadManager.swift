@@ -21,13 +21,15 @@ class UploadManager: ObservableObject {
 
 
     func uploadVideoToFirebase(videoURL: URL, reminder: Reminder) async {
-        startUpload(videoURL: videoURL){ result in
-            switch result {
-            case .success(let firebaseURL):
-                reminder.firebaseVideoURL = firebaseURL
+        Task{ @MainActor in
+            startUpload(videoURL: videoURL){ result in
+                switch result {
+                case .success(let firebaseURL):
+                    reminder.firebaseVideoURL = firebaseURL
 
-            case .failure(let error):
-                print("Firebase upload failed: \(error.localizedDescription)")
+                case .failure(let error):
+                    print("Firebase upload failed: \(error.localizedDescription)")
+                }
             }
         }
     }

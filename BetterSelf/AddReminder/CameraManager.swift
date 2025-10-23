@@ -96,15 +96,7 @@ class CameraManager: NSObject {
             self.movieFileOutput = movieFileOutput
             
             // Configure video settings
-            if let connection = movieFileOutput.connection(with: .video) {
-                if connection.isVideoStabilizationSupported {
-                    connection.preferredVideoStabilizationMode = .auto
-                }
-                
-                if connection.isVideoOrientationSupported {
-                    connection.videoOrientation = .portrait
-                }
-            }
+            applyCurrentVideoConfiguration()
         }
         
         // Create preview layer
@@ -160,12 +152,8 @@ class CameraManager: NSObject {
         captureSession.addInput(newVideoDeviceInput)
         videoDeviceInput = newVideoDeviceInput
         
-        // Update video orientation
-        if let movieFileOutput = movieFileOutput,
-           let connection = movieFileOutput.connection(with: .video),
-           connection.isVideoOrientationSupported {
-            connection.videoOrientation = .portrait
-        }
+        // Update video orientation/mirroring based on interface orientation
+        applyCurrentVideoConfiguration()
         
         captureSession.commitConfiguration()
     }
@@ -210,5 +198,65 @@ extension CameraManager: AVCaptureFileOutputRecordingDelegate {
             recordingCompletion?(outputFileURL)
         }
         recordingCompletion = nil
+    }
+}
+
+// MARK: - Rotation / Orientation helpers
+private extension CameraManager {
+    func applyCurrentVideoConfiguration() {
+        let angle = rotationAngleForCurrentInterfaceOrientation()
+        
+        if let connection = movieFileOutput?.connection(with: .video) {
+            if connection.isVideoStabilizationSupported {
+                connection.preferredVideoStabilizationMode = .auto
+            }
+            if connection.isVideoMirroringSupported {
+                connection.isVideoMirrored = (currentCameraPosition == .front)
+            }
+            if connection.isVideoRotationAngleSupported(angle) {
+                connection.videoRotationAngle = angle
+            }
+        }
+        
+        if let previewConnection = previewLayer?.connection {
+            if previewConnection.isVideoMirroringSupported {
+                previewConnection.isVideoMirrored = (currentCameraPosition == .front)
+            }
+            if previewConnection.isVideoRotationAngleSupported(angle) {
+                previewConnection.videoRotationAngle = angle
+            }
+        }
+    }
+    
+    func rotationAngleForCurrentInterfaceOrientation() -> CGFloat {
+        switch currentInterfaceOrientation() {
+        case .portrait:
+            return 90
+        case .landscapeRight:
+            return 0
+        case .landscapeLeft:
+            return 180
+        case .portraitUpsideDown:
+            return 270
+        default:
+            return 90
+        }
+    }
+    
+    func currentInterfaceOrientation() -> UIInterfaceOrientation {
+        
+        if Thread.isMainThread {
+            return UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .first?.interfaceOrientation ?? .portrait
+        } else {
+            var orientation: UIInterfaceOrientation = .portrait
+            DispatchQueue.main.sync {
+                orientation = UIApplication.shared.connectedScenes
+                    .compactMap { $0 as? UIWindowScene }
+                    .first?.interfaceOrientation ?? .portrait
+            }
+            return orientation
+        }
     }
 }

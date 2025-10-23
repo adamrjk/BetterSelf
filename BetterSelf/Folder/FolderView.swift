@@ -56,7 +56,7 @@ struct FolderView: View {
                         color.overlayGradient(scheme)
                             .ignoresSafeArea()
 
-                        FoldersList(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert, refuseLoading: $refuseLoading)
+                        FoldersListCompat(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert, refuseLoading: $refuseLoading)
                             .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
                             .onChange(of: scenePhase){ oldPhase, newPhase in
                                 if newPhase == .background {
@@ -131,9 +131,9 @@ struct FolderView: View {
                 .sheet(isPresented: $videoRecorder) {
                     CustomCameraView(
                         isPresented: $videoRecorder,
-                        onVideoRecorded: { url, isFront in
+                        onVideoRecorded: { url, _ in
                             recordedVideoURL = url
-                            self.isFront = isFront
+                            self.isFront = false
                             videoRecorded.toggle()
                         }
                     )
@@ -169,7 +169,7 @@ struct FolderView: View {
                     }
 
                 }
-                .sheet(isPresented: $addReminder){
+                .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
                     if let reminder = newReminder {
                         AddReminderView(reminder: reminder)
                             .onDisappear{
@@ -219,18 +219,13 @@ struct FolderView: View {
                             Image(systemName: "plus")
                                 .font(.title2)
                                 .foregroundStyle(scheme == .light
-                                                 ? .black
+                                                 ? .white
                                                  : .black)
                                 .padding(20)
-//                                .clipShape(.circl)
-//                                .adaptiveGlass(scheme)
 
 
                         }
-                        .adaptiveTranslucent(scheme == .light
-                                    ? .white
-                                    : .creamyYellow
-                        )
+                        .adaptiveTranslucent(color.plusButton(scheme))
                         .clipShape(.circle)
 
 
@@ -247,6 +242,20 @@ struct FolderView: View {
 
         }
 
+
+    }
+
+    func deleteEmptyReminder() {
+        if let reminder = newReminder{
+            guard reminder.isChecked == false else { return }
+            if reminder.isEmpty {
+                modelContext.delete(reminder)
+            }
+            if (reminder.type != .TimeLessLetter && reminder.photo == nil && !reminder.isLoading) {
+                reminder.type = .TimeLessLetter
+            }
+            reminder.isChecked = true
+        }
 
     }
 

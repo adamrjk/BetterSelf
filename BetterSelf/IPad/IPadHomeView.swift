@@ -202,48 +202,6 @@ struct IPadHomeView: View {
                 sorting = .dateNew
             }
         }
-        .overlay(
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-
-                    if editMode?.wrappedValue == .inactive {
-                        Button{
-                            let reminder = Reminder(title: "", text: "", link: "", folder: folder)
-                            modelContext.insert(reminder)
-                            newReminder = reminder
-                            addReminder.toggle()
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
-                            }
-                        }label: {
-
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .foregroundStyle(scheme == .light
-                                                 ? .black
-                                                 : .black)
-                                .padding(20)
-                        }
-                        .tutorialIdentifier("PlusButton")
-                        .adaptiveTranslucent(scheme == .light
-                                             ? .white
-                                             : .creamyYellow
-                        )
-                        .clipShape(.circle)
-                    }
-
-
-
-
-
-
-
-                }
-                .padding(.trailing, 10)
-            }
-        )
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
@@ -341,51 +299,7 @@ struct IPadHomeView: View {
         } message: {
             Text("You won't be able to restore this Reminder")
         }
-        // iPhone/compact: use sheet; iPad: use full-screen cover (edge-to-edge)
-        .sheet(
-            isPresented: .init(
-                get: { addReminder && UIDevice.current.userInterfaceIdiom != .pad },
-                set: { addReminder = $0 }
-            ),
-            onDismiss: deleteEmptyReminder
-        ){
-            if let reminder = newReminder {
-                AddReminderView(reminder: reminder)
-                    .onDisappear{
-                        if TutorialManager.shared.inTutorial {
-                            sorting = .dateNew
-                            TutorialManager.shared.viewId("Home")
-                            TutorialManager.shared.startTutorial("Home")
-                        }
-                    }
-            }
-        }
-        .sheet(
-            isPresented: .init(
-                get: { addReminder && UIDevice.current.userInterfaceIdiom == .pad },
-                set: { addReminder = $0 }
-            ),
-            onDismiss: deleteEmptyReminder
-        ){
-            if let reminder = newReminder {
-                if #available(iOS 18.0, *) {
-                    AddReminderView(reminder: reminder)
-                        .presentationDetents([.height(800)])
-                        .presentationSizing(.page)
 
-                        .presentationDragIndicator(.visible)
-                        .onDisappear{
-                            if TutorialManager.shared.inTutorial {
-                                sorting = .dateNew
-                                TutorialManager.shared.viewId("Home")
-                                TutorialManager.shared.startTutorial("Home")
-                            }
-                        }
-                } else {
-                    // Fallback on earlier versions
-                }
-            }
-        }
         .sheet(isPresented: $refuseLoading){
             RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
                 .presentationDetents([.height(300)])

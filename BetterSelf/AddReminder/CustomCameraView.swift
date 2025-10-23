@@ -157,8 +157,8 @@ class CameraViewController: UIViewController {
             // Record button
             recordButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             recordButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
-            recordButton.widthAnchor.constraint(equalToConstant: 80),
-            recordButton.heightAnchor.constraint(equalToConstant: 80),
+//            recordButton.widthAnchor.constraint(equalToConstant: 80),
+//            recordButton.heightAnchor.constraint(equalToConstant: 80),
             
             // Recording indicator
             recordingIndicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),

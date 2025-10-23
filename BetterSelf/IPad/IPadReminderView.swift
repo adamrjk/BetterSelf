@@ -9,12 +9,15 @@ import SwiftUI
 
 import AVKit
 
-struct ReminderView: View {
+struct IPadReminderView: View {
 
+    @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
 
     @Environment(\.colorScheme) var scheme
     @EnvironmentObject var color: ColorManager
+
+    @Binding var selectedFolder: Folder
 
     let onExpandDetail: (() -> Void)?
 
@@ -24,6 +27,12 @@ struct ReminderView: View {
 
     @State private var pendingShareURL: URL?
     @State private var isPresentingShare = false
+
+    @State private var newReminder: Reminder?
+
+    @State private var addReminder = false
+    @State private var selectedReminder: Reminder?
+
 
 
     var body: some View {
@@ -139,6 +148,48 @@ struct ReminderView: View {
 
         }
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
+        .overlay(
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+
+
+                        Button{
+                            let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
+                            modelContext.insert(reminder)
+                            newReminder = reminder
+                            addReminder.toggle()
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
+                            }
+                        }label: {
+
+                            Image(systemName: "plus")
+                                .font(.title2)
+                                .foregroundStyle(scheme == .light
+                                                 ? .black
+                                                 : .black)
+                                .padding(20)
+                        }
+                        .tutorialIdentifier("PlusButton")
+                        .adaptiveTranslucent(scheme == .light
+                                             ? .white
+                                             : .creamyYellow
+                        )
+                        .clipShape(.circle)
+                    }
+
+
+
+
+
+
+
+                }
+                .padding(.trailing, 10)
+
+        )
         .toolbar(removing: .sidebarToggle)
         .sheet(isPresented: $isPresentingShare){
             if let url = pendingShareURL {
@@ -150,6 +201,27 @@ struct ReminderView: View {
                 .presentationDetents([.height(300)])
 
         }
+        .sheet(
+            isPresented: $addReminder, onDismiss: deleteEmptyReminder){
+            if let reminder = newReminder {
+                if #available(iOS 18.0, *) {
+                    AddReminderView(reminder: reminder)
+                        .presentationDetents([.height(800)])
+                        .presentationSizing(.page)
+
+                        .presentationDragIndicator(.visible)
+                        .onDisappear{
+                            if TutorialManager.shared.inTutorial {
+//                                sorting = .dateNew
+                                TutorialManager.shared.viewId("Home")
+                                TutorialManager.shared.startTutorial("Home")
+                            }
+                        }
+                } else {
+                    // Fallback on earlier versions
+                }
+            }
+        }
         .sheet(isPresented: $edit){
             AddReminderView(reminder: reminder)
                 .onDisappear{
@@ -159,6 +231,7 @@ struct ReminderView: View {
                     }
                 }
         }
+
         .sheet(isPresented: $detailSheet){
             if reminder.type == .InstantInsight {
                 NavigationView{
@@ -177,6 +250,20 @@ struct ReminderView: View {
         }
 
 
+
+    }
+
+    func deleteEmptyReminder() {
+        if let reminder = newReminder{
+            guard reminder.isChecked == false else { return }
+            if reminder.isEmpty {
+                modelContext.delete(reminder)
+            }
+            if (reminder.type != .TimeLessLetter && reminder.photo == nil && !reminder.isLoading) {
+                reminder.type = .TimeLessLetter
+            }
+            reminder.isChecked = true
+        }
 
     }
 
@@ -199,8 +286,9 @@ struct ReminderView: View {
         }
         return result
     }
-    init(reminder: Reminder, onExpandDetail: (() -> Void)? = nil) {
+    init(reminder: Reminder, selectedFolder: Binding<Folder>, onExpandDetail: (() -> Void)? = nil) {
         _reminder = State(initialValue: reminder)
+        _selectedFolder = selectedFolder
         self.onExpandDetail = onExpandDetail
     }
 

@@ -44,7 +44,7 @@ struct YoutubeView: View {
                     YouTubePlayerView(player)
                         .id(time)
                         .frame(maxWidth: .infinity)
-                        .aspectRatio(16/9, contentMode: .fit)
+                        .aspectRatio(16.0/9.0, contentMode: .fit)
                         .scaledToFit()
                         .cornerRadius(30)
                         .background(

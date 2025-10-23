@@ -65,8 +65,10 @@ struct YouTubeThumbnailView: View {
                     if type == .addReminder {
                         image
                             .resizable()
-
-                            .frame(maxHeight: 300)
+                            .scaledToFill()
+                            .aspectRatio(16.0/9.0, contentMode: .fit)
+                            .frame(maxWidth: .infinity, maxHeight: 300)
+                            .clipped()
                             .cornerRadius(30)
                             .background(
                                 RoundedRectangle(cornerRadius: 30)

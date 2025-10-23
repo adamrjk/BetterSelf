@@ -40,19 +40,17 @@ struct SharedLinkView: View {
 
 
                 case .shortForm:
-                    ArticleView(link: link)
-                        .ignoresSafeArea()
-
-
-                    //            case .shortForm:
-                    //                switch shortType {
-                    //                case .youtubeShort:
-                    //                    Text("youtube Shorts handling coming soon")
-                    //                case .instaReel:
-                    //                    InstagramReelView(reelID: getInstagramReelID() ?? "")
-                    //                case .tiktok:
-                    //                    TikTokVideoView(username: getTikTokUsername() ?? "", videoID: getTikTokVideoID() ?? "")
-                    //                }
+//                    ArticleView(link: link)
+//                        .ignoresSafeArea()
+                    InAppOpen(link: URL(string: link)!)
+//                    switch shortType {
+//                    case .youtubeShort:
+//                        Text("youtube Shorts handling coming soon")
+//                    case .instaReel:
+//                        InstagramReelView(reelID: getInstagramReelID() ?? "")
+//                    case .tiktok:
+//                        TikTokVideoView(username: getTikTokUsername() ?? "", videoID: getTikTokVideoID() ?? "")
+//                    }
 
                 case .article:
                     ArticleView(link: link)
@@ -202,14 +200,14 @@ struct SharedLinkView: View {
 //            }
 
         }
-//        else if link.localizedStandardContains("tiktok.com"){
-//            self.type = .shortForm
-//            self.shortType = .tiktok
-//        }
-//        else if link.localizedStandardContains("instagram.com") {
-//            self.type = .shortForm
-//            self.shortType = .instaReel
-//        }
+        else if link.localizedStandardContains("tiktok.com"){
+            self.type = .shortForm
+            self.shortType = .tiktok
+        }
+        else if link.localizedStandardContains("instagram.com") {
+            self.type = .shortForm
+            self.shortType = .instaReel
+        }
         else {
             self.type = .article
         }

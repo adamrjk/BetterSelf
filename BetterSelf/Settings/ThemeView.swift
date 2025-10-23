@@ -326,11 +326,11 @@ enum Theme: String {
             case .auto:
                 return scheme == .light
                 ? Color.blackGradient
-                : Color.whiteBackgroundGradient
+                : LinearGradient(colors: [.white], startPoint: .top, endPoint: .bottom)
             case .light:
                 return Color.blackGradient
             case .dark:
-                return Color.whiteBackgroundGradient
+                return LinearGradient(colors: [.white], startPoint: .top, endPoint: .bottom)
             }
         }
     }

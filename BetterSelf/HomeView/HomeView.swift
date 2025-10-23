@@ -151,9 +151,9 @@ struct HomeView: View {
                                 Button {
                                     Task {
                                         do {
-                                            _ = try await FirestoreService.shared.storeReminder(reminder)
                                             pendingShareURL = getLink(reminder)
                                             isPresentingShare = true
+                                            _ = try await FirestoreService.shared.storeReminder(reminder)
                                         } catch {
                                             print("Share prepare failed: \(error)")
                                         }
@@ -239,15 +239,12 @@ struct HomeView: View {
                             Image(systemName: "plus")
                                 .font(.title2)
                                 .foregroundStyle(scheme == .light
-                                                 ? .black
+                                                 ? .white
                                                  : .black)
                                 .padding(20)
                         }
                         .tutorialIdentifier("PlusButton")
-                        .adaptiveTranslucent(scheme == .light
-                                             ? .white
-                                             : .creamyYellow
-                        )
+                        .adaptiveTranslucent(color.plusButton(scheme))
                         .clipShape(.circle)
                     }
 
@@ -389,9 +386,9 @@ struct HomeView: View {
         .sheet(isPresented: $videoRecorder) {
             CustomCameraView(
                 isPresented: $videoRecorder,
-                onVideoRecorded: { url, isFront in
+                onVideoRecorded: { url, _ in
                     recordedVideoURL = url
-                    self.isFront = isFront
+                    self.isFront = false
                     videoRecorded.toggle()
                 }
             )

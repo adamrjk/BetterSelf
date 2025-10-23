@@ -58,6 +58,19 @@ class ColorManager: ObservableObject {
         }
     }
 
+    func plusButton(_ scheme: ColorScheme) -> Color {
+        switch theme {
+        case .yellowPurple:
+            scheme == .light
+            ? .black
+            : .creamyYellow
+        case .blackWhite:
+            scheme == .light
+            ? .black
+            : .creamyYellow
+        }
+    }
+
     func cardBackground(_ scheme: ColorScheme) ->  LinearGradient {
 
         switch theme {

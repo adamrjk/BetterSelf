@@ -12,7 +12,8 @@ import SwiftData
 
 @Model
 class Folder: Equatable {
-    @Attribute(.unique) var name: String
+    var name: String
+
     var faceID: Bool
     var date: Date
 
@@ -38,6 +39,10 @@ class Folder: Equatable {
         lhs.name == rhs.name
 
     }
+
+    static let mindset = Folder(name: "Mindset")
+
+    static let reflections = Folder(name: "Reflections")
 
     static let example = Folder(name: "Example")
 

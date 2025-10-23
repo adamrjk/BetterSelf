@@ -43,7 +43,7 @@ struct SharingTutorial: View {
                         
                         // Video Player Card
                         GifPlayerView(gifName: "tutorial")
-                            .aspectRatio(9/16, contentMode: .fit)
+                            .aspectRatio(9.0/16.0, contentMode: .fit)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
                             .padding(.horizontal, 30)

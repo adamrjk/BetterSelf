@@ -10,6 +10,8 @@ import SwiftData
 
 struct SplitView: View {
     @Binding var notifReminder: NavigableReminder?
+    @Environment(\.colorScheme) var scheme
+    @StateObject var color = ColorManager.shared
 
     @State private var selectedReminder: Reminder?
     @State private var selectedFolder = Folder(name: "")
@@ -58,7 +60,7 @@ struct SplitView: View {
         } detail: {
 
                 if let reminder = selectedReminder {
-                    ReminderView(reminder: reminder, onExpandDetail: {
+                    IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail: {
                         withAnimation {
                             columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
                         }
@@ -66,13 +68,17 @@ struct SplitView: View {
                     .id(reminder.id)
 
                 } else {
-                    VStack(spacing: 12) {
-                        Text("Select a Reminder")
-                            .font(.title2)
-                            .foregroundStyle(.secondary)
-                        CleanText("Choose a reminder from the middle column to view details.")
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
+                    ZStack {
+                        color.mainGradient(scheme)
+                            .ignoresSafeArea()
+                        color.overlayGradient(scheme)
+                            .ignoresSafeArea()
+                        VStack(spacing: 12) {
+                            Text("Select a Reminder")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+
+                        }
                     }
                 }
         }
@@ -80,9 +86,9 @@ struct SplitView: View {
         .onAppear {
             // Default to All Reminders and first pinned, if any
             selectedFolder = Folder(name: "")
+            columnVisibility = .doubleColumn
             if selectedReminder == nil, let firstPinned = pinned.first {
                 selectedReminder = firstPinned
-                columnVisibility = .doubleColumn
             }
         }
         .onChange(of: notifReminder) { _, newValue in
