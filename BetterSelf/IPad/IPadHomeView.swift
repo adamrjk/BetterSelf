@@ -78,6 +78,10 @@ struct IPadHomeView: View {
     @State private var isPresentingShare = false
     @State private var pendingShareURL: URL?
 
+    // For pushing detail view on iPad when using double-column split
+    @State private var selectedFolderForDetail: Folder = Folder(name: "")
+    @State private var splitColumnVisibility: NavigationSplitViewVisibility = .doubleColumn
+
 
     var body: some View {
 
@@ -164,6 +168,75 @@ struct IPadHomeView: View {
 
             }
         }
+        .overlay(
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    if #unavailable(iOS 26){
+
+                        if editMode?.wrappedValue == .inactive {
+                            Button{
+                                let reminder = Reminder(title: "", text: "", link: "", folder: folder)
+                                modelContext.insert(reminder)
+                                newReminder = reminder
+                                addReminder.toggle()
+                                if TutorialManager.shared.inTutorial {
+                                    TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
+                                }
+                            }label: {
+
+                                Image(systemName: "plus")
+                                    .font(.title2)
+                                    .foregroundStyle(scheme == .light
+                                                     ? .white
+                                                     : .black)
+                                    .padding(20)
+                            }
+                            .tutorialIdentifier("PlusButton")
+                            .adaptiveTranslucent(color.plusButton(scheme))
+                            .clipShape(.circle)
+                        }
+                    }
+
+
+
+
+
+
+
+                }
+                .padding(.trailing, 10)
+            }
+        )
+        .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
+            if let reminder = newReminder {
+                if #available(iOS 18.0, *) {
+                    AddReminderView(reminder: reminder)
+                        .presentationDetents([.height(800)])
+                        .presentationSizing(.page)
+                        .presentationDragIndicator(.visible)
+                        .onDisappear{
+                            if TutorialManager.shared.inTutorial {
+                                //                                sorting = .dateNew
+                                TutorialManager.shared.viewId("Home")
+                                TutorialManager.shared.startTutorial("Home")
+                            }
+                        }
+                } else {
+                    // iOS 17 fallback
+                    AddReminderView(reminder: reminder)
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.visible)
+                        .onDisappear{
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.viewId("Home")
+                                TutorialManager.shared.startTutorial("Home")
+                            }
+                        }
+                }
+            }
+        }
         .onAppear{
 
             if TutorialManager.shared.inTutorial {
@@ -171,6 +244,12 @@ struct IPadHomeView: View {
                 TutorialManager.shared.startTutorial("Home")
             }
 
+            // Keep a local folder binding for detail navigation
+            if let f = folder {
+                selectedFolderForDetail = f
+            } else {
+                selectedFolderForDetail = Folder(name: "")
+            }
         }
         .onChange(of: TutorialManager.shared.currentDone){
             if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
@@ -320,7 +399,8 @@ struct IPadHomeView: View {
         .navigationTitle(folder?.name ?? "All Reminders")
 
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-        .toolbar(removing: .sidebarToggle)
+//        .toolbar(removing: .sidebarToggle)
+        
         .navigationBarBackButtonHidden()
     }
 
@@ -435,6 +515,7 @@ struct IPadHomeView: View {
         }
 
         _sorting = State(initialValue: folder?.sorting ?? AllRemindersSorting)
+        _selectedFolderForDetail = State(initialValue: folder ?? Folder(name: ""))
 
         if let folder = folder {
             // Filter reminders for this folder

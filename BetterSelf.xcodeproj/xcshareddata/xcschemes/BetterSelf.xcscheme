@@ -56,6 +56,13 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "Name: SWIFTUI_ATTRIBUTEGRAPH_DEBUG&#10;Name: SWIFTUI_ATTRIBUTEGRAPH_DEBUG&#10;SWIFTUI_ATTRIBUTEGRAPH_DEBUG"
+            value = "1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

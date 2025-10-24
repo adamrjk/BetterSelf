@@ -59,6 +59,47 @@ struct IPadReminderView: View {
                 }
             }
         }
+        .overlay(
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+
+                    if #available(iOS 26, *){
+                        Button{
+                            let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
+                            modelContext.insert(reminder)
+                            newReminder = reminder
+                            addReminder.toggle()
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
+                            }
+                        }label: {
+
+                            Image(systemName: "plus")
+                                .font(.title2)
+                                .foregroundStyle(scheme == .light
+                                                 ? .white
+                                                 : .black)
+                                .padding(20)
+                        }
+                        .tutorialIdentifier("PlusButton")
+                        .adaptiveTranslucent(color.plusButton(scheme))
+                        .clipShape(.circle)
+                        .padding(.vertical, reminder.isYoutube || reminder.type == .InstantInsight ? 100 : 0)
+
+
+                    }
+
+
+
+
+
+                }
+                .padding(.trailing, 10)
+
+            }
+        )
         .onAppear{
             if TutorialManager.shared.inTutorial {
                 TutorialManager.shared.viewId("Reminder")
@@ -70,22 +111,25 @@ struct IPadReminderView: View {
         .navigationTitle(reminder.title)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                HStack(spacing: 4) {
-                    // Expand/Collapse button slot (always reserved to avoid reflow)
-                    let canExpand = (onExpandDetail != nil)
+                if column != .detailOnly {
                     Button {
                         onExpandDetail?()
                     } label: {
                         Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "arrow.down.right.and.arrow.up.left" : "chevron.left")
                             .frame(width: 28, height: 28)
                     }
-                    .opacity(canExpand ? 1 : 0)
-                    .allowsHitTesting(canExpand)
                     .foregroundStyle(color.button(scheme))
                     .buttonStyle(.plain)
                     .padding(8)
+                }
 
-                    // Edit button (fixed space)
+
+
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 4) {
+                    // Share button (fixed space)
                     Button {
                         edit.toggle()
                     } label: {
@@ -95,12 +139,8 @@ struct IPadReminderView: View {
                     .foregroundStyle(color.button(scheme))
                     .buttonStyle(.plain)
                     .padding(8)
-                }
-            }
 
-            ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 4) {
-                    // Share button (fixed space)
+
                     Button {
                         Task {
                             do {
@@ -137,7 +177,7 @@ struct IPadReminderView: View {
             }
         }
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-        .toolbar(removing: .sidebarToggle)
+//        .toolbar(removing: .sidebarToggle)
         
 //        .toolbar(removing: .sidebarToggle)
         .sheet(isPresented: $isPresentingShare){

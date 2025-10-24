@@ -312,12 +312,12 @@ class TutorialManager: ObservableObject {
 
     var index = 0
 
-//    let AllSteps: [[TutorialStep]] = [StepStorage.folderViewSteps0, StepStorage.HomeViewSteps0, StepStorage.AddReminderSteps, StepStorage.HomeViewSteps1,
-//                                    StepStorage.reminderSteps, StepStorage.homeViewSteps2, StepStorage.folderViewSteps1, StepStorage.AddFolderSteps,
-//                                    StepStorage.folderViewSteps2 ]
-//
-//    let viewIds: [String] = ["Folder", "Home", "AddReminder", "Home", "Reminder", "Home", "Folder", "AddFolder", "Folder"]
-    let AllSteps: [[TutorialStep]] = [StepStorage.folderViewSteps2]
-    let viewIds: [String] = ["Folder"]
+    let AllSteps: [[TutorialStep]] = [StepStorage.folderViewSteps0, StepStorage.HomeViewSteps0, StepStorage.AddReminderSteps, StepStorage.HomeViewSteps1,
+                                    StepStorage.reminderSteps, StepStorage.homeViewSteps2, StepStorage.folderViewSteps1, StepStorage.AddFolderSteps,
+                                    StepStorage.folderViewSteps2 ]
+
+    let viewIds: [String] = ["Folder", "Home", "AddReminder", "Home", "Reminder", "Home", "Folder", "AddFolder", "Folder"]
+//    let AllSteps: [[TutorialStep]] = [StepStorage.folderViewSteps2]
+//    let viewIds: [String] = ["Folder"]
 }
 

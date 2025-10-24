@@ -83,7 +83,7 @@ struct FolderView: View {
                     }
                 }
                 .onAppear{
-                    checkIfWelcome()
+//                    checkIfWelcome()
 
                     if TutorialManager.shared.inTutorial && TutorialManager.shared.isHomeView2 {
                         TutorialManager.shared.endTutorial()

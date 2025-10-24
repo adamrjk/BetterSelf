@@ -122,14 +122,6 @@ struct IPadFolderView: View {
                         .buttonStyle(.plain)
 
                     }
-
-                    ToolbarItem(placement: .topBarTrailing){
-                        Spacer()
-                            .frame(width: 50)
-                    }
-
-
-
                     ToolbarItem(placement: .topBarLeading){
                         Button("Settings", systemImage: "gear"){
 

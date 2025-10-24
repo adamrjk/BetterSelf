@@ -36,67 +36,46 @@ struct SplitView: View {
         return pinned
     }
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
-            // Sidebar (Folders)
-            IPadFolderView(selectedReminder: $selectedReminder, selectedFolder: $selectedFolder)
-        } content: {
-            // Content (Reminders list for selected folder)
-            NavigationStack {
-                if selectedFolder.name.isEmpty {
-                    IPadHomeView(selectedReminder: $selectedReminder)
-                } else {
-                    IPadHomeView(folder: selectedFolder, selectedReminder: $selectedReminder)
-                }
-            }
-        } detail: {
-
-            if let reminder = selectedReminder {
-                ZStack {
-                    IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail:{
-                        withAnimation {
-                            columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
+        Group {
+            if #available(iOS 26.0, *) {
+                // iOS 26+: keep the existing three-column layout
+                NavigationSplitView(columnVisibility: $columnVisibility) {
+                    // Sidebar (Folders)
+                    IPadFolderView(selectedReminder: $selectedReminder, selectedFolder: $selectedFolder)
+                } content: {
+                    // Content (Reminders list for selected folder)
+                    NavigationStack {
+                        if selectedFolder.name.isEmpty {
+                            IPadHomeView(selectedReminder: $selectedReminder)
+                        } else {
+                            IPadHomeView(folder: selectedFolder, selectedReminder: $selectedReminder)
                         }
-                    }, isDetailOnly: columnVisibility == .detailOnly, column: $columnVisibility)
-                    .id(reminder.id)
-
-                    if columnVisibility != .detailOnly {
-                        Button{
-                            let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
-                            modelContext.insert(reminder)
-                            newReminder = reminder
-                            addReminder.toggle()
-                        }label: {
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .foregroundStyle(scheme == .light ? .white : .black)
-                                .padding(20)
-                        }
-                        .tutorialIdentifier("PlusButton")
-                        .adaptiveTranslucent(color.plusButton(scheme))
-                        .clipShape(.circle)
-                        .padding(.trailing, 10)
-                        .padding(.bottom, reminder.type == .InstantInsight ? 100 : 0)
                     }
-                }
-            }
+                } detail: {
+                    if let reminder = selectedReminder {
+                            IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail:{
+                                withAnimation {
+                                    columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
+                                }
+                            }, isDetailOnly: columnVisibility == .detailOnly, column: $columnVisibility)
+                            .id(reminder.id)
 
-            else {
-                    ZStack {
-                        color.mainGradient(scheme)
-                            .ignoresSafeArea()
-                        color.overlayGradient(scheme)
-                            .ignoresSafeArea()
-                        VStack(spacing: 12) {
-                            Text("Select a Reminder")
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-                        }
+                    } else {
+                        ZStack {
+                            color.mainGradient(scheme)
+                                .ignoresSafeArea()
+                            color.overlayGradient(scheme)
+                                .ignoresSafeArea()
+                            VStack(spacing: 12) {
+                                Text("Select a Reminder")
+                                    .font(.headline)
+                                    .foregroundStyle(.secondary)
+                            }
 
-                        if columnVisibility != .detailOnly {
+                            if columnVisibility != .detailOnly {
                                 VStack {
                                     Spacer()
                                     HStack {
-
                                         Spacer()
                                         Button{
                                             let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
@@ -116,32 +95,66 @@ struct SplitView: View {
                                         .padding(.bottom, 0)
                                     }
                                 }
-
+                            }
                         }
-
-
-
                     }
                 }
+            } else {
+                // iOS 17–18: use a two-column split with navigation driven inside the detail
+                NavigationSplitView(columnVisibility: $columnVisibility) {
+                    // Sidebar (Folders)
+                    IPadFolderView(selectedReminder: $selectedReminder, selectedFolder: $selectedFolder)
+                } detail: {
+                    NavigationStack {
+                        if selectedFolder.name.isEmpty {
+                            IPadHomeView(selectedReminder: $selectedReminder)
+                                .navigationDestination(item: $selectedReminder) { reminder in
+                                    IPadReminderView(
+                                        reminder: reminder,
+                                        selectedFolder: $selectedFolder,
+                                        column: $columnVisibility
+                                    )
+                                }
+                        } else {
+                            IPadHomeView(folder: selectedFolder, selectedReminder: $selectedReminder)
+                                .navigationDestination(item: $selectedReminder) { reminder in
+                                    IPadReminderView(
+                                        reminder: reminder,
+                                        selectedFolder: $selectedFolder,
+                                        column: $columnVisibility
+                                    )
+                                }
+                        }
+                    }
+                }
+            }
         }
         .navigationSplitViewColumnWidth(min: 300, ideal: 320, max: 400)
         .onAppear {
             // Default to All Reminders and first pinned, if any
             selectedFolder = Folder(name: "")
-            columnVisibility = .doubleColumn
+            if #available(iOS 26, *) {
+                columnVisibility = .doubleColumn
+            }
+            else {
+                columnVisibility = .detailOnly
+            }
             if selectedReminder == nil, let firstPinned = pinned.first {
                 selectedReminder = firstPinned
             }
         }
         .onChange(of: notifReminder) { _, newValue in
             if let nav = newValue {
-                // Ensure detail column is visible when navigating via notification
-                columnVisibility = .all
+                // Ensure detail column is visible when navigating via notification (iOS 26+ only)
+                if #available(iOS 26.0, *) {
+                    columnVisibility = .all
+                }
                 if let folder = nav.reminder.folder {
                     selectedFolder = folder
                 } else {
                     selectedFolder = Folder(name: "")
                 }
+                // Drive selection; on pre-26, HomeView pushes via navigationDestination
                 selectedReminder = nav.reminder
             }
         }
