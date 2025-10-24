@@ -59,8 +59,19 @@ struct IPadFolderView: View {
                         color.overlayGradient(scheme)
                             .ignoresSafeArea()
 
-                        IPadFoldersList(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert, refuseLoading: $refuseLoading)
-                            .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
+                        FolderListContent(
+                            searchText: $searchText,
+                            showAlert: $showAlert,
+                            refuseLoading: $refuseLoading,
+                            mode: .iPad,
+                            onSelectReminder: { reminder in
+                                selectedReminder = reminder
+                            },
+                            onSelectFolder: { folder in
+                                selectedFolder = folder
+                            }
+                        )
+                        .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
                             .onChange(of: scenePhase){ oldPhase, newPhase in
                                 if newPhase == .background {
                                     // App is leaving → lock again
@@ -93,6 +104,9 @@ struct IPadFolderView: View {
                 }
                 .navigationTitle("BetterSelf")
                 .toolbar{
+
+
+
                     ToolbarItem(placement: .topBarTrailing){
                         Button("Add Folder", systemImage: "folder.fill.badge.plus"){
                             let folder = Folder(name: "")
@@ -108,6 +122,13 @@ struct IPadFolderView: View {
                         .buttonStyle(.plain)
 
                     }
+
+                    ToolbarItem(placement: .topBarTrailing){
+                        Spacer()
+                            .frame(width: 50)
+                    }
+
+
 
                     ToolbarItem(placement: .topBarLeading){
                         Button("Settings", systemImage: "gear"){

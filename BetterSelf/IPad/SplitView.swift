@@ -41,33 +41,22 @@ struct SplitView: View {
             NavigationStack {
                 if selectedFolder.name.isEmpty {
                     IPadHomeView(selectedReminder: $selectedReminder)
-//                    IPadHomeView(onSelectReminder: { reminder in
-//                        selectedReminder = reminder
-//                        columnVisibility = .doubleColumn
-//                    }, onToggleSidebar: {
-//                        withAnimation { columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly }
-//                    })
                 } else {
-//                    IPadHomeView(folder: selectedFolder, onSelectReminder: { reminder in
-//                        selectedReminder = reminder
-//                        columnVisibility = .doubleColumn
-//                    }, onToggleSidebar: {
-//                        withAnimation { columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly }
-//                    })
                     IPadHomeView(folder: selectedFolder, selectedReminder: $selectedReminder)
                 }
             }
         } detail: {
 
-                if let reminder = selectedReminder {
-                    IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail: {
-                        withAnimation {
-                            columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
-                        }
-                    })
-                    .id(reminder.id)
+            if let reminder = selectedReminder {
+                IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail:{
+                    withAnimation {
+                        columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
+                    }
+                }, isDetailOnly: columnVisibility == .detailOnly, column: $columnVisibility)
+                .id(reminder.id)
+            }
 
-                } else {
+            else {
                     ZStack {
                         color.mainGradient(scheme)
                             .ignoresSafeArea()

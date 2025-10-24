@@ -69,7 +69,7 @@ struct HomeView: View {
     @State private var sorting: Sorting
 
 
-    @State private var selection = Set<Reminder>()
+    @State private var selection = Set<Reminder.ID>()
     @State private var recordedVideoURL: URL?
     @State private var isFront: Bool?
     @State private var videoRecorded = false
@@ -98,81 +98,43 @@ struct HomeView: View {
                     }
                 }
                 else {
-                    List(selection: $selection) {
-                        ForEach(sortedReminders){ reminder in
-                            Button {
-
-
-                                if reminder.isLoading && reminder.firebaseVideoURL == nil {
-                                    refuseLoading.toggle()
-                                }
-                                else {
-                                    if TutorialManager.shared.inTutorial {
-                                        TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
-                                    }
-                                    if let handler = onSelectReminder, UIDevice.current.userInterfaceIdiom == .pad {
-                                        handler(reminder)
-                                    } else {
-                                        selectedReminder = reminder
-                                    }
-                                }
-                            } label: {
-                                ReminderRowView(reminder: reminder, isPreview: false)
-
+                    HomeListContent(
+                        folder: folder,
+                        mode: .phone,
+                        searchText: $searchText,
+                        refuseLoading: $refuseLoading,
+                        selection: $selection,
+                        sorting: sorting,
+                        onSelectReminder: { reminder in
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
                             }
-                            .tutorialIdentifier(isFirstId(reminder))
-                            .swipeActions{
-
-                                Button("", systemImage: "trash"){
-                                    reminderToDelete = reminder
-                                    deleteAlert.toggle()
-                                }
-                                .tint(.red)
-
-                                Button("", systemImage: "folder.fill"){
-                                    remindersToMove = [reminder]
-                                    moveToFolder.toggle()
-                                }
-
-                                .tint(.black)
-
+                            if let handler = onSelectReminder, UIDevice.current.userInterfaceIdiom == .pad {
+                                handler(reminder)
+                            } else {
+                                selectedReminder = reminder
                             }
-                            .tag(reminder)
-                            .swipeActions(edge: .leading){
-                                Button("", systemImage: "pin.fill"){
-                                    reminder.pinned.toggle()
-                                    if reminder.pinned {
-                                        reminder.datePinned = .now
-                                    }
-
+                        },
+                        onRequestDelete: { reminder in
+                            reminderToDelete = reminder
+                            deleteAlert.toggle()
+                        },
+                        onRequestMove: { reminder in
+                            remindersToMove = [reminder]
+                            moveToFolder.toggle()
+                        },
+                        onShare: { reminder in
+                            Task {
+                                do {
+                                    pendingShareURL = getLink(reminder)
+                                    isPresentingShare = true
+                                    _ = try await FirestoreService.shared.storeReminder(reminder)
+                                } catch {
+                                    print("Share prepare failed: \(error)")
                                 }
-                                .tint(.orange)
-
-                                Button {
-                                    Task {
-                                        do {
-                                            pendingShareURL = getLink(reminder)
-                                            isPresentingShare = true
-                                            _ = try await FirestoreService.shared.storeReminder(reminder)
-                                        } catch {
-                                            print("Share prepare failed: \(error)")
-                                        }
-                                    }
-                                } label: {
-                                    Image(systemName: "square.and.arrow.up")
-                                }
-                                .tint(.green)
                             }
-                            .tag(reminder)
-
                         }
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-
-                    }
-                    .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search for a Reminder")
-                    .listStyle(.plain)
-                    .padding(0)
+                    )
 
                 }
             }
@@ -461,7 +423,7 @@ struct HomeView: View {
     }
 
     func move() {
-        remindersToMove = Array(selection)
+        remindersToMove = reminders.filter { selection.contains($0.id) }
         moveToFolder.toggle()
 
     }
@@ -474,9 +436,10 @@ struct HomeView: View {
 
         } else {
             // Extract URLs before deletion
-            let videoURLs = selection.compactMap { $0.firebaseVideoURL }
+            let selectedReminders = reminders.filter { selection.contains($0.id) }
+            let videoURLs = selectedReminders.compactMap { $0.firebaseVideoURL }
 
-            selection.forEach{ reminder in
+            selectedReminders.forEach { reminder in
                 modelContext.delete(reminder)
             }
 

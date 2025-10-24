@@ -37,9 +37,7 @@ extension View {
         self.modifier(AdaptiveGlassModifier(scheme: scheme))
     }
 }
-//#Preview {
-//    AdaptativeGlassModifier()
-//}
+
 
 
 

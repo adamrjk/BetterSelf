@@ -69,11 +69,14 @@ struct IPadHomeView: View {
     @State private var sorting: Sorting
 
 
-    @State private var selection = Set<Reminder>()
+    @State private var selection = Set<Reminder.ID>()
+    @State private var editModeState: EditMode = .inactive
     @State private var recordedVideoURL: URL?
     @State private var isFront: Bool?
     @State private var videoRecorded = false
     @State private var title = ""
+    @State private var isPresentingShare = false
+    @State private var pendingShareURL: URL?
 
 
     var body: some View {
@@ -96,66 +99,44 @@ struct IPadHomeView: View {
                     }
                 }
                 else {
-                    List(selection: $selection) {
-                        ForEach(sortedReminders){ reminder in
-                            Button {
-
-
-                                if reminder.isLoading && reminder.firebaseVideoURL == nil {
-                                    refuseLoading.toggle()
-                                }
-                                else {
-                                    if TutorialManager.shared.inTutorial {
-                                        TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
-                                    }
-//                                    if let handler = onSelectReminder, UIDevice.current.userInterfaceIdiom == .pad {
-//                                        handler(reminder)
-                                    else {
-                                        selectedReminder = reminder
-                                    }
-                                }
-                            } label: {
-                                ReminderRowView(reminder: reminder, isPreview: false)
-
+                    HomeListContent(
+                        folder: folder,
+                        mode: .iPad,
+                        searchText: $searchText,
+                        refuseLoading: $refuseLoading,
+                        selection: $selection,
+                        sorting: sorting,
+                        onSelectReminder: { reminder in
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
                             }
-                            .tutorialIdentifier(isFirstId(reminder))
-                            .swipeActions{
-
-                                Button("", systemImage: "trash"){
-                                    reminderToDelete = reminder
-                                    deleteAlert.toggle()
-                                }
-                                .tint(.red)
-
-                                Button("", systemImage: "folder.fill"){
-                                    remindersToMove = [reminder]
-                                    moveToFolder.toggle()
-                                }
-
-                                .tint(.black)
-
-                            }
-                            .tag(reminder)
-                            .swipeActions(edge: .leading){
-                                Button("", systemImage: "pin.fill"){
-                                    reminder.pinned.toggle()
-                                    if reminder.pinned {
-                                        reminder.datePinned = .now
+                            selectedReminder = reminder
+                        },
+                        onRequestDelete: { reminder in
+                            reminderToDelete = reminder
+                            deleteAlert.toggle()
+                        },
+                        onRequestMove: { reminder in
+                            remindersToMove = [reminder]
+                            moveToFolder.toggle()
+                        },
+                        onShare: { reminder in
+                            Task {
+                                do {
+                                    if reminder.shareID == nil {
+                                        reminder.shareID = reminder.generateShortID()
                                     }
-
+                                    pendingShareURL = reminder.shareLink
+                                    isPresentingShare = true
+                                    _ = try await FirestoreService.shared.storeReminder(reminder)
+                                } catch {
+                                    print("Share prepare failed: \(error)")
                                 }
-                                .tint(.orange)
                             }
-                            .tag(reminder)
-
-                        }
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-
-                    }
-                    .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search for a Reminder")
-                    .listStyle(.plain)
-                    .padding(0)
+                        },
+                        selectedReminderId: selectedReminder?.id
+                    )
+                    .environment(\.editMode, $editModeState)
 
                 }
             }
@@ -230,10 +211,10 @@ struct IPadHomeView: View {
                     }
 
                     Button{
-                        if editMode?.wrappedValue == .inactive {
-                            editMode?.wrappedValue = .active
+                        if editModeState == .inactive {
+                            editModeState = .active
                         } else {
-                            editMode?.wrappedValue = .inactive
+                            editModeState = .inactive
                         }
                     } label: {
                         HStack {
@@ -300,6 +281,12 @@ struct IPadHomeView: View {
             Text("You won't be able to restore this Reminder")
         }
 
+        .sheet(isPresented: $isPresentingShare){
+            if let url = pendingShareURL {
+                ShareSheet(activityItems: [url])
+            }
+        }
+
         .sheet(isPresented: $refuseLoading){
             RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
                 .presentationDetents([.height(300)])
@@ -323,7 +310,7 @@ struct IPadHomeView: View {
         }
         .sheet(isPresented: $moveToFolder, onDismiss: {
             selection = []
-            editMode?.wrappedValue = .inactive
+            editModeState = .inactive
         }){
             if let reminders = remindersToMove {
                 MoveToFolder(reminders: reminders)
@@ -333,15 +320,7 @@ struct IPadHomeView: View {
         .navigationTitle(folder?.name ?? "All Reminders")
 
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-//        .navigationDestination(item: $selectedReminder) { reminder in
-//            ReminderView(reminder: reminder)
-//                .onDisappear{
-//                    TutorialManager.shared.viewId("Home")
-//                    TutorialManager.shared.startTutorial("Home")
-//
-//                }
-//        }
-
+        .toolbar(removing: .sidebarToggle)
         .navigationBarBackButtonHidden()
     }
 
@@ -362,7 +341,7 @@ struct IPadHomeView: View {
     }
 
     func move() {
-        remindersToMove = Array(selection)
+        remindersToMove = reminders.filter { selection.contains($0.id) }
         moveToFolder.toggle()
 
     }
@@ -375,13 +354,14 @@ struct IPadHomeView: View {
 
         } else {
             // Extract URLs before deletion
-            let videoURLs = selection.compactMap { $0.firebaseVideoURL }
+            let selectedReminders = reminders.filter { selection.contains($0.id) }
+            let videoURLs = selectedReminders.compactMap { $0.firebaseVideoURL }
 
-            selection.forEach{ reminder in
+            selectedReminders.forEach { reminder in
                 modelContext.delete(reminder)
             }
 
-            editMode?.wrappedValue = .inactive
+            editModeState = .inactive
 
             Task {
                 for url in videoURLs {

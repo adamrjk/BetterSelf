@@ -12,6 +12,9 @@ import SwiftUI
 
 
 struct FolderView: View {
+
+    @State private var model = FolderViewModel()
+
     @Environment(\.modelContext) var modelContext
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
            sort: \Folder.date) var folders: [Folder]
@@ -56,8 +59,19 @@ struct FolderView: View {
                         color.overlayGradient(scheme)
                             .ignoresSafeArea()
 
-                        FoldersListCompat(searchText: $searchText, selectedReminder: $selectedReminder, selectedFolder: $selectedFolder,  showAlert: $showAlert, refuseLoading: $refuseLoading)
-                            .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
+                        FolderListContent(
+                            searchText: $searchText,
+                            showAlert: $showAlert,
+                            refuseLoading: $refuseLoading,
+                            mode: .phone,
+                            onSelectReminder: { reminder in
+                                selectedReminder = reminder
+                            },
+                            onSelectFolder: { folder in
+                                selectedFolder = folder
+                            }
+                        )
+                        .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
                             .onChange(of: scenePhase){ oldPhase, newPhase in
                                 if newPhase == .background {
                                     // App is leaving → lock again
