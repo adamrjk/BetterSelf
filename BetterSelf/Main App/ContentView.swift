@@ -91,7 +91,17 @@ struct ContentView: View {
             }
             .tint(color.button(scheme))
             .sheet(isPresented: $welcome){
-                WelcomeView()
+                if #available(iOS 18.0, *) {
+                    WelcomeView()
+                        .presentationDetents([.height(800)])
+                        .presentationSizing(.page)
+                        .presentationDragIndicator(.visible)
+                } else {
+                    // iOS 17 fallback
+                    WelcomeView()
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.visible)
+                }
             }
             .onChange(of: notificationManager.shouldNavigateToReminder) { _, shouldNavigate in
                 if shouldNavigate {

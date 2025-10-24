@@ -138,51 +138,7 @@ struct IPadReminderView: View {
         }
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
         .toolbar(removing: .sidebarToggle)
-        .overlay(
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    VStack(spacing: 12) {
-
-                        if !isDetailOnly {
-                            withAnimation(.easeOut){
-                                Button{
-                                    let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
-                                    modelContext.insert(reminder)
-                                    newReminder = reminder
-                                    addReminder.toggle()
-                                    if TutorialManager.shared.inTutorial {
-                                        TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
-                                    }
-                                }label: {
-                                    Image(systemName: "plus")
-                                        .font(.title2)
-                                        .foregroundStyle(scheme == .light
-                                                         ? .white
-                                                         : .black)
-                                        .padding(20)
-                                }
-                                .tutorialIdentifier("PlusButton")
-                                .adaptiveTranslucent(color.plusButton(scheme))
-                                .clipShape(.circle)
-                                .padding(.vertical, reminder.type == .InstantInsight ? 100 : 0)
-                            }
-                        }
-
-                    }
-
-
-
-
-
-
-
-                }
-            }
-                .padding(.trailing, 10)
-
-        )
+        
 //        .toolbar(removing: .sidebarToggle)
         .sheet(isPresented: $isPresentingShare){
             if let url = pendingShareURL {
@@ -211,7 +167,16 @@ struct IPadReminderView: View {
                                 }
                             }
                     } else {
-                        // Fallback on earlier versions
+                        // iOS 17 fallback
+                        AddReminderView(reminder: reminder)
+                            .presentationDetents([.large])
+                            .presentationDragIndicator(.visible)
+                            .onDisappear{
+                                if TutorialManager.shared.inTutorial {
+                                    TutorialManager.shared.viewId("Home")
+                                    TutorialManager.shared.startTutorial("Home")
+                                }
+                            }
                     }
                 }
             }
@@ -229,6 +194,8 @@ struct IPadReminderView: View {
                         }
                 } else {
                     AddReminderView(reminder: reminder)
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.visible)
                         .onDisappear{
                             if TutorialManager.shared.inTutorial {
                                 TutorialManager.shared.viewId("Reminder")

@@ -11,11 +11,14 @@ import SwiftData
 struct SplitView: View {
     @Binding var notifReminder: NavigableReminder?
     @Environment(\.colorScheme) var scheme
+    @Environment(\.modelContext) var modelContext
     @StateObject var color = ColorManager.shared
 
     @State private var selectedReminder: Reminder?
     @State private var selectedFolder = Folder(name: "")
     @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+    @State private var addReminder = false
+    @State private var newReminder: Reminder?
     @Query(filter: #Predicate<Reminder> { $0.isChecked == true }, sort: \Reminder.date) var reminders: [Reminder]
 
     private var unlockedReminders: [Reminder] {
@@ -48,12 +51,33 @@ struct SplitView: View {
         } detail: {
 
             if let reminder = selectedReminder {
-                IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail:{
-                    withAnimation {
-                        columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
+                ZStack {
+                    IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail:{
+                        withAnimation {
+                            columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
+                        }
+                    }, isDetailOnly: columnVisibility == .detailOnly, column: $columnVisibility)
+                    .id(reminder.id)
+
+                    if columnVisibility != .detailOnly {
+                        Button{
+                            let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
+                            modelContext.insert(reminder)
+                            newReminder = reminder
+                            addReminder.toggle()
+                        }label: {
+                            Image(systemName: "plus")
+                                .font(.title2)
+                                .foregroundStyle(scheme == .light ? .white : .black)
+                                .padding(20)
+                        }
+                        .tutorialIdentifier("PlusButton")
+                        .adaptiveTranslucent(color.plusButton(scheme))
+                        .clipShape(.circle)
+                        .padding(.trailing, 10)
+                        .padding(.bottom, reminder.type == .InstantInsight ? 100 : 0)
                     }
-                }, isDetailOnly: columnVisibility == .detailOnly, column: $columnVisibility)
-                .id(reminder.id)
+                }
             }
 
             else {
@@ -66,8 +90,37 @@ struct SplitView: View {
                             Text("Select a Reminder")
                                 .font(.headline)
                                 .foregroundStyle(.secondary)
+                        }
+
+                        if columnVisibility != .detailOnly {
+                                VStack {
+                                    Spacer()
+                                    HStack {
+
+                                        Spacer()
+                                        Button{
+                                            let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
+                                            modelContext.insert(reminder)
+                                            newReminder = reminder
+                                            addReminder.toggle()
+                                        }label: {
+                                            Image(systemName: "plus")
+                                                .font(.title2)
+                                                .foregroundStyle(scheme == .light ? .white : .black)
+                                                .padding(20)
+                                        }
+                                        .tutorialIdentifier("PlusButton")
+                                        .adaptiveTranslucent(color.plusButton(scheme))
+                                        .clipShape(.circle)
+                                        .padding(.trailing, 10)
+                                        .padding(.bottom, 0)
+                                    }
+                                }
 
                         }
+
+
+
                     }
                 }
         }
@@ -95,6 +148,33 @@ struct SplitView: View {
         .onChange(of: selectedFolder) { _, _ in
             // Reset detail when switching folders
             selectedReminder = nil
+        }
+        .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder) {
+            if let reminder = newReminder {
+                if #available(iOS 18.0, *) {
+                    AddReminderView(reminder: reminder)
+                        .presentationDetents([.height(800)])
+                        .presentationSizing(.page)
+                        .presentationDragIndicator(.visible)
+                } else {
+                    AddReminderView(reminder: reminder)
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.visible)
+                }
+            }
+        }
+    }
+
+    func deleteEmptyReminder() {
+        if let reminder = newReminder{
+            guard reminder.isChecked == false else { return }
+            if reminder.isEmpty {
+                modelContext.delete(reminder)
+            }
+            if (reminder.type != .TimeLessLetter && reminder.photo == nil && !reminder.isLoading) {
+                reminder.type = .TimeLessLetter
+            }
+            reminder.isChecked = true
         }
     }
 }
