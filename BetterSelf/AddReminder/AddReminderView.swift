@@ -71,9 +71,9 @@ struct AddReminderView: View {
                                 .padding(.horizontal, 20)
 
                             Picker("Reminder Type", selection: $reminder.type){
-                                ForEach(ReminderType.allCases, id: \.self) { type in
-                                    Text(type.rawValue)
-                                        .tag(type)
+                                ForEach(SimpleReminderType.allCases, id: \.self) { simpleType in
+                                    Text(simpleType.rawValue)
+                                        .tag(equivType(simpleType))
                                 }
                             }
                             .padding(12)
@@ -299,6 +299,17 @@ struct AddReminderView: View {
             }
             return nil
 
+        }
+    }
+
+    func equivType(_ simpleType: SimpleReminderType) -> ReminderType {
+        switch simpleType {
+        case .InstantInsight:
+                .InstantInsight
+        case .EchoSnap:
+                .EchoSnap
+        case .TimeLessLetter:
+                .TimeLessLetter
         }
     }
 

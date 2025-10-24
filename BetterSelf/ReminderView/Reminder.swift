@@ -63,6 +63,9 @@ class Reminder {
     
 
 
+
+
+
     var isEmpty: Bool {
         text.isEmpty && photo == nil && firebaseVideoURL == nil && link.isEmpty && !isLoading
     }
@@ -124,6 +127,12 @@ enum ReminderType: String, Codable, CaseIterable {
     case EchoSnap = "EchoSnap"
     case TimeLessLetter = "TimeLessLetter"
 }
+enum SimpleReminderType: String, Codable, CaseIterable {
+    case InstantInsight = "Video"
+    case EchoSnap = "Photo"
+    case TimeLessLetter = "Text"
+}
+
 
 
 struct NavigableReminder: Identifiable, Equatable, Hashable {
