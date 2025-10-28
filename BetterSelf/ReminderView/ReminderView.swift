@@ -31,7 +31,7 @@ struct ReminderView: View {
             if reminder.isYoutube {
                 SharedLinkView(link: reminder.link, time: $reminder.time, text: reminder.text)
             }
-            else if reminder.onlyLink {
+            else if reminder.onlyLink && reminder.isArticle {
                 SharedLinkView(link: reminder.link, time: $reminder.time, text: "")
             }
             else {

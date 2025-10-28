@@ -113,6 +113,20 @@ class ColorManager: ObservableObject {
         }
     }
 
+    func toggleColor(_ scheme: ColorScheme) -> Color {
+        switch theme {
+        case .yellowPurple:
+            return scheme == .light
+            ? Color.purple
+            : Color.creamyYellow
+        case .blackWhite:
+            return scheme == .light
+            ? Color.black
+            : Color.creamyYellow
+        }
+
+    }
+
     func buttonGradient(_ scheme: ColorScheme) -> LinearGradient {
         switch theme {
         case .yellowPurple:

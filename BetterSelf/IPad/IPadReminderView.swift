@@ -64,8 +64,9 @@ struct IPadReminderView: View {
                 Spacer()
                 HStack {
                     Spacer()
-
-                    if #available(iOS 26, *){
+                    
+                    if column != .detailOnly,
+                       #available(iOS 26, *){
                         Button{
                             let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
                             modelContext.insert(reminder)

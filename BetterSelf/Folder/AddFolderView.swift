@@ -63,9 +63,7 @@ struct AddFolderView: View {
 
                     HStack(spacing: 16 ) {
                         Toggle("Face ID to Unlock", isOn: $folder.faceID)
-                            .tint(scheme == .light
-                                  ? .purple
-                                  : .yellow)
+                            .tint(color.toggleColor( scheme))
                             .foregroundStyle(.secondary)
                             .font(.subheadline)
 

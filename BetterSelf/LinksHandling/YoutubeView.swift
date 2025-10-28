@@ -33,11 +33,11 @@ struct YoutubeView: View {
     }
     var body: some View {
         ZStack {
-            color.mainGradient(scheme)
-                .ignoresSafeArea()
-
-            color.overlayGradient(scheme)
-                .ignoresSafeArea()
+//            color.mainGradient(scheme)
+//                .ignoresSafeArea()
+//
+//            color.overlayGradient(scheme)
+//                .ignoresSafeArea()
             ZStack {
                 ScrollView {
 

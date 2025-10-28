@@ -87,9 +87,7 @@ struct SettingsView: View {
 
 //                        HStack(spacing: 16 ) {
 //                            Toggle("Start Tutorial Again", isOn: $tutorial)
-//                                .tint(scheme == .light
-//                                      ? .purple
-//                                      : .yellow)
+//                                .tint(color.toggleColor(scheme)
 //                                .foregroundStyle(.secondary)
 //                                .font(.subheadline)
 //

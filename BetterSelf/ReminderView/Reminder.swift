@@ -89,6 +89,11 @@ class Reminder {
         link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be")
     }
 
+    var isArticle: Bool {
+        !isYoutube && !link.localizedStandardContains("instagram.com") && !link.localizedStandardContains("tiktok.com")
+    }
+
+
     var shareLink: URL {
         if let share = shareID {
             URL(string: "https://bettermyself.app/share/\(share)")!
@@ -97,6 +102,8 @@ class Reminder {
             URL(string: "https://bettermyself.app/share/\(id.uuidString)")!
         }
     }
+
+
 
     func generateShortID(length: Int = 6) -> String {
         let chars = Array("abcdefghijklmnopqrstuvwxyz0123456789")
