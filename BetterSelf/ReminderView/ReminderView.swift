@@ -46,6 +46,7 @@ struct ReminderView: View {
             }
         }
         .onAppear{
+            AnalyticsService.logScreenView(screenName: "Reminder", screenClass: "ReminderView")
             if TutorialManager.shared.inTutorial {
                 TutorialManager.shared.viewId("Reminder")
                 TutorialManager.shared.startTutorial("Reminder")
@@ -59,6 +60,11 @@ struct ReminderView: View {
 
             ToolbarItem(placement: .topBarLeading) {
                 Button{
+                    AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                        "button": UIDevice.current.userInterfaceIdiom == .pad ? "expand_detail" : "back",
+                        "view": "ReminderView",
+                        "id": reminder.id.uuidString
+                    ])
                     if UIDevice.current.userInterfaceIdiom == .pad, let expand = onExpandDetail {
                         expand()
                     } else {
@@ -77,6 +83,10 @@ struct ReminderView: View {
 
             ToolbarItem(placement: .topBarLeading){
                 Button {
+                    AnalyticsService.log(AnalyticsService.EventName.reminderEdited, params: [
+                        "id": reminder.id.uuidString,
+                        "type": reminder.type.rawValue
+                    ])
                     edit.toggle()
                 } label: {
                     Label("Edit", systemImage: "pencil")
@@ -92,6 +102,10 @@ struct ReminderView: View {
                 Button {
                     Task {
                         do {
+                            AnalyticsService.log(AnalyticsService.EventName.shareTapped, params: [
+                                "id": reminder.id.uuidString,
+                                "type": reminder.type.rawValue
+                            ])
                             pendingShareURL = getLink(reminder)
                             isPresentingShare = true
                             _ = try await FirestoreService.shared.storeReminder(reminder)
@@ -113,6 +127,10 @@ struct ReminderView: View {
                 if !reminder.link.isEmpty && !reminder.isYoutube && !reminder.onlyLink{
                     ToolbarItem(placement: .topBarTrailing){
                         Button("Access Link", systemImage: "link.circle.fill"){
+                            AnalyticsService.log(AnalyticsService.EventName.linkOpened, params: [
+                                "id": reminder.id.uuidString,
+                                "url": reminder.link
+                            ])
                             detailSheet.toggle()
                         }
                         .font(.headline)
@@ -128,6 +146,11 @@ struct ReminderView: View {
             else {
                 ToolbarItem(placement: .topBarTrailing){
                     Button("Details", systemImage: "info.circle.fill"){
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "details",
+                            "view": "ReminderView",
+                            "id": reminder.id.uuidString
+                        ])
                         detailSheet.toggle()
                     }
                     .font(.headline)

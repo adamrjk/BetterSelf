@@ -150,6 +150,10 @@ struct IPadHomeView: View {
                     Spacer()
                     HStack {
                         Button("Delete"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "delete_overlay",
+                                "view": "IPadHomeView"
+                            ])
                             deleteAlert.toggle()
                         }
                         .adaptiveGlass(scheme)
@@ -158,7 +162,13 @@ struct IPadHomeView: View {
                         Spacer()
 
 
-                        Button("Move", action: move)
+                        Button("Move"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "move_overlay",
+                                "view": "IPadHomeView"
+                            ])
+                            move()
+                        }
                             .adaptiveGlass(scheme)
                             .buttonStyle(.plain)
                     }
@@ -177,6 +187,10 @@ struct IPadHomeView: View {
 
                         if editMode?.wrappedValue == .inactive {
                             Button{
+                                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                    "button": "plus_overlay",
+                                    "view": "IPadHomeView"
+                                ])
                                 let reminder = Reminder(title: "", text: "", link: "", folder: folder)
                                 modelContext.insert(reminder)
                                 newReminder = reminder
@@ -290,6 +304,10 @@ struct IPadHomeView: View {
                     }
 
                     Button{
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "select_reminders_toggle",
+                            "view": "IPadHomeView"
+                        ])
                         if editModeState == .inactive {
                             editModeState = .active
                         } else {
@@ -310,6 +328,10 @@ struct IPadHomeView: View {
                     }
 
                     Button {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "record_video",
+                            "view": "IPadHomeView"
+                        ])
                         videoRecorder.toggle()
                     } label: {
                         Image(systemName: "video.fill.badge.plus")
@@ -354,6 +376,10 @@ struct IPadHomeView: View {
         }
         .alert("Are you Sure?", isPresented: $deleteAlert){
             Button("Delete", role: .destructive){
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "delete_confirm",
+                    "view": "IPadHomeView"
+                ])
                 delete()
             }
         } message: {

@@ -94,6 +94,7 @@ struct FolderView: View {
                         TutorialManager.shared.viewId("Folder")
                         TutorialManager.shared.startTutorial("Folder")
                     }
+            AnalyticsService.logScreenView(screenName: "Folders", screenClass: "FolderView")
                 }
                 .onChange(of: TutorialManager.shared.currentDone){
                     if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
@@ -106,6 +107,10 @@ struct FolderView: View {
                 .toolbar{
                     ToolbarItem(placement: .topBarTrailing){
                         Button("Add Folder", systemImage: "folder.fill.badge.plus"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "add_folder",
+                                "view": "FolderView"
+                            ])
                             let folder = Folder(name: "")
                             modelContext.insert(folder)
                             newFolder = folder
@@ -122,6 +127,10 @@ struct FolderView: View {
 
                     ToolbarItem(placement: .topBarLeading){
                         Button("Settings", systemImage: "gear"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "settings_open",
+                                "view": "FolderView"
+                            ])
 
                             settings.toggle()
                         }
@@ -133,6 +142,10 @@ struct FolderView: View {
 
                     ToolbarItem(placement: .topBarLeading){
                         Button("Quick Add", systemImage: "video.fill.badge.plus"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "quick_add",
+                                "view": "FolderView"
+                            ])
                             videoRecorder.toggle()
                         }
                         .foregroundStyle(color.button(scheme))
@@ -310,6 +323,9 @@ struct FolderView: View {
             }
             else {
                 folder.isChecked = true
+                AnalyticsService.log(AnalyticsService.EventName.folderCreated, params: [
+                    "name": folder.name
+                ])
             }
         }
 

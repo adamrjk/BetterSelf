@@ -35,6 +35,10 @@ struct TimeLessLetterView: View {
                 if isSheet {
                     ToolbarItem(placement: .topBarLeading) {
                         Button("Back"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "back",
+                                "view": "TimeLessLetterView"
+                            ])
                             dismiss()
                         }
                     }

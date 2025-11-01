@@ -17,6 +17,7 @@
 		668A864A2E811B23003D8DE7 /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 668A86492E811B23003D8DE7 /* YouTubePlayerKit */; };
 		66A705112E79C5750007E1FE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 66A705102E79C5750007E1FE /* FirebaseAuth */; };
 		66B80EE82EA78CC700118A46 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 66B80EE72EA78CC700118A46 /* FirebaseFirestore */; };
+		66C587B32EB600AE0023B4CF /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 66C587B22EB600AE0023B4CF /* FirebaseFunctions */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -152,6 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				668A864A2E811B23003D8DE7 /* YouTubePlayerKit in Frameworks */,
+				66C587B32EB600AE0023B4CF /* FirebaseFunctions in Frameworks */,
 				6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */,
 				6678C6992E545CDB00C80E8F /* FirebaseCore in Frameworks */,
 				6678C68F2E5454D200C80E8F /* FirebaseStorage in Frameworks */,
@@ -267,6 +269,7 @@
 				66A705102E79C5750007E1FE /* FirebaseAuth */,
 				668A86492E811B23003D8DE7 /* YouTubePlayerKit */,
 				66B80EE72EA78CC700118A46 /* FirebaseFirestore */,
+				66C587B22EB600AE0023B4CF /* FirebaseFunctions */,
 			);
 			productName = BetterSelf;
 			productReference = 666F96C02E4F775D007AE674 /* BetterSelf.app */;
@@ -662,6 +665,7 @@
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BetterSelf needs microphone access to record audio with your video reminders for a complete recording experience.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need to be able to add to Photos Library to enable the Quick Add Feature.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your Photos to play videos and show images.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "We'll convert your speech to text to help you solve your problem";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -709,6 +713,7 @@
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BetterSelf needs microphone access to record audio with your video reminders for a complete recording experience.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need to be able to add to Photos Library to enable the Quick Add Feature.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your Photos to play videos and show images.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "We'll convert your speech to text to help you solve your problem";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -823,6 +828,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		66C587B22EB600AE0023B4CF /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

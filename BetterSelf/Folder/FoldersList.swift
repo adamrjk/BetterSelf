@@ -296,6 +296,10 @@ struct FoldersList: View {
     func deleteFolder(_ folder: Folder) {
         // Extract URLs before deletion
         let videoURLs = folder.reminders.compactMap { $0.firebaseVideoURL }
+        AnalyticsService.log(AnalyticsService.EventName.folderDeleted, params: [
+            "name": folder.name,
+            "reminders_count": String(folder.reminders.count)
+        ])
         modelContext.delete(folder)
 
         Task {
@@ -457,7 +461,14 @@ struct FoldersList_iOS17: View {
         .scrollContentBackground(.hidden)
         .background(Color.clear)
         .alert("Are you Sure?", isPresented: $deleteAlert){
-            Button("Delete", role: .destructive){ if let folder = folderToDelete { deleteFolder(folder) } }
+            Button("Delete", role: .destructive){
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "delete_folder_confirm",
+                    "view": "FoldersList",
+                    "folder": folderToDelete?.name ?? ""
+                ])
+                if let folder = folderToDelete { deleteFolder(folder) }
+            }
         } message: { Text("This will delete all the Reminders in this Folder") }
     }
 
@@ -465,6 +476,11 @@ struct FoldersList_iOS17: View {
     @ViewBuilder private var searchResults: some View {
         ForEach(filteredReminders){ reminder in
             Button {
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "search_result_open",
+                    "view": "FoldersList",
+                    "id": reminder.id.uuidString
+                ])
                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                     refuseLoading.toggle()
                 } else {
@@ -488,6 +504,11 @@ struct FoldersList_iOS17: View {
             } else {
                 ForEach(pinned) { reminder in
                     Button {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "pinned_open",
+                            "view": "FoldersList",
+                            "id": reminder.id.uuidString
+                        ])
                         if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                             refuseLoading.toggle()
                         } else {
@@ -546,6 +567,10 @@ struct FoldersList_iOS17: View {
 
             // index 1: All Reminders
             Button {
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "open_all_reminders",
+                    "view": "FoldersList"
+                ])
                 if TutorialManager.shared.inTutorial {
                     TutorialManager.shared.handleTargetViewClick(target: "AllRemindersButton")
                 }
@@ -565,6 +590,11 @@ struct FoldersList_iOS17: View {
             ForEach(Array(folders.enumerated()), id: \.element.persistentModelID) { idx, folder in
                 let rowIndex = idx + 2
                 Button {
+                    AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                        "button": "folder_row_tap",
+                        "view": "FoldersList",
+                        "folder": folder.name
+                    ])
                     if folder.faceID && folder.isLocked {
                         authenticate(folder)
                     } else {
@@ -582,6 +612,11 @@ struct FoldersList_iOS17: View {
                 .padding(.bottom, rowIndex == total - 1 ? 6 : 0)
                 .swipeActions(edge: .trailing) {
                     Button(role: .destructive) {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "folder_delete_swipe",
+                            "view": "FoldersList",
+                            "folder": folder.name
+                        ])
                         folderToDelete = folder
                         deleteAlert.toggle()
                     } label: {

@@ -35,6 +35,10 @@ struct StartTimeView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "start_time_ok",
+                            "view": "StartTimeView"
+                        ])
                         time = hours * 3600 + minutes * 60 + seconds
                         saveTime(time)
                         dismiss()

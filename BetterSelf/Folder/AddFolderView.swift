@@ -95,6 +95,11 @@ struct AddFolderView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "save_folder",
+                            "view": "AddFolderView",
+                            "name": folder.name
+                        ])
                         let nameIsNotValid = folders.contains { $0.name.lowercased() == folder.name.lowercased() }
                         if folder.name.isEmpty || nameIsNotValid {
                             refuseSaving.toggle()
@@ -127,6 +132,10 @@ struct AddFolderView: View {
                         HStack {
                             Spacer()
                             Button{
+                                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                    "button": "dismiss_keyboard",
+                                    "view": "AddFolderView"
+                                ])
                                 keyboard = false
                             } label: {
                                 Image(systemName: "arrow.down")

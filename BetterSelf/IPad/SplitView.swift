@@ -78,6 +78,10 @@ struct SplitView: View {
                                     HStack {
                                         Spacer()
                                         Button{
+                                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                                "button": "plus_overlay",
+                                                "view": "SplitView"
+                                            ])
                                             let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
                                             modelContext.insert(reminder)
                                             newReminder = reminder

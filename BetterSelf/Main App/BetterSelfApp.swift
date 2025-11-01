@@ -17,6 +17,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
+        // Configure Analytics with anonymous defaults; identifiable tracking opt-in later
+        AnalyticsService.configure(consentedToIdentifiableTracking: false)
+        AnalyticsService.log(AnalyticsService.EventName.appOpened)
         UNUserNotificationCenter.current().delegate = self
         return true
     }

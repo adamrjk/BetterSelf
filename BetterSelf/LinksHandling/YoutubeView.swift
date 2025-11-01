@@ -77,6 +77,10 @@ struct YoutubeView: View {
                     HStack {
                         Spacer()
                         Button {
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "open_start_time",
+                                "view": "YoutubeView"
+                            ])
                             startTime.toggle()
 
                         } label: {

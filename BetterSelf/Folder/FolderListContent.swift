@@ -74,6 +74,11 @@ struct FolderListContent: View {
         .animation(.smooth, value: pinned)
         .alert("Are you Sure?", isPresented: $deleteAlert) {
             Button("Delete", role: .destructive) {
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "delete_folder_confirm",
+                    "view": "FolderListContent",
+                    "folder": folderToDelete?.name ?? ""
+                ])
                 if let folder = folderToDelete { deleteFolder(folder) }
             }
         } message: {
@@ -93,6 +98,11 @@ struct FolderListContent: View {
     private var searchResultsView: some View {
         ForEach(filteredReminders) { reminder in
             Button {
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "search_result_open",
+                    "view": "FolderListContent",
+                    "id": reminder.id.uuidString
+                ])
                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                     refuseLoading.toggle()
                 } else {
@@ -132,6 +142,11 @@ struct FolderListContent: View {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 480), spacing: 16)], spacing: 12) {
                             ForEach(pinned) { reminder in
                                 Button {
+                                    AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                        "button": "pinned_open",
+                                        "view": "FolderListContent",
+                                        "id": reminder.id.uuidString
+                                    ])
                                     if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                                         refuseLoading.toggle()
                                     } else {
@@ -146,6 +161,11 @@ struct FolderListContent: View {
                     } else {
                         ForEach(pinned) { reminder in
                             Button {
+                                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                    "button": "pinned_open",
+                                    "view": "FolderListContent",
+                                    "id": reminder.id.uuidString
+                                ])
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                                     refuseLoading.toggle()
                                 } else {
@@ -188,6 +208,10 @@ struct FolderListContent: View {
 
                     VStack(spacing: 0) {
                         Button {
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "open_all_reminders",
+                                "view": "FolderListContent"
+                            ])
                             if TutorialManager.shared.inTutorial {
                                 TutorialManager.shared.handleTargetViewClick(target: "AllRemindersButton")
                             }
@@ -227,14 +251,22 @@ struct FolderListContent: View {
         List {
             ForEach(folders) { folder in
                 if folder.faceID && folder.isLocked {
-                    Button { authenticate(folder) } label: {
+                    Button { AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                        "button": "authenticate_folder",
+                        "view": "FolderListContent",
+                        "folder": folder.name
+                    ]); authenticate(folder) } label: {
                         FolderRowView(folder: folder, count: getCount(folder))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                         if folder != folders.last { Divider() }
                     }
                 } else {
-                    Button { onSelectFolder(folder) } label: {
+                    Button { AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                        "button": "open_folder",
+                        "view": "FolderListContent",
+                        "folder": folder.name
+                    ]); onSelectFolder(folder) } label: {
                         FolderRowView(folder: folder, count: getCount(folder))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
@@ -242,6 +274,11 @@ struct FolderListContent: View {
                     }
                     .swipeActions {
                         Button("", systemImage: "trash") {
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "folder_delete_swipe",
+                                "view": "FolderListContent",
+                                "folder": folder.name
+                            ])
                             folderToDelete = folder
                             deleteAlert.toggle()
                         }

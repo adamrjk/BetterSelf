@@ -152,6 +152,11 @@ struct ThemeView: View {
     @ViewBuilder
     private func themeCard(option: Theme, isSelected: Bool, mode: ThemeMode) -> some View {
         Button {
+            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                "button": "theme_selected",
+                "view": "ThemeView",
+                "theme": option.rawValue
+            ])
             selectedThemeKey = option.rawValue
         } label: {
             VStack(alignment: .leading, spacing: 14) {

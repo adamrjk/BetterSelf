@@ -124,6 +124,10 @@ struct HomeView: View {
                             moveToFolder.toggle()
                         },
                         onShare: { reminder in
+                            AnalyticsService.log(AnalyticsService.EventName.shareTapped, params: [
+                                "id": reminder.id.uuidString,
+                                "type": reminder.type.rawValue
+                            ])
                             Task {
                                 do {
                                     pendingShareURL = getLink(reminder)
@@ -144,6 +148,10 @@ struct HomeView: View {
                     Spacer()
                     HStack {
                         Button("Delete"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "delete_overlay",
+                                "view": "HomeView"
+                            ])
                             deleteAlert.toggle()
                         }
                         .adaptiveGlass(scheme)
@@ -152,7 +160,13 @@ struct HomeView: View {
                         Spacer()
 
 
-                        Button("Move", action: move)
+                        Button("Move"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "move_overlay",
+                                "view": "HomeView"
+                            ])
+                            move()
+                        }
                             .adaptiveGlass(scheme)
                             .buttonStyle(.plain)
                     }
@@ -163,6 +177,7 @@ struct HomeView: View {
             }
         }
         .onAppear{
+            AnalyticsService.logScreenView(screenName: "Home", screenClass: "HomeView")
 
             if TutorialManager.shared.inTutorial {
                 TutorialManager.shared.viewId("Home")
@@ -189,6 +204,10 @@ struct HomeView: View {
 
                     if editMode?.wrappedValue == .inactive {
                         Button{
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "plus_overlay",
+                                "view": "HomeView"
+                            ])
                             let reminder = Reminder(title: "", text: "", link: "", folder: folder)
                             modelContext.insert(reminder)
                             newReminder = reminder
@@ -248,6 +267,10 @@ struct HomeView: View {
                     }
 
                     Button{
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "select_reminders_toggle",
+                            "view": "HomeView"
+                        ])
                         if editMode?.wrappedValue == .inactive {
                             editMode?.wrappedValue = .active
                         } else {
@@ -281,6 +304,10 @@ struct HomeView: View {
 
                 ToolbarItem(placement: .topBarLeading){
                     Button("Go Back", systemImage: "chevron.left"){
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "back",
+                            "view": "HomeView"
+                        ])
                         dismiss()
 
                     }
@@ -293,6 +320,10 @@ struct HomeView: View {
             
             ToolbarItem(placement: .topBarLeading){
                 Button("Quick Add", systemImage: "video.fill.badge.plus"){
+                    AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                        "button": "quick_add",
+                        "view": "HomeView"
+                    ])
                     videoRecorder.toggle()
                 }
                 .buttonStyle(.plain)
@@ -318,6 +349,10 @@ struct HomeView: View {
         }
         .alert("Are you Sure?", isPresented: $deleteAlert){
             Button("Delete", role: .destructive){
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "delete_confirm",
+                    "view": "HomeView"
+                ])
                 delete()
             }
         } message: {
@@ -420,6 +455,15 @@ struct HomeView: View {
 
         uploadManager.loadVideo(reminder, recordedVideoURL: recordedVideoURL)
 
+        AnalyticsService.log(AnalyticsService.EventName.reminderCreated, params: [
+            "id": reminder.id.uuidString,
+            "type": reminder.type.rawValue,
+            "has_video": (recordedVideoURL != nil) ? "true" : "false",
+            "has_photo": (reminder.photo != nil) ? "true" : "false",
+            "has_link": reminder.link.isEmpty ? "false" : "true",
+            "source": "video_quick_add"
+        ])
+
     }
 
     func move() {
@@ -440,6 +484,10 @@ struct HomeView: View {
             let videoURLs = selectedReminders.compactMap { $0.firebaseVideoURL }
 
             selectedReminders.forEach { reminder in
+                AnalyticsService.log(AnalyticsService.EventName.reminderDeleted, params: [
+                    "id": reminder.id.uuidString,
+                    "type": reminder.type.rawValue
+                ])
                 modelContext.delete(reminder)
             }
 
@@ -480,6 +528,10 @@ struct HomeView: View {
                 }
             }
 
+            AnalyticsService.log(AnalyticsService.EventName.reminderDeleted, params: [
+                "id": reminder.id.uuidString,
+                "type": reminder.type.rawValue
+            ])
             modelContext.delete(reminder)
         }
     }
@@ -490,6 +542,10 @@ struct HomeView: View {
                 await deleteVideo(url)
             }
         }
+        AnalyticsService.log(AnalyticsService.EventName.reminderDeleted, params: [
+            "id": reminder.id.uuidString,
+            "type": reminder.type.rawValue
+        ])
         modelContext.delete(reminder)
     }
 

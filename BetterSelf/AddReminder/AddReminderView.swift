@@ -159,6 +159,10 @@ struct AddReminderView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "save_reminder",
+                            "view": "AddReminderView"
+                        ])
                         if reminder.isEmpty{
                             refuseSaving.toggle()
                         }
@@ -190,6 +194,10 @@ struct AddReminderView: View {
                         HStack {
                             Spacer()
                             Button{
+                                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                    "button": "dismiss_keyboard",
+                                    "view": "AddReminderView"
+                                ])
                                 keyboard = false
                             } label: {
                                 Image(systemName: "arrow.down")
@@ -250,6 +258,10 @@ struct AddReminderView: View {
                         YouTubeThumbnailView(videoURL: reminder.link, type: .addReminder)
 
                         Button{
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "remove_youtube_link",
+                                "view": "AddReminderView"
+                            ])
                             reminder.link = ""
 
                         } label: {

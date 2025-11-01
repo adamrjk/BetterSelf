@@ -24,7 +24,13 @@ struct SafariView: UIViewControllerRepresentable {
 struct YoutubeShortsPlayer: View {
     @State private var show = false
     var body: some View {
-        Button("Open Short") { show = true }
+        Button("Open Short") {
+            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                "button": "open_short",
+                "view": "YoutubeShortsPlayer"
+            ])
+            show = true
+        }
         .sheet(isPresented: $show) {
             // Use the /shorts/ link
             SafariView(url: URL(string:"https://www.youtube.com/shorts/FpT3Fi3_484")!)

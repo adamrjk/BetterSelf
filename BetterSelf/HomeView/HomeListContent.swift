@@ -87,6 +87,11 @@ struct HomeListContent: View {
             ForEach(sortedReminders) { reminder in
                 let isSelected = (selectedReminderId == reminder.id)
                 Button {
+                    AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                        "button": "row_open",
+                        "view": "HomeListContent",
+                        "id": reminder.id.uuidString
+                    ])
                     if editMode?.wrappedValue == .active {
                         // In edit mode, taps should toggle selection, not activate navigation
                         return
@@ -116,11 +121,21 @@ struct HomeListContent: View {
                 .tutorialIdentifier(isFirstId(reminder))
                 .swipeActions {
                     Button("", systemImage: "trash") {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "delete_swipe",
+                            "view": "HomeListContent",
+                            "id": reminder.id.uuidString
+                        ])
                         onRequestDelete(reminder)
                     }
                     .tint(.red)
 
                     Button("", systemImage: "folder.fill") {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "move_swipe",
+                            "view": "HomeListContent",
+                            "id": reminder.id.uuidString
+                        ])
                         onRequestMove(reminder)
                     }
                     .tint(.black)
@@ -130,11 +145,20 @@ struct HomeListContent: View {
                     Button("", systemImage: "pin.fill") {
                         reminder.pinned.toggle()
                         if reminder.pinned { reminder.datePinned = .now }
+                        let event = reminder.pinned ? AnalyticsService.EventName.reminderPinned : AnalyticsService.EventName.reminderUnpinned
+                        AnalyticsService.log(event, params: [
+                            "id": reminder.id.uuidString,
+                            "type": reminder.type.rawValue
+                        ])
                     }
                     .tint(.orange)
 
                     if let onShare = onShare {
                         Button {
+                            AnalyticsService.log(AnalyticsService.EventName.shareTapped, params: [
+                                "id": reminder.id.uuidString,
+                                "type": reminder.type.rawValue
+                            ])
                             onShare(reminder)
                         } label: {
                             Image(systemName: "square.and.arrow.up")

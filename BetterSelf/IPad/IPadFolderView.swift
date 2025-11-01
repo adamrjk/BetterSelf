@@ -94,6 +94,7 @@ struct IPadFolderView: View {
                         TutorialManager.shared.viewId("Folder")
                         TutorialManager.shared.startTutorial("Folder")
                     }
+            AnalyticsService.logScreenView(screenName: "Folders", screenClass: "IPadFolderView")
                 }
                 .onChange(of: TutorialManager.shared.currentDone){
                     if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
@@ -109,6 +110,10 @@ struct IPadFolderView: View {
 
                     ToolbarItem(placement: .topBarTrailing){
                         Button("Add Folder", systemImage: "folder.fill.badge.plus"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "add_folder",
+                                "view": "IPadFolderView"
+                            ])
                             let folder = Folder(name: "")
                             modelContext.insert(folder)
                             newFolder = folder
@@ -124,6 +129,10 @@ struct IPadFolderView: View {
                     }
                     ToolbarItem(placement: .topBarLeading){
                         Button("Settings", systemImage: "gear"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "settings_open",
+                                "view": "IPadFolderView"
+                            ])
 
                             settings.toggle()
                         }
@@ -253,6 +262,9 @@ struct IPadFolderView: View {
             }
             else {
                 folder.isChecked = true
+                AnalyticsService.log(AnalyticsService.EventName.folderCreated, params: [
+                    "name": folder.name
+                ])
             }
         }
 

@@ -54,6 +54,10 @@ struct AddingVideoView: View {
                             }
                         }
                         Button{
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "cancel_video_loading",
+                                "view": "AddingVideoView"
+                            ])
                             isLoading = false
                             thumbnailImage = nil
                             selectedItem = nil
@@ -103,6 +107,10 @@ struct AddingVideoView: View {
                                       .shadow(color: .black.opacity(0.3), radius: 2)
                             }
                             Button{
+                                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                    "button": "remove_video_thumbnail",
+                                    "view": "AddingVideoView"
+                                ])
                                 isLoading = false
                                 thumbnailImage = nil
                                 selectedItem = nil

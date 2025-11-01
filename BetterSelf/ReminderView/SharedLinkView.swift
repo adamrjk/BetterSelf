@@ -66,6 +66,11 @@ struct SharedLinkView: View {
                 if isSheet {
                     ToolbarItem(placement: .topBarLeading){
                         Button("Cancel"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "cancel",
+                                "view": "SharedLinkView",
+                                "url": link
+                            ])
                             dismiss()
 
                         }

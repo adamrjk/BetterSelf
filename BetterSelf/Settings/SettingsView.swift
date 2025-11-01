@@ -117,6 +117,10 @@ struct SettingsView: View {
             .toolbar{
                 ToolbarItem(placement: .topBarTrailing){
                     Button{
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "settings_close",
+                            "view": "SettingsView"
+                        ])
                         dismiss()
                     }label: {
                         Image(systemName: "arrow.down")

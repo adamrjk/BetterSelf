@@ -77,6 +77,11 @@ struct IPadFoldersList: View {
         .animation(.smooth, value: pinned)
         .alert("Are you Sure?", isPresented: $deleteAlert){
             Button("Delete", role: .destructive){
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "delete_folder_confirm",
+                    "view": "IPadFoldersList",
+                    "folder": folderToDelete?.name ?? ""
+                ])
                 if let folder = folderToDelete {
                     deleteFolder(folder)
                 }
@@ -98,6 +103,11 @@ struct IPadFoldersList: View {
     private var searchResultsView: some View {
         ForEach(filteredReminders){ reminder in
             Button {
+                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                    "button": "search_result_open",
+                    "view": "IPadFoldersList",
+                    "id": reminder.id.uuidString
+                ])
                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                     refuseLoading.toggle()
                 }
@@ -139,6 +149,11 @@ struct IPadFoldersList: View {
                     ], spacing: 12) {
                         ForEach(pinned) { reminder in
                             Button {
+                                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                    "button": "pinned_open",
+                                    "view": "IPadFoldersList",
+                                    "id": reminder.id.uuidString
+                                ])
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                                     refuseLoading.toggle()
                                 }
@@ -183,6 +198,10 @@ struct IPadFoldersList: View {
                     VStack(spacing: 0) {
                         // All Reminders folder
                         Button {
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "open_all_reminders",
+                                "view": "IPadFoldersList"
+                            ])
                             if TutorialManager.shared.inTutorial {
                                 TutorialManager.shared.handleTargetViewClick(target: "AllRemindersButton")
                             }
@@ -223,6 +242,11 @@ struct IPadFoldersList: View {
             ForEach(folders) { folder in
                 if folder.faceID && folder.isLocked {
                     Button {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "authenticate_folder",
+                            "view": "IPadFoldersList",
+                            "folder": folder.name
+                        ])
                         authenticate(folder)
                     } label: {
                         FolderRowView(folder: folder, count: getCount(folder))
@@ -235,6 +259,11 @@ struct IPadFoldersList: View {
 
                 } else {
                     Button {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "open_folder",
+                            "view": "IPadFoldersList",
+                            "folder": folder.name
+                        ])
                         selectedFolder = folder
                     } label: {
                         FolderRowView(folder: folder, count: getCount(folder))
@@ -247,6 +276,11 @@ struct IPadFoldersList: View {
                     }
                     .swipeActions{
                         Button("", systemImage: "trash"){
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "folder_delete_swipe",
+                                "view": "IPadFoldersList",
+                                "folder": folder.name
+                            ])
                             folderToDelete = folder
                             deleteAlert.toggle()
                         }
@@ -270,6 +304,10 @@ struct IPadFoldersList: View {
     func deleteFolder(_ folder: Folder) {
         // Extract URLs before deletion
         let videoURLs = folder.reminders.compactMap { $0.firebaseVideoURL }
+        AnalyticsService.log(AnalyticsService.EventName.folderDeleted, params: [
+            "name": folder.name,
+            "reminders_count": String(folder.reminders.count)
+        ])
         modelContext.delete(folder)
 
         Task {

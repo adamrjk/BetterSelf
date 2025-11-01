@@ -74,6 +74,10 @@ struct MoveToFolder: View {
                         Button{
                             reminders.forEach{ reminder in
                                 reminder.folder = folder
+                                AnalyticsService.log(AnalyticsService.EventName.reminderMoved, params: [
+                                    "id": reminder.id.uuidString,
+                                    "to_folder": folder.name
+                                ])
                             }
                             dismiss()
                         } label: {
@@ -94,6 +98,10 @@ struct MoveToFolder: View {
             .toolbar{
                 ToolbarItem(placement: .topBarLeading){
                     Button("Cancel"){
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "move_cancel",
+                            "view": "MoveToFolder"
+                        ])
                         dismiss()
                     }
                 }

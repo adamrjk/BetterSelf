@@ -131,6 +131,12 @@ struct ContentView: View {
                 signInAnonymously()
                 scheduleBulkNotifications()
             }
+            .onChange(of: tabPage) { _, newValue in
+                let tabName = (newValue == 0) ? "reminders" : "problem_solver"
+                AnalyticsService.log("tab_selected", params: [
+                    "tab": tabName
+                ])
+            }
         }
 
     func getSchemeAndTheme(){

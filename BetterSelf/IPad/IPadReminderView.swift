@@ -68,6 +68,10 @@ struct IPadReminderView: View {
                     if column != .detailOnly,
                        #available(iOS 26, *){
                         Button{
+                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                "button": "plus_overlay",
+                                "view": "IPadReminderView"
+                            ])
                             let reminder = Reminder(title: "", text: "", link: "", folder: selectedFolder)
                             modelContext.insert(reminder)
                             newReminder = reminder
@@ -114,6 +118,11 @@ struct IPadReminderView: View {
             ToolbarItem(placement: .topBarLeading) {
                 if column != .detailOnly {
                     Button {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "expand_detail",
+                            "view": "IPadReminderView",
+                            "id": reminder.id.uuidString
+                        ])
                         onExpandDetail?()
                     } label: {
                         Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "arrow.down.right.and.arrow.up.left" : "chevron.left")
@@ -132,6 +141,11 @@ struct IPadReminderView: View {
                 HStack(spacing: 4) {
                     // Share button (fixed space)
                     Button {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "edit",
+                            "view": "IPadReminderView",
+                            "id": reminder.id.uuidString
+                        ])
                         edit.toggle()
                     } label: {
                         Image(systemName: "pencil")
@@ -143,6 +157,10 @@ struct IPadReminderView: View {
 
 
                     Button {
+                        AnalyticsService.log(AnalyticsService.EventName.shareTapped, params: [
+                            "id": reminder.id.uuidString,
+                            "type": reminder.type.rawValue
+                        ])
                         Task {
                             do {
                                 pendingShareURL = getLink(reminder)
@@ -164,6 +182,11 @@ struct IPadReminderView: View {
                     let showInfo = (reminder.type == .InstantInsight)
                     let showLink = (!showInfo && !reminder.link.isEmpty && !reminder.isYoutube && !reminder.onlyLink)
                     Button {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": (showInfo ? "details" : "access_link"),
+                            "view": "IPadReminderView",
+                            "id": reminder.id.uuidString
+                        ])
                         detailSheet.toggle()
                     } label: {
                         Image(systemName: showInfo ? "info.circle.fill" : "link.circle.fill")
