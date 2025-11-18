@@ -358,22 +358,19 @@ struct HomeView: View {
         } message: {
             Text("You won't be able to restore this Reminder")
         }
-        .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
-            if let reminder = newReminder {
-                AddReminderView(reminder: reminder)
-                    .onDisappear{
-                        if TutorialManager.shared.inTutorial {
-                            sorting = .dateNew
-                            TutorialManager.shared.viewId("Home")
-                            TutorialManager.shared.startTutorial("Home")
-                        }
+        .sheet(item: $newReminder, onDismiss: deleteEmptyReminder){ reminder in
+            AddReminderView(reminder: reminder)
+                .onDisappear{
+                    if TutorialManager.shared.inTutorial {
+                        sorting = .dateNew
+                        TutorialManager.shared.viewId("Home")
+                        TutorialManager.shared.startTutorial("Home")
                     }
-            }
+                }
         }
-        .sheet(isPresented: $isPresentingShare){
-            if let url = pendingShareURL {
-                ShareSheet(activityItems: [url])
-            }
+        .sheet(item: $pendingShareURL){ url in
+            ShareSheet(activityItems: [url])
+
         }
         .sheet(isPresented: $refuseLoading){
             RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")

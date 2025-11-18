@@ -182,30 +182,28 @@ struct FolderView: View {
                             }
                         }
                 }
-                .sheet(isPresented: $addFolder, onDismiss: deleteEmptyFolder){
-                    if let folder = newFolder {
-                        AddFolderView(folder: folder)
-                            .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
-                            .presentationDetents([.medium, .large])
-                            .onDisappear {
-                                if TutorialManager.shared.inTutorial {
-                                    TutorialManager.shared.viewId("Folder")
-                                    TutorialManager.shared.startTutorial("Folder")
-                                }
+                .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
+                    AddFolderView(folder: folder)
+                        .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
+                        .presentationDetents([.medium, .large])
+                        .onDisappear {
+                            if TutorialManager.shared.inTutorial {
+                                TutorialManager.shared.viewId("Folder")
+                                TutorialManager.shared.startTutorial("Folder")
                             }
-                    }
+                        }
+
 
                 }
-                .sheet(isPresented: $addReminder, onDismiss: deleteEmptyReminder){
-                    if let reminder = newReminder {
-                        AddReminderView(reminder: reminder)
-                            .onDisappear{
+                .sheet(item: $newReminder, onDismiss: deleteEmptyReminder){ reminder in
+                    AddReminderView(reminder: reminder)
+                        .onDisappear{
                                 if TutorialManager.shared.inTutorial {
                                     TutorialManager.shared.viewId("Folder")
                                     TutorialManager.shared.startTutorial("Folder")
                                 }
                             }
-                    }
+
                 }
 
                 .sheet(isPresented: $refuseLoading){
@@ -249,16 +247,9 @@ struct FolderView: View {
                                                  ? .white
                                                  : .black)
                                 .padding(20)
-
-
                         }
                         .adaptiveTranslucent(color.plusButton(scheme))
                         .clipShape(.circle)
-
-
-
-
-
 
 
                     }

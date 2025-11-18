@@ -83,7 +83,7 @@ struct IPadFolderView: View {
                     }
                 }
                 .onAppear{
-                    checkIfWelcome()
+//                    checkIfWelcome()
 
                     if TutorialManager.shared.inTutorial && TutorialManager.shared.isHomeView2 {
                         TutorialManager.shared.endTutorial()
@@ -162,7 +162,7 @@ struct IPadFolderView: View {
                 .sheet(isPresented: $settings){
                     SettingsView()
                         .onDisappear{
-                            checkIfWelcome()
+//                            checkIfWelcome()
 
                             if TutorialManager.shared.inTutorial {
                                 TutorialManager.shared.viewId("Folder")
