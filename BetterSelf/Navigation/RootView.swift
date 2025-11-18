@@ -11,31 +11,37 @@ struct RootView: View {
 
     var body: some View {
         NavigationStack(path: $flow.path) {
-            FolderView()
+            ContentView()
         }
         .navigationDestination(for: FolderDestination.self) { _ in
-            HomeView()
+            FolderView()
         }
-        .navigationDestination(for: HomeDestination.self) { _ in
-            ReminderView() // or a list of reminders
+        .navigationDestination(for: HomeDestination.self) { dest in
+            if dest.folder.name.isEmpty {
+                HomeView()
+            }
+            else {
+                HomeView(folder: dest.folder)
+            }
         }
         .navigationDestination(for: ReminderDestination.self) { dest in
-            ReminderView(reminderID: dest.reminderID)
+            ReminderView(reminder: dest.reminder)
         }
         .sheet(item: $flow.activeSheet) { sheet in
             switch sheet {
-            case .addReminder(let id):
-                AddReminderView(reminderID: id)
+            case .addReminder(let reminder):
+                AddReminderView(reminder: reminder)
                     .onDisappear { flow.dismissSheet() }
             case .settings:
                 SettingsView()
-                    .onDisappear { flow.dismissSheet() }
+                    .onDisappear {
+                        flow.dismissSheet()
+
+                    }
             }
         }
         .environment(flow)
     }
 }
 
-#Preview {
-    RootView()
-}
+

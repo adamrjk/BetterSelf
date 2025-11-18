@@ -56,7 +56,7 @@ struct ContentView: View {
                         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
                 }
                 else  {
-                    FolderView(notifReminder: $notifReminder)
+                    FolderView()
                         .tag(0)
                         .tabItem{
                             Label("Reminders", systemImage: "list.bullet")

@@ -220,7 +220,6 @@ struct FolderView: View {
                 .navigationDestination(item: $selectedFolder) { folder in
                     if folder.name.isEmpty {
                         HomeView()
-
                     }
                     else {
                         HomeView(folder: folder)
