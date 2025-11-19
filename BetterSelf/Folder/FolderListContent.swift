@@ -16,6 +16,9 @@ enum FolderListLayoutMode {
 }
 
 struct FolderListContent: View {
+    @EnvironmentObject var flow: AppFlow
+
+
     @Environment(\.modelContext) var modelContext
     @Environment(\.isSearching) var isSearching
     @Environment(\.colorScheme) var scheme
@@ -32,8 +35,6 @@ struct FolderListContent: View {
     @Binding var refuseLoading: Bool
 
     let mode: FolderListLayoutMode
-    let onSelectReminder: (Reminder) -> Void
-    let onSelectFolder: (Folder) -> Void
 
     @State private var deleteAlert = false
     @State private var folderToDelete: Folder?
@@ -106,7 +107,8 @@ struct FolderListContent: View {
                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                     refuseLoading.toggle()
                 } else {
-                    onSelectReminder(reminder)
+                    flow.openReminder(reminder)
+
                 }
             } label: {
                 ReminderRowView(reminder: reminder, isPreview: true)
@@ -150,7 +152,7 @@ struct FolderListContent: View {
                                     if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                                         refuseLoading.toggle()
                                     } else {
-                                        onSelectReminder(reminder)
+                                        flow.openReminder(reminder)
                                     }
                                 } label: {
                                     ReminderRowView(reminder: reminder, isPreview: true)
@@ -169,7 +171,7 @@ struct FolderListContent: View {
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
                                     refuseLoading.toggle()
                                 } else {
-                                    onSelectReminder(reminder)
+                                    flow.openReminder(reminder)
                                 }
                             } label: {
                                 ReminderRowView(reminder: reminder, isPreview: true)
@@ -215,7 +217,8 @@ struct FolderListContent: View {
                             if TutorialManager.shared.inTutorial {
                                 TutorialManager.shared.handleTargetViewClick(target: "AllRemindersButton")
                             }
-                            onSelectFolder(Folder(name: ""))
+
+                            flow.openAllReminders()
                         } label: {
                             FolderRowView(folder: nil, count: getCount())
                                 .padding(.horizontal, 16)
@@ -262,11 +265,14 @@ struct FolderListContent: View {
                         if folder != folders.last { Divider() }
                     }
                 } else {
-                    Button { AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                        "button": "open_folder",
-                        "view": "FolderListContent",
-                        "folder": folder.name
-                    ]); onSelectFolder(folder) } label: {
+                    Button {
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "open_folder",
+                            "view": "FolderListContent",
+                            "folder": folder.name
+                        ]);
+                        flow.openFolder(folder)
+                    } label: {
                         FolderRowView(folder: folder, count: getCount(folder))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)

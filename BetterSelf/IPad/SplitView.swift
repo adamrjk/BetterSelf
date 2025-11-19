@@ -44,21 +44,20 @@ struct SplitView: View {
                     IPadFolderView(selectedReminder: $selectedReminder, selectedFolder: $selectedFolder)
                 } content: {
                     // Content (Reminders list for selected folder)
-                    NavigationStack {
-                        if selectedFolder.name.isEmpty {
-                            IPadHomeView(selectedReminder: $selectedReminder)
-                        } else {
-                            IPadHomeView(folder: selectedFolder, selectedReminder: $selectedReminder)
-                        }
+                    if selectedFolder.name.isEmpty {
+                        IPadHomeView(selectedReminder: $selectedReminder)
+                    } else {
+                        IPadHomeView(folder: selectedFolder, selectedReminder: $selectedReminder)
                     }
+
                 } detail: {
                     if let reminder = selectedReminder {
-                            IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail:{
-                                withAnimation {
-                                    columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
-                                }
-                            }, isDetailOnly: columnVisibility == .detailOnly, column: $columnVisibility)
-                            .id(reminder.id)
+                        IPadReminderView(reminder: reminder, selectedFolder: $selectedFolder, onExpandDetail:{
+                            withAnimation {
+                                columnVisibility = (columnVisibility == .detailOnly) ? .all : .detailOnly
+                            }
+                        }, isDetailOnly: columnVisibility == .detailOnly, column: $columnVisibility)
+                        .id(reminder.id)
 
                     } else {
                         ZStack {
@@ -109,27 +108,28 @@ struct SplitView: View {
                     // Sidebar (Folders)
                     IPadFolderView(selectedReminder: $selectedReminder, selectedFolder: $selectedFolder)
                 } detail: {
-                    NavigationStack {
-                        if selectedFolder.name.isEmpty {
-                            IPadHomeView(selectedReminder: $selectedReminder)
-                                .navigationDestination(item: $selectedReminder) { reminder in
-                                    IPadReminderView(
-                                        reminder: reminder,
-                                        selectedFolder: $selectedFolder,
-                                        column: $columnVisibility
-                                    )
-                                }
-                        } else {
-                            IPadHomeView(folder: selectedFolder, selectedReminder: $selectedReminder)
-                                .navigationDestination(item: $selectedReminder) { reminder in
-                                    IPadReminderView(
-                                        reminder: reminder,
-                                        selectedFolder: $selectedFolder,
-                                        column: $columnVisibility
-                                    )
-                                }
-                        }
+
+                    if selectedFolder.name.isEmpty {
+                        IPadHomeView(selectedReminder: $selectedReminder)
+                            .navigationDestination(item: $selectedReminder) { reminder in
+                                IPadReminderView(
+                                    reminder: reminder,
+                                    selectedFolder: $selectedFolder,
+                                    column: $columnVisibility
+                                )
+                            }
                     }
+                    else {
+                        IPadHomeView(folder: selectedFolder, selectedReminder: $selectedReminder)
+                            .navigationDestination(item: $selectedReminder) { reminder in
+                                IPadReminderView(
+                                    reminder: reminder,
+                                    selectedFolder: $selectedFolder,
+                                    column: $columnVisibility
+                                )
+                            }
+                    }
+
                 }
             }
         }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ReminderRowView: View {
-    @State var reminder: Reminder
+    let reminder: Reminder
     
     @State var isPreview: Bool
     @EnvironmentObject var color: ColorManager

@@ -25,7 +25,7 @@ struct SharedLinkView: View {
     var isSheet: Bool
 
     var body: some View {
-        NavigationStack {
+
 
             ZStack {
                 color.mainGradient(scheme)
@@ -77,7 +77,7 @@ struct SharedLinkView: View {
                     }
                 }
             }
-        }
+        
     }
 
     func getYoutubeId() -> String? {

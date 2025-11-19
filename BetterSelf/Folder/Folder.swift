@@ -24,6 +24,7 @@ class Folder: Equatable {
     // Relationship to reminders
     @Relationship(deleteRule: .cascade, inverse: \Reminder.folder) var reminders: [Reminder]
 
+
     init(name: String, reminders: [Reminder] = []) {
         self.name = name
         self.reminders = reminders

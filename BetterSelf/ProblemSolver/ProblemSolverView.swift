@@ -35,7 +35,7 @@ struct ProblemSolverView: View {
     @StateObject var solver: ProblemSolverManager = ProblemSolverManager.shared
 
     var body: some View {
-        NavigationStack {
+
             ZStack {
                 color.mainGradient(scheme)
                     .ignoresSafeArea()
@@ -98,7 +98,7 @@ struct ProblemSolverView: View {
                 ReminderView(reminder: reminder)
             }
             .navigationTitle("ProblemSolver")
-        }
+        
     }
     func startSolving(_ input: String){
         Task {

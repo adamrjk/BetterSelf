@@ -345,8 +345,8 @@ struct IPadReminderView: View {
 
 
 
-#Preview {
-    ReminderView(reminder: .example)
-}
+//#Preview {
+//    ReminderView(reminder: .example)
+//}
 
 

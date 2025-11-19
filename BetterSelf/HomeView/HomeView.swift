@@ -16,6 +16,8 @@ struct HomeView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.editMode) var editMode
 
+    @EnvironmentObject var flow: AppFlow
+
 
     @Environment(\.colorScheme) var scheme
     @EnvironmentObject var color: ColorManager
@@ -74,9 +76,6 @@ struct HomeView: View {
     @State private var isFront: Bool?
     @State private var videoRecorded = false
     @State private var title = ""
-    @State private var isPresentingShare = false
-    @State private var pendingShareURL: URL?
-
 
     var body: some View {
 
@@ -112,7 +111,8 @@ struct HomeView: View {
                             if let handler = onSelectReminder, UIDevice.current.userInterfaceIdiom == .pad {
                                 handler(reminder)
                             } else {
-                                selectedReminder = reminder
+//                                selectedReminder = reminder
+                                flow.openReminder(reminder)
                             }
                         },
                         onRequestDelete: { reminder in
@@ -130,8 +130,7 @@ struct HomeView: View {
                             ])
                             Task {
                                 do {
-                                    pendingShareURL = getLink(reminder)
-                                    isPresentingShare = true
+                                    flow.shareSheet(getLink(reminder))
                                     _ = try await FirestoreService.shared.storeReminder(reminder)
                                 } catch {
                                     print("Share prepare failed: \(error)")
@@ -211,6 +210,7 @@ struct HomeView: View {
                             let reminder = Reminder(title: "", text: "", link: "", folder: folder)
                             modelContext.insert(reminder)
                             newReminder = reminder
+                            flow.addReminderSheet(reminder)
                             addReminder.toggle()
                             if TutorialManager.shared.inTutorial {
                                 TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
@@ -308,7 +308,7 @@ struct HomeView: View {
                             "button": "back",
                             "view": "HomeView"
                         ])
-                        dismiss()
+                        flow.popInsights()
 
                     }
                     .foregroundStyle(color.button(scheme))
@@ -324,7 +324,8 @@ struct HomeView: View {
                         "button": "quick_add",
                         "view": "HomeView"
                     ])
-                    videoRecorder.toggle()
+//                    videoRecorder.toggle()
+                    flow.cameraSheet()
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(color.button(scheme))
@@ -343,9 +344,6 @@ struct HomeView: View {
         }
         .onAppear{
             sorting = folder?.sorting ?? loadData()
-
-
-
         }
         .alert("Are you Sure?", isPresented: $deleteAlert){
             Button("Delete", role: .destructive){
@@ -358,37 +356,35 @@ struct HomeView: View {
         } message: {
             Text("You won't be able to restore this Reminder")
         }
-        .sheet(item: $newReminder, onDismiss: deleteEmptyReminder){ reminder in
-            AddReminderView(reminder: reminder)
-                .onDisappear{
-                    if TutorialManager.shared.inTutorial {
-                        sorting = .dateNew
-                        TutorialManager.shared.viewId("Home")
-                        TutorialManager.shared.startTutorial("Home")
-                    }
-                }
-        }
-        .sheet(item: $pendingShareURL){ url in
-            ShareSheet(activityItems: [url])
-
-        }
+//        .sheet(item: $newReminder, onDismiss: deleteEmptyReminder){ reminder in
+//            AddReminderView(reminder: reminder)
+//                .onDisappear{
+//                    if TutorialManager.shared.inTutorial {
+//                        sorting = .dateNew
+//                        TutorialManager.shared.viewId("Home")
+//                        TutorialManager.shared.startTutorial("Home")
+//                    }
+//                }
+//        }
+//        .sheet(item: $pendingShareURL){ shareURL in
+//            ShareSheet(activityItems: [shareURL.url])
+//        }
         .sheet(isPresented: $refuseLoading){
             RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
                 .presentationDetents([.height(300)])
         }
-
-        .sheet(isPresented: $videoRecorder) {
-            CustomCameraView(
-                isPresented: $videoRecorder,
-                onVideoRecorded: { url, _ in
-                    recordedVideoURL = url
-                    self.isFront = false
-                    videoRecorded.toggle()
-                }
-            )
-            .ignoresSafeArea()
-
-        }
+//        .sheet(isPresented: $videoRecorder) {
+//            CustomCameraView(
+//                isPresented: $videoRecorder,
+//                onVideoRecorded: { url, _ in
+//                    recordedVideoURL = url
+//                    self.isFront = false
+//                    videoRecorded.toggle()
+//                }
+//            )
+//            .ignoresSafeArea()
+//
+//        }
         .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
             AddTitleSheet(title: $title)
                 .presentationDetents([.height(300)])
@@ -405,14 +401,14 @@ struct HomeView: View {
         .navigationTitle(folder?.name ?? "All Reminders")
 
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-        .navigationDestination(item: $selectedReminder) { reminder in
-            ReminderView(reminder: reminder)
-                .onDisappear{
-                    TutorialManager.shared.viewId("Home")
-                    TutorialManager.shared.startTutorial("Home")
-
-                }
-        }
+//        .navigationDestination(item: $selectedReminder) { reminder in
+//            ReminderView(reminder: reminder)
+//                .onDisappear{
+//                    TutorialManager.shared.viewId("Home")
+//                    TutorialManager.shared.startTutorial("Home")
+//
+//                }
+//        }
 
         .navigationBarBackButtonHidden()
     }

@@ -108,12 +108,12 @@ struct YoutubeView: View {
 
 
         }
-        .sheet(isPresented: $startTime){
-            StartTimeView(time: $time){ newTime in
-                player.parameters.startTime = Measurement(value: Double(newTime), unit: UnitDuration.seconds)
-            }
-            .presentationDetents([.height(300)])
-        }
+//        .sheet(isPresented: $startTime){
+//            StartTimeView(time: $time){ newTime in
+//                player.parameters.startTime = Measurement(value: Double(newTime), unit: UnitDuration.seconds)
+//            }
+//            .presentationDetents([.height(300)])
+//        }
     }
 }
 

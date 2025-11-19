@@ -13,6 +13,7 @@ import SwiftUI
 
 struct FolderView: View {
 
+    @EnvironmentObject var flow: AppFlow
     @State private var model = FolderViewModel()
 
     @Environment(\.modelContext) var modelContext
@@ -32,7 +33,6 @@ struct FolderView: View {
     @State private var refuseLoading = false
     @State private var selectedReminder: Reminder?
     @State private var selectedFolder: Folder?
-    @Binding var notifReminder: NavigableReminder?
     @State private var addReminder = false
 
     @Environment(\.colorScheme) var scheme
@@ -47,8 +47,6 @@ struct FolderView: View {
     @State private var videoRecorder = false
 
     var body: some View {
-        NavigationStack {
-
             GeometryReader { proxy in
 
                 ZStack {
@@ -63,13 +61,7 @@ struct FolderView: View {
                             searchText: $searchText,
                             showAlert: $showAlert,
                             refuseLoading: $refuseLoading,
-                            mode: .phone,
-                            onSelectReminder: { reminder in
-                                selectedReminder = reminder
-                            },
-                            onSelectFolder: { folder in
-                                selectedFolder = folder
-                            }
+                            mode: .phone
                         )
                         .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
                             .onChange(of: scenePhase){ oldPhase, newPhase in
@@ -81,7 +73,9 @@ struct FolderView: View {
                                 }
                             }
                     }
+
                 }
+
                 .onAppear{
 //                    checkIfWelcome()
 
@@ -103,7 +97,6 @@ struct FolderView: View {
                     }
 
                 }
-                .navigationTitle("BetterSelf")
                 .toolbar{
                     ToolbarItem(placement: .topBarTrailing){
                         Button("Add Folder", systemImage: "folder.fill.badge.plus"){
@@ -115,6 +108,8 @@ struct FolderView: View {
                             modelContext.insert(folder)
                             newFolder = folder
                             addFolder.toggle()
+                            flow.addFolderSheet(folder)
+
                             TutorialManager.shared.handleTargetViewClick(target: "FolderButton")
 
 
@@ -131,7 +126,7 @@ struct FolderView: View {
                                 "button": "settings_open",
                                 "view": "FolderView"
                             ])
-
+                            flow.settingSheet()
                             settings.toggle()
                         }
                         .foregroundStyle(color.button(scheme))
@@ -147,6 +142,7 @@ struct FolderView: View {
                                 "view": "FolderView"
                             ])
                             videoRecorder.toggle()
+                            flow.cameraSheet()
                         }
                         .foregroundStyle(color.button(scheme))
                         .padding(8)
@@ -155,79 +151,76 @@ struct FolderView: View {
 
 
                 }
-                .sheet(isPresented: $videoRecorder) {
-                    CustomCameraView(
-                        isPresented: $videoRecorder,
-                        onVideoRecorded: { url, _ in
-                            recordedVideoURL = url
-                            self.isFront = false
-                            videoRecorded.toggle()
-                        }
-                    )
-                    .ignoresSafeArea()
-
-                }
+//                .sheet(isPresented: $videoRecorder) {
+//                    CustomCameraView(
+//                        isPresented: $videoRecorder,
+//                        onVideoRecorded: { url, _ in
+//                            recordedVideoURL = url
+//                            self.isFront = false
+//                            videoRecorded.toggle()
+//                        }
+//                    )
+//                    .ignoresSafeArea()
+//
+//                }
                 .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
                     AddTitleSheet(title: $title)
                         .presentationDetents([.height(300)])
                 }
-                .sheet(isPresented: $settings){
-                    SettingsView()
-                        .onDisappear{
-                            checkIfWelcome()
-
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.viewId("Folder")
-                                TutorialManager.shared.startTutorial("Folder")
-                            }
-                        }
-                }
-                .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
-                    AddFolderView(folder: folder)
-                        .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
-                        .presentationDetents([.medium, .large])
-                        .onDisappear {
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.viewId("Folder")
-                                TutorialManager.shared.startTutorial("Folder")
-                            }
-                        }
-
-
-                }
-                .sheet(item: $newReminder, onDismiss: deleteEmptyReminder){ reminder in
-                    AddReminderView(reminder: reminder)
-                        .onDisappear{
-                                if TutorialManager.shared.inTutorial {
-                                    TutorialManager.shared.viewId("Folder")
-                                    TutorialManager.shared.startTutorial("Folder")
-                                }
-                            }
-
-                }
+//                .sheet(isPresented: $settings){
+//                    SettingsView()
+//                        .onDisappear{
+//                            checkIfWelcome()
+//
+//                            if TutorialManager.shared.inTutorial {
+//                                TutorialManager.shared.viewId("Folder")
+//                                TutorialManager.shared.startTutorial("Folder")
+//                            }
+//                        }
+//                }
+//                .sheet(item: $newFolder, onDismiss: deleteEmptyFolder){ folder in
+//                    AddFolderView(folder: folder)
+//                        .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
+//                        .presentationDetents([.medium, .large])
+//                        .onDisappear {
+//                            if TutorialManager.shared.inTutorial {
+//                                TutorialManager.shared.viewId("Folder")
+//                                TutorialManager.shared.startTutorial("Folder")
+//                            }
+//                        }
+//
+//                }
+//                .sheet(item: $newReminder, onDismiss: deleteEmptyReminder){ reminder in
+//                    AddReminderView(reminder: reminder)
+//                        .onDisappear{
+//                                if TutorialManager.shared.inTutorial {
+//                                    TutorialManager.shared.viewId("Folder")
+//                                    TutorialManager.shared.startTutorial("Folder")
+//                                }
+//                            }
+//
+//                }
 
                 .sheet(isPresented: $refuseLoading){
                     RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
                         .presentationDetents([.height(300)])
                 }
                 .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-                .navigationDestination(item: $selectedReminder) { reminder in
-                    ReminderView(reminder: reminder)
-                }
-                .navigationDestination(item: $notifReminder){ navReminder in
-                    ReminderView(reminder: navReminder.reminder)
-                }
-                .navigationDestination(item: $selectedFolder) { folder in
-                    if folder.name.isEmpty {
-                        HomeView()
-                    }
-                    else {
-                        HomeView(folder: folder)
-                    }
-                }
+//                .navigationDestination(item: $selectedReminder) { reminder in
+//                    ReminderView(reminder: reminder)
+//                }
+//                .navigationDestination(item: $selectedFolder) { folder in
+//                    if folder.name.isEmpty {
+//                        HomeView()
+//                    }
+//                    else {
+//                        HomeView(folder: folder)
+//                    }
+//                }
                 .alert("Failed Authentication", isPresented: $showAlert){
                 }
             }
+            .navigationTitle("BetterSelf")
             .overlay(
                 VStack {
                     Spacer()
@@ -237,7 +230,8 @@ struct FolderView: View {
                             let reminder = Reminder(title: "", text: "", link: "")
                             modelContext.insert(reminder)
                             newReminder = reminder
-                            addReminder.toggle()
+                            flow.addReminderSheet(reminder)
+                            // Presented via .sheet(item: $newReminder)
                         }label: {
 
                             Image(systemName: "plus")
@@ -257,7 +251,7 @@ struct FolderView: View {
             )
 
 
-        }
+        
 
 
     }
@@ -320,9 +314,6 @@ struct FolderView: View {
         }
 
     }
-    init(notifReminder: Binding<NavigableReminder?>){
-        _notifReminder = notifReminder
-    }
 
 
 
@@ -332,7 +323,7 @@ struct FolderView: View {
 }
 
 #Preview {
-    FolderView(notifReminder: .constant(nil))
+    FolderView()
 }
 
 

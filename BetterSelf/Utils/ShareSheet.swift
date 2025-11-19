@@ -20,3 +20,15 @@ struct ShareSheet: UIViewControllerRepresentable {
 }
 
 
+
+
+struct ShareURL: Identifiable {
+    let id: UUID
+    let url: URL
+
+    init(_ url: URL) {
+        self.id = UUID()
+        self.url = url
+    }
+
+}

@@ -63,13 +63,7 @@ struct IPadFolderView: View {
                             searchText: $searchText,
                             showAlert: $showAlert,
                             refuseLoading: $refuseLoading,
-                            mode: .iPad,
-                            onSelectReminder: { reminder in
-                                selectedReminder = reminder
-                            },
-                            onSelectFolder: { folder in
-                                selectedFolder = folder
-                            }
+                            mode: .iPad
                         )
                         .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
                             .onChange(of: scenePhase){ oldPhase, newPhase in
@@ -277,9 +271,6 @@ struct IPadFolderView: View {
 
 }
 
-#Preview {
-    FolderView(notifReminder: .constant(nil))
-}
 
 
 
