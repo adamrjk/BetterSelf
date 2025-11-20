@@ -107,7 +107,7 @@ struct ReminderView: View {
                                 "id": reminder.id.uuidString,
                                 "type": reminder.type.rawValue
                             ])
-                            pendingShareURL = getLink(reminder)
+                            pendingShareURL = ReminderService.getLink(reminder)
                             if let url = pendingShareURL {
                                 flow.shareSheet(url)
                                 isPresentingShare = true
@@ -192,46 +192,27 @@ struct ReminderView: View {
 //                    }
 //                }
 //        }
-//        .sheet(isPresented: $detailSheet){
-//            if reminder.type == .InstantInsight {
-//                NavigationView{
-//                    TimeLessLetterView(isSheet: true, reminder: reminder)
-//                        .navigationTitle(reminder.title)
-//                        .navigationBarTitleDisplayMode(.inline)
-//                        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-//                }
-//                .presentationDetents([.medium, .large])
-//            }
-//            else {
-//                SharedLinkView(link: reminder.link, time: $reminder.time, text: "", isSheet: true)
-//            }
-//
-//
-//        }
+        .sheet(isPresented: $detailSheet){
+            if reminder.type == .InstantInsight {
+                NavigationView{
+                    TimeLessLetterView(isSheet: true, reminder: reminder)
+                        .navigationTitle(reminder.title)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
+                }
+                .presentationDetents([.medium, .large])
+            }
+            else {
+                SharedLinkView(link: reminder.link, time: $reminder.time, text: "", isSheet: true)
+            }
+
+
+        }
 
 
 
     }
 
-    func getLink(_ reminder: Reminder) -> URL {
-        if reminder.shareID != nil {
-            return reminder.shareLink
-        }
-        else {
-            reminder.shareID = generateShortID()
-            return reminder.shareLink
-        }
-
-
-    }
-    func generateShortID(length: Int = 6) -> String {
-        let chars = Array("abcdefghijklmnopqrstuvwxyz0123456789")
-        var result = ""
-        for _ in 0..<length {
-            result.append(chars.randomElement()!)
-        }
-        return result
-    }
     init(reminder: Reminder, onExpandDetail: (() -> Void)? = nil) {
         _reminder = State(initialValue: reminder)
 

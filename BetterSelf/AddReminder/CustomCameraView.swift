@@ -3,15 +3,15 @@ import AVFoundation
 import UIKit
 
 struct CustomCameraView: UIViewControllerRepresentable {
-    @Binding var isPresented: Bool
+//    var dismiss: () -> Void
     let onVideoRecorded: (URL, Bool) -> Void
 
     func makeUIViewController(context: Context) -> CameraViewController {
         let controller = CameraViewController()
         controller.onVideoRecorded = onVideoRecorded
-        controller.onDismiss = {
-            isPresented = false
-        }
+//        controller.onDismiss = {
+//            dismiss()
+//        }
         return controller
     }
     

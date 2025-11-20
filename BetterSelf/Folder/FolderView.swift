@@ -141,7 +141,7 @@ struct FolderView: View {
                                 "button": "quick_add",
                                 "view": "FolderView"
                             ])
-                            videoRecorder.toggle()
+//                            videoRecorder.toggle()
                             flow.cameraSheet()
                         }
                         .foregroundStyle(color.button(scheme))
@@ -163,10 +163,10 @@ struct FolderView: View {
 //                    .ignoresSafeArea()
 //
 //                }
-                .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
-                    AddTitleSheet(title: $title)
-                        .presentationDetents([.height(300)])
-                }
+//                .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
+//                    AddTitleSheet(title: $title)
+//                        .presentationDetents([.height(300)])
+//                }
 //                .sheet(isPresented: $settings){
 //                    SettingsView()
 //                        .onDisappear{
@@ -221,102 +221,15 @@ struct FolderView: View {
                 }
             }
             .navigationTitle("BetterSelf")
-            .overlay(
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        Button{
-                            let reminder = Reminder(title: "", text: "", link: "")
-                            modelContext.insert(reminder)
-                            newReminder = reminder
-                            flow.addReminderSheet(reminder)
-                            // Presented via .sheet(item: $newReminder)
-                        }label: {
-
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .foregroundStyle(scheme == .light
-                                                 ? .white
-                                                 : .black)
-                                .padding(20)
-                        }
-                        .adaptiveTranslucent(color.plusButton(scheme))
-                        .clipShape(.circle)
-
-
-                    }
-                    .padding(.trailing, 10)
-                }
-            )
+            .floatingPlusButton {
+                flow.addReminderSheet()
+            }
 
 
         
 
 
     }
-
-    func deleteEmptyReminder() {
-        if let reminder = newReminder{
-            guard reminder.isChecked == false else { return }
-            if reminder.isEmpty {
-                modelContext.delete(reminder)
-            }
-            if (reminder.type != .TimeLessLetter && reminder.photo == nil && !reminder.isLoading) {
-                reminder.type = .TimeLessLetter
-            }
-            reminder.isChecked = true
-        }
-
-    }
-
-    func saveReminder() {
-            let reminder = Reminder(
-                title: title,
-                text: "",
-                link: ""
-            )
-            if let front = self.isFront {
-                reminder.isFront = front
-            }
-            reminder.isChecked = true
-            modelContext.insert(reminder)
-
-            uploadManager.loadVideo(reminder, recordedVideoURL: recordedVideoURL)
-
-        }
-
-    func checkIfWelcome(){
-        if UserDefaults().bool(forKey: "Tutorial \(NotificationManager.shared.version)") {
-        }
-        else {
-            TutorialManager.shared.getStarted()
-            UserDefaults().set(true, forKey: "Tutorial \(NotificationManager.shared.version)")
-        }
-
-
-    }
-
-    func deleteEmptyFolder() {
-        if let folder = newFolder {
-            guard folder.isChecked == false else { return }
-            let nameIsNotValid = folders.contains { $0.name.lowercased() == folder.name.lowercased() }
-            if folder.name.isEmpty || nameIsNotValid {
-                modelContext.delete(folder)
-
-            }
-            else {
-                folder.isChecked = true
-                AnalyticsService.log(AnalyticsService.EventName.folderCreated, params: [
-                    "name": folder.name
-                ])
-            }
-        }
-
-    }
-
-
-
 
 
 

@@ -94,7 +94,7 @@ struct ContentView: View {
                 //                }
                 //                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
             }
-            .sheet(item: $flow.activeSheet){ sheet in
+            .sheet(item: $flow.activeSheet, onDismiss: flow.onDismiss){ sheet in
                 sheet
             }
             .tint(color.button(scheme))
@@ -134,6 +134,7 @@ struct ContentView: View {
                 }
             }
             .onAppear {
+                flow.configure(with: { modelContext })
                 checkIfWelcome()
                 getSchemeAndTheme()
                 signInAnonymously()

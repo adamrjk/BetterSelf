@@ -86,97 +86,98 @@ struct IPadHomeView: View {
     var body: some View {
 
         ZStack {
-            color.mainGradient(scheme)
-                .ignoresSafeArea()
-
-            color.overlayGradient(scheme)
-                .ignoresSafeArea()
-            Group {
-                if reminders.isEmpty {
-                    VStack {
-                        Text("Looks like you have no Reminders")
-                            .font(.headline)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                        CleanText("Click the plus on the top right corner to add a new Reminder")
-                            .multilineTextAlignment(.center)
-                    }
-                }
-                else {
-                    HomeListContent(
-                        folder: folder,
-                        mode: .iPad,
-                        searchText: $searchText,
-                        refuseLoading: $refuseLoading,
-                        selection: $selection,
-                        sorting: sorting,
-                        onSelectReminder: { reminder in
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
-                            }
-                            selectedReminder = reminder
-                        },
-                        onRequestDelete: { reminder in
-                            reminderToDelete = reminder
-                            deleteAlert.toggle()
-                        },
-                        onRequestMove: { reminder in
-                            remindersToMove = [reminder]
-                            moveToFolder.toggle()
-                        },
-                        onShare: { reminder in
-                            Task {
-                                do {
-                                    if reminder.shareID == nil {
-                                        reminder.shareID = reminder.generateShortID()
-                                    }
-                                    pendingShareURL = reminder.shareLink
-                                    isPresentingShare = true
-                                    _ = try await FirestoreService.shared.storeReminder(reminder)
-                                } catch {
-                                    print("Share prepare failed: \(error)")
-                                }
-                            }
-                        },
-                        selectedReminderId: selectedReminder?.id
-                    )
-                    .environment(\.editMode, $editModeState)
-
-                }
-            }
-
-            if !selection.isEmpty {
-                VStack {
-                    Spacer()
-                    HStack {
-                        Button("Delete"){
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "delete_overlay",
-                                "view": "IPadHomeView"
-                            ])
-                            deleteAlert.toggle()
-                        }
-                        .adaptiveGlass(scheme)
-                        .buttonStyle(.plain)
-
-                        Spacer()
-
-
-                        Button("Move"){
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "move_overlay",
-                                "view": "IPadHomeView"
-                            ])
-                            move()
-                        }
-                            .adaptiveGlass(scheme)
-                            .buttonStyle(.plain)
-                    }
-                    .padding(.horizontal, 5)
-                }
-
-
-            }
+//            color.mainGradient(scheme)
+//                .ignoresSafeArea()
+//
+//            color.overlayGradient(scheme)
+//                .ignoresSafeArea()
+//            Group {
+//                if reminders.isEmpty {
+//                    VStack {
+//                        Text("Looks like you have no Reminders")
+//                            .font(.headline)
+//                            .multilineTextAlignment(.center)
+//                            .padding()
+//                        CleanText("Click the plus on the top right corner to add a new Reminder")
+//                            .multilineTextAlignment(.center)
+//                    }
+//                }
+//                else {
+//                    HomeListContent(
+//                        folder: folder,
+//                        mode: .iPad,
+//                        searchText: $searchText,
+//                        refuseLoading: $refuseLoading,
+//                        selection: $selection,
+//                        sorting: sorting,
+//                        onSelectReminder: { reminder in
+//                            if TutorialManager.shared.inTutorial {
+//                                TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
+//                            }
+//                            selectedReminder = reminder
+//                        },
+//                        onRequestDelete: { reminder in
+//                            reminderToDelete = reminder
+//                            deleteAlert.toggle()
+//                        },
+//                        onRequestMove: { reminder in
+//                            remindersToMove = [reminder]
+//                            moveToFolder.toggle()
+//                        },
+//                        onShare: { reminder in
+//                            Task {
+//                                do {
+//                                    if reminder.shareID == nil {
+//                                        reminder.shareID = reminder.generateShortID()
+//                                    }
+//                                    pendingShareURL = reminder.shareLink
+//                                    isPresentingShare = true
+//                                    _ = try await FirestoreService.shared.storeReminder(reminder)
+//                                } catch {
+//                                    print("Share prepare failed: \(error)")
+//                                }
+//                            }
+//                        },
+//                        selectedReminderId: selectedReminder?.id
+//                    )
+//                    .environment(\.editMode, $editModeState)
+//
+//                }
+//            }
+//
+//            if !selection.isEmpty {
+//                VStack {
+//                    Spacer()
+//                    HStack {
+//                        Button("Delete"){
+//                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+//                                "button": "delete_overlay",
+//                                "view": "IPadHomeView"
+//                            ])
+//                            deleteAlert.toggle()
+//                        }
+//                        .adaptiveGlass(scheme)
+//                        .buttonStyle(.plain)
+//
+//                        Spacer()
+//
+//
+//                        Button("Move"){
+//                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+//                                "button": "move_overlay",
+//                                "view": "IPadHomeView"
+//                            ])
+//                            move()
+//                        }
+//                            .adaptiveGlass(scheme)
+//                            .buttonStyle(.plain)
+//                    }
+//                    .padding(.horizontal, 5)
+//                }
+//
+//
+//            }
+            Text("Hello")
         }
         .overlay(
             VStack {
@@ -399,7 +400,6 @@ struct IPadHomeView: View {
 
         .sheet(isPresented: $videoRecorder) {
             CustomCameraView(
-                isPresented: $videoRecorder,
                 onVideoRecorded: { url, isFront in
                     recordedVideoURL = url
                     self.isFront = isFront
@@ -410,7 +410,7 @@ struct IPadHomeView: View {
 
         }
         .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
-            AddTitleSheet(title: $title)
+            AddTitleSheet(title: title)
                 .presentationDetents([.height(300)])
         }
         .sheet(isPresented: $moveToFolder, onDismiss: {

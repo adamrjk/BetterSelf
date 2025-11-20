@@ -62,7 +62,8 @@ enum SheetDestination {
     case addReminder(Reminder) // optional reminder for editing
     case settings
     case addFolder(Folder)
-    case camera
+    case camera(RecordingHandler)
+    case titleSheet
     case share(URL)
 }
 
@@ -75,14 +76,31 @@ extension SheetDestination: NavigationDestination {
             AddFolderView(folder: folder)
         case .addReminder(let reminder):
             AddReminderView(reminder: reminder)
-        case .camera:
-            #warning("Solve this")
-            CustomCameraView(isPresented: .constant(true), onVideoRecorded: {_, _ in })
+        case .camera(let handler):
+            CustomCameraView(
+                onVideoRecorded: { url, isFront in
+                    handler.onVideoRecorded(url, isFront)
+                }
+            )
+            .ignoresSafeArea()
         case .settings:
             SettingsView()
         case .share(let url):
             ShareSheet(activityItems: [url])
+        case .titleSheet:
+            AddTitleSheet(title: "")
+                .presentationDetents([.height(300)])
         }
 
+
     }
+
 }
+
+struct RecordingHandler: Hashable, Equatable {
+    let id = UUID()
+    let onVideoRecorded: (URL, Bool) -> Void
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+    static func ==(lhs: RecordingHandler, rhs: RecordingHandler) -> Bool { lhs.id == rhs.id}
+}
+

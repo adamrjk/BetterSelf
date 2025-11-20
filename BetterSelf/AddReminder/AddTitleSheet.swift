@@ -11,13 +11,14 @@ import Photos
 import AVKit
 
 struct AddTitleSheet: View {
+    @EnvironmentObject var flow: AppFlow
 
     @Environment(\.dismiss) var dismiss
 
     @EnvironmentObject var color: ColorManager
 
     @FocusState var keyboard: Bool
-    @Binding var title: String
+    @State var title: String
 
     @Environment(\.colorScheme) var scheme
 
@@ -66,6 +67,7 @@ struct AddTitleSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button{
+                        flow.saveReminder(title)
                         dismiss()
                     } label: {
                         Text("Save")
@@ -106,8 +108,8 @@ struct AddTitleSheet: View {
             )
         }
     }
-    init(title: Binding<String>){
-        _title = title        
+    init(title: String){
+        _title = State(initialValue: title)
     }
 
 

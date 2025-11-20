@@ -21,6 +21,28 @@ final class AppFlow: ObservableObject {
     @Published var insightsPath = NavigationPath()
     @Published var solverPath = NavigationPath()
     @Published var activeSheet: SheetDestination?
+    private var sheet: SheetDestination = .settings
+
+
+
+    private var camStuff: (URL, Bool)?
+
+
+    private var isConfigured = false
+    private var contextProvider: (() -> ModelContext)?
+    func configure(with provider: @escaping () -> ModelContext) {
+        guard !isConfigured else { return }
+        contextProvider = provider
+        isConfigured = true
+        reminderService = ReminderService(provider: provider)
+        folderService = FolderService(ctx: provider())
+        // build services here using provider()
+    }
+
+
+    var reminderService: ReminderService?
+    var folderService: FolderService?
+
 
 
     // MARK: - Reminders tab navigation
@@ -39,7 +61,12 @@ final class AppFlow: ObservableObject {
 //    }
 
     func shareSheet(_ url: URL){
-        activeSheet = .share(url)
+        sheet(.share(url))
+
+    }
+    func sheet(_ dest: SheetDestination){
+        activeSheet = dest
+        sheet = dest
     }
 
     func openReminder(_ reminder: Reminder){
@@ -60,20 +87,69 @@ final class AppFlow: ObservableObject {
         push(.allReminders)
     }
 
+
     func cameraSheet(){
-        activeSheet = .camera
+        activeSheet = .camera(RecordingHandler(onVideoRecorded: { url, front in
+            self.camStuff = (url, front)
+            self.activeSheet = nil
+            self.activeSheet = .titleSheet
+        }))
+
+    }
+
+    func addReminderSheet(){ addReminderSheet(nil) }
+
+    func addReminderSheet(_ folder: Folder?){
+
+        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+            "button": "plus_overlay",
+            "view": "HomeView"
+        ])
+        let reminder = Reminder(title: "", text: "", link: "", folder: folder)
+        if let provider = contextProvider {
+            let ctx: ModelContext = provider()
+             ctx.insert(reminder)
+            sheet(.addReminder(reminder))
+        }
+
+        if TutorialManager.shared.inTutorial {
+            TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
+        }
+
     }
 
     func addReminderSheet(_ reminder: Reminder){
-        activeSheet = .addReminder(reminder)
+        sheet(.addReminder(reminder))
     }
     func addFolderSheet(_ folder: Folder){
-        activeSheet = .addFolder(folder)
+        sheet(.addFolder(folder))
     }
 
     func settingSheet(){
-        activeSheet = .settings
+        sheet(.settings)
     }
+
+    func onDismiss() {
+        // Optional centralized cleanup for sheets that created temp models
+
+        switch sheet {
+        case .addReminder(let reminder):
+            reminderService?.deleteEmptyReminder(reminder)
+        case .addFolder(let folder):
+            folderService?.deleteEmptyFolder(folder)
+        case .settings, .camera, .share, .titleSheet:
+            break
+        }
+    }
+
+    func saveReminder(_ title: String) {
+        if let camStuff = camStuff {
+            reminderService?.saveReminder(title, camStuff.0, camStuff.1)
+        }
+    }
+
+
+
 
 
     // MARK: - Deep links / notifications
@@ -82,3 +158,4 @@ final class AppFlow: ObservableObject {
         // This method exists for future centralization.
     }
 }
+

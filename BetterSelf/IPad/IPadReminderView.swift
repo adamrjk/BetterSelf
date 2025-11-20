@@ -209,11 +209,11 @@ struct IPadReminderView: View {
                 ShareSheet(activityItems: [url])
             }
         }
-        .sheet(isPresented: $reminder.isShared){
-            AddTitleSheet(title: $reminder.title)
-                .presentationDetents([.height(300)])
-
-        }
+//        .sheet(isPresented: $reminder.isShared){
+//            AddTitleSheet(title: $reminder.title)
+//                .presentationDetents([.height(300)])
+//
+//        }
         .sheet(
             isPresented: $addReminder, onDismiss: deleteEmptyReminder){
                 if let reminder = newReminder {

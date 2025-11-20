@@ -42,6 +42,10 @@ struct HomeView: View {
     @State private var deleteAlert = false
     @State private var reminderToDelete: Reminder?
 
+    private var reminderService: ReminderService {
+        ReminderService(provider: { modelContext })
+    }
+
     
     var unlockedReminders: [Reminder]{
         reminders.filter{
@@ -106,12 +110,11 @@ struct HomeView: View {
                         sorting: sorting,
                         onSelectReminder: { reminder in
                             if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
+                                TutorialManager.shared.handleTargetViewClick(target: ReminderService.isFirstId(reminder))
                             }
                             if let handler = onSelectReminder, UIDevice.current.userInterfaceIdiom == .pad {
                                 handler(reminder)
                             } else {
-//                                selectedReminder = reminder
                                 flow.openReminder(reminder)
                             }
                         },
@@ -130,7 +133,7 @@ struct HomeView: View {
                             ])
                             Task {
                                 do {
-                                    flow.shareSheet(getLink(reminder))
+                                    flow.shareSheet(ReminderService.getLink(reminder))
                                     _ = try await FirestoreService.shared.storeReminder(reminder)
                                 } catch {
                                     print("Share prepare failed: \(error)")
@@ -142,38 +145,35 @@ struct HomeView: View {
                 }
             }
 
-            if !selection.isEmpty {
-                VStack {
-                    Spacer()
-                    HStack {
-                        Button("Delete"){
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "delete_overlay",
-                                "view": "HomeView"
-                            ])
-                            deleteAlert.toggle()
-                        }
-                        .adaptiveGlass(scheme)
-                        .buttonStyle(.plain)
-
-                        Spacer()
-
-
-                        Button("Move"){
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "move_overlay",
-                                "view": "HomeView"
-                            ])
-                            move()
-                        }
-                            .adaptiveGlass(scheme)
-                            .buttonStyle(.plain)
-                    }
-                    .padding(.horizontal, 5)
-                }
-
-
-            }
+//            if !selection.isEmpty {
+//                VStack {
+//                    Spacer()
+//                    HStack {
+//                        Button("Delete"){
+//                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+//                                "button": "delete_overlay",
+//                                "view": "HomeView"
+//                            ])
+//                            deleteAlert.toggle()
+//                        }
+//                        .adaptiveGlass(scheme)
+//                        .buttonStyle(.plain)
+//                        Spacer()
+//                        Button("Move"){
+//                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+//                                "button": "move_overlay",
+//                                "view": "HomeView"
+//                            ])
+//                            move()
+//                        }
+//                            .adaptiveGlass(scheme)
+//                            .buttonStyle(.plain)
+//                    }
+//                    .padding(.horizontal, 5)
+//                }
+//
+//
+//            }
         }
         .onAppear{
             AnalyticsService.logScreenView(screenName: "Home", screenClass: "HomeView")
@@ -182,6 +182,8 @@ struct HomeView: View {
                 TutorialManager.shared.viewId("Home")
                 TutorialManager.shared.startTutorial("Home")
             }
+
+            sorting = folder?.sorting ?? ReminderService.loadData()
 
         }
         .onChange(of: TutorialManager.shared.currentDone){
@@ -195,156 +197,102 @@ struct HomeView: View {
                 sorting = .dateNew
             }
         }
-        .overlay(
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-
-                    if editMode?.wrappedValue == .inactive {
-                        Button{
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "plus_overlay",
-                                "view": "HomeView"
-                            ])
-                            let reminder = Reminder(title: "", text: "", link: "", folder: folder)
-                            modelContext.insert(reminder)
-                            newReminder = reminder
-                            flow.addReminderSheet(reminder)
-                            addReminder.toggle()
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
-                            }
-                        }label: {
-
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .foregroundStyle(scheme == .light
-                                                 ? .white
-                                                 : .black)
-                                .padding(20)
-                        }
-                        .tutorialIdentifier("PlusButton")
-                        .adaptiveTranslucent(color.plusButton(scheme))
-                        .clipShape(.circle)
-                    }
-
-
-
-
-
-
-
-                }
-                .padding(.trailing, 10)
-            }
-        )
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Menu {
-
-                        Picker("Sort", selection: $sorting) {
-                            Text("Newest First")
-                                .tag( Sorting.dateNew)
-
-                            Text("Oldest First")
-                                .tag(Sorting.dateOld)
-                            Text("Title")
-                                .tag(Sorting.name)
-
-                        }
-                    }label: {
-                        HStack {
-                            Image(systemName: "arrow.up.arrow.down")
-                                .font(.subheadline)
-                                .foregroundStyle(color.button(scheme))
-                                .padding(7)
-
-                            Text("Sort By")
-
-                        }
-                    }
-
-                    Button{
-                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                            "button": "select_reminders_toggle",
-                            "view": "HomeView"
-                        ])
-                        if editMode?.wrappedValue == .inactive {
-                            editMode?.wrappedValue = .active
-                        } else {
-                            editMode?.wrappedValue = .inactive
-                        }
-                    } label: {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.subheadline)
-                                .buttonStyle(.plain)
-                                .foregroundStyle(color.button(scheme))
-                                .padding(8)
-
-                            Text("Select Reminders")
-                        }
-
-
-                    }
-
-
-
-
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.subheadline)
-                        .foregroundStyle(color.button(scheme))
-                        .padding(8)
-                }
-                .buttonStyle(.plain)
-            }
-
-                ToolbarItem(placement: .topBarLeading){
-                    Button("Go Back", systemImage: "chevron.left"){
-                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                            "button": "back",
-                            "view": "HomeView"
-                        ])
-                        flow.popInsights()
-
-                    }
-                    .foregroundStyle(color.button(scheme))
-                    .padding(8)
-                    .font(.headline)
-                    .buttonStyle(.plain)
-
-                }
-            
-            ToolbarItem(placement: .topBarLeading){
-                Button("Quick Add", systemImage: "video.fill.badge.plus"){
-                    AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                        "button": "quick_add",
-                        "view": "HomeView"
-                    ])
-//                    videoRecorder.toggle()
-                    flow.cameraSheet()
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(color.button(scheme))
-                .padding(8)
-            }
-
-
-        }
+//        .floatingPlusButton {
+//            if editMode?.wrappedValue == .inactive {
+//                flow.addReminderSheet(folder)
+//            }
+//        }
+//        .toolbar {
+//            ToolbarItem(placement: .topBarTrailing) {
+//                Menu {
+//                    Menu {
+//
+//                        Picker("Sort", selection: $sorting) {
+//                            Text("Newest First")
+//                                .tag( Sorting.dateNew)
+//
+//                            Text("Oldest First")
+//                                .tag(Sorting.dateOld)
+//                            Text("Title")
+//                                .tag(Sorting.name)
+//
+//                        }
+//                    }label: {
+//                        HStack {
+//                            Image(systemName: "arrow.up.arrow.down")
+//                                .font(.subheadline)
+//                                .foregroundStyle(color.button(scheme))
+//                                .padding(7)
+//
+//                            Text("Sort By")
+//
+//                        }
+//                    }
+//
+//                    Button{
+//                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+//                            "button": "select_reminders_toggle",
+//                            "view": "HomeView"
+//                        ])
+//                        if editMode?.wrappedValue == .inactive {
+//                            editMode?.wrappedValue = .active
+//                        } else {
+//                            editMode?.wrappedValue = .inactive
+//                        }
+//                    } label: {
+//                        HStack {
+//                            Image(systemName: "checkmark.circle.fill")
+//                                .font(.subheadline)
+//                                .buttonStyle(.plain)
+//                                .foregroundStyle(color.button(scheme))
+//                                .padding(8)
+//
+//                            Text("Select Reminders")
+//                        }
+//
+//
+//                    }
+//
+//                } label: {
+//                    Image(systemName: "ellipsis")
+//                        .font(.subheadline)
+//                        .foregroundStyle(color.button(scheme))
+//                        .padding(8)
+//                }
+//                .buttonStyle(.plain)
+//            }
+//
+//                ToolbarItem(placement: .topBarLeading){
+//                    Button("Go Back", systemImage: "chevron.left"){
+//                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+//                            "button": "back",
+//                            "view": "HomeView"
+//                        ])
+//                        flow.popInsights()
+//
+//                    }
+//                    .foregroundStyle(color.button(scheme))
+//                    .padding(8)
+//                    .font(.headline)
+//                    .buttonStyle(.plain)
+//
+//                }
+//            
+////            ToolbarItem(placement: .topBarLeading){
+////                VideoRecorderToolBarButton(flow: flow, color: color.button(scheme))
+////            }
+//
+//
+//        }
         .onChange(of: sorting){ oldSorting, newSorting in
             if let folder = folder {
                 folder.sorting = newSorting
             }
             else {
-                saveData(newSorting)
+                ReminderService.saveData(newSorting)
             }
         }
-        .onAppear{
-            sorting = folder?.sorting ?? loadData()
-        }
+
         .alert("Are you Sure?", isPresented: $deleteAlert){
             Button("Delete", role: .destructive){
                 AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
@@ -356,37 +304,8 @@ struct HomeView: View {
         } message: {
             Text("You won't be able to restore this Reminder")
         }
-//        .sheet(item: $newReminder, onDismiss: deleteEmptyReminder){ reminder in
-//            AddReminderView(reminder: reminder)
-//                .onDisappear{
-//                    if TutorialManager.shared.inTutorial {
-//                        sorting = .dateNew
-//                        TutorialManager.shared.viewId("Home")
-//                        TutorialManager.shared.startTutorial("Home")
-//                    }
-//                }
-//        }
-//        .sheet(item: $pendingShareURL){ shareURL in
-//            ShareSheet(activityItems: [shareURL.url])
-//        }
         .sheet(isPresented: $refuseLoading){
             RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
-                .presentationDetents([.height(300)])
-        }
-//        .sheet(isPresented: $videoRecorder) {
-//            CustomCameraView(
-//                isPresented: $videoRecorder,
-//                onVideoRecorded: { url, _ in
-//                    recordedVideoURL = url
-//                    self.isFront = false
-//                    videoRecorded.toggle()
-//                }
-//            )
-//            .ignoresSafeArea()
-//
-//        }
-        .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
-            AddTitleSheet(title: $title)
                 .presentationDetents([.height(300)])
         }
         .sheet(isPresented: $moveToFolder, onDismiss: {
@@ -395,69 +314,13 @@ struct HomeView: View {
         }){
             if let reminders = remindersToMove {
                 MoveToFolder(reminders: reminders)
-
             }
         }
         .navigationTitle(folder?.name ?? "All Reminders")
-
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-//        .navigationDestination(item: $selectedReminder) { reminder in
-//            ReminderView(reminder: reminder)
-//                .onDisappear{
-//                    TutorialManager.shared.viewId("Home")
-//                    TutorialManager.shared.startTutorial("Home")
-//
-//                }
-//        }
-
         .navigationBarBackButtonHidden()
     }
 
-    func getLink(_ reminder: Reminder) -> URL {
-        if reminder.shareID != nil {
-            return reminder.shareLink
-        }
-        else {
-            reminder.shareID = generateShortID()
-            return reminder.shareLink
-        }
-
-
-    }
-    func generateShortID(length: Int = 6) -> String {
-        let chars = Array("abcdefghijklmnopqrstuvwxyz0123456789")
-        var result = ""
-        for _ in 0..<length {
-            result.append(chars.randomElement()!)
-        }
-        return result
-    }
-
-
-    func saveReminder() {
-        let reminder = Reminder(
-            title: title,
-            text: "",
-            link: ""
-        )
-        if let front = self.isFront {
-            reminder.isFront = front
-        }
-        reminder.isChecked = true
-        modelContext.insert(reminder)
-
-        uploadManager.loadVideo(reminder, recordedVideoURL: recordedVideoURL)
-
-        AnalyticsService.log(AnalyticsService.EventName.reminderCreated, params: [
-            "id": reminder.id.uuidString,
-            "type": reminder.type.rawValue,
-            "has_video": (recordedVideoURL != nil) ? "true" : "false",
-            "has_photo": (reminder.photo != nil) ? "true" : "false",
-            "has_link": reminder.link.isEmpty ? "false" : "true",
-            "source": "video_quick_add"
-        ])
-
-    }
 
     func move() {
         remindersToMove = reminders.filter { selection.contains($0.id) }
@@ -468,7 +331,7 @@ struct HomeView: View {
     func delete() {
         if selection.isEmpty {
             if let reminder = reminderToDelete {
-                deleteReminder(reminder)
+                reminderService.deleteReminder(reminder)
             }
 
         } else {
@@ -485,70 +348,15 @@ struct HomeView: View {
             }
 
             editMode?.wrappedValue = .inactive
-
             Task {
                 for url in videoURLs {
-                    await deleteVideo(url)
+                    await reminderService.deleteVideo(url)
                 }
             }
         }
 
 
     }
-
-    func deleteEmptyReminder() {
-        if let reminder = newReminder{
-            guard reminder.isChecked == false else { return }
-            if reminder.isEmpty {
-                modelContext.delete(reminder)
-            }
-            if (reminder.type != .TimeLessLetter && reminder.photo == nil && !reminder.isLoading) {
-                reminder.type = .TimeLessLetter
-            }
-            reminder.isChecked = true
-        }
-
-    }
-
-
-    func deleteReminder(at offsets: IndexSet) {
-        for offset in offsets {
-            let reminder = reminders[offset]
-
-            if let url = reminder.firebaseVideoURL {
-                Task {
-                    await deleteVideo(url)
-                }
-            }
-
-            AnalyticsService.log(AnalyticsService.EventName.reminderDeleted, params: [
-                "id": reminder.id.uuidString,
-                "type": reminder.type.rawValue
-            ])
-            modelContext.delete(reminder)
-        }
-    }
-
-    func deleteReminder(_ reminder: Reminder) {
-        if let url = reminder.firebaseVideoURL {
-            Task {
-                await deleteVideo(url)
-            }
-        }
-        AnalyticsService.log(AnalyticsService.EventName.reminderDeleted, params: [
-            "id": reminder.id.uuidString,
-            "type": reminder.type.rawValue
-        ])
-        modelContext.delete(reminder)
-    }
-
-
-
-    func deleteVideo(_ url: String) async {
-        FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { _ in }
-    }
-
-
 
     init(folder: Folder? = nil, onSelectReminder: ((Reminder) -> Void)? = nil, onToggleSidebar: (() -> Void)? = nil) {
         self.folder = folder
@@ -575,43 +383,13 @@ struct HomeView: View {
             })
         } else {
             // All reminders (no folder)
-            _reminders =  Query(filter: #Predicate<Reminder> { $0.isChecked == true
+            _reminders = Query(filter: #Predicate<Reminder> {
+                $0.isChecked == true
             })
         }
-    }
-
-    func loadData() -> Sorting {
-        if let data = UserDefaults.standard.data(forKey: "AllRemindersSorting") {
-            if let decoded = try? JSONDecoder().decode(Sorting.self, from: data) {
-                return decoded
-            }
-        }
-        return .dateOld
-    }
-    func saveData(_ newSorting: Sorting) {
-        if let data = try? JSONEncoder().encode(newSorting) {
-            UserDefaults.standard.set(data, forKey: "AllRemindersSorting")
-        }
-    }
-
-    
-
-    
-
-    func isFirstId(_ reminder: Reminder) -> String {
-        if let first = sortedReminders.first {
-            reminder.id == first.id  ? "FirstReminderButton" : "RemindersButton"
-        }
-        else {
-            "RemindersButton"
-        }
-
-
-
-
-
 
     }
+
 
 }
 

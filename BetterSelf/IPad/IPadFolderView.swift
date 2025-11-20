@@ -137,22 +137,22 @@ struct IPadFolderView: View {
                     }
 
                 }
-                .sheet(isPresented: $videoRecorder) {
-                    CustomCameraView(
-                        isPresented: $videoRecorder,
-                        onVideoRecorded: { url, isFront in
-                            recordedVideoURL = url
-                            self.isFront = isFront
-                            videoRecorded.toggle()
-                        }
-                    )
-                    .ignoresSafeArea()
-
-                }
-                .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
-                    AddTitleSheet(title: $title)
-                        .presentationDetents([.height(300)])
-                }
+//                .sheet(isPresented: $videoRecorder) {
+//                    CustomCameraView(
+//                        isPresented: $videoRecorder,
+//                        onVideoRecorded: { url, isFront in
+//                            recordedVideoURL = url
+//                            self.isFront = isFront
+//                            videoRecorded.toggle()
+//                        }
+//                    )
+//                    .ignoresSafeArea()
+//
+//                }
+//                .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
+//                    AddTitleSheet(title: $title)
+//                        .presentationDetents([.height(300)])
+//                }
                 .sheet(isPresented: $settings){
                     SettingsView()
                         .onDisappear{
