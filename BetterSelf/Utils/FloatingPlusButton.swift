@@ -11,38 +11,41 @@ struct FloatingPlusButton: View {
     @Environment(\.colorScheme) private var scheme
     @EnvironmentObject private var color: ColorManager
 
+    let shouldAppear: Bool
     let action: () -> Void
 
     var body: some View {
-        VStack {
-            Spacer()
-            HStack {
+        if shouldAppear {
+            VStack {
                 Spacer()
+                HStack {
+                    Spacer()
 
 
-                Button(action: action) {
-                    Image(systemName: "plus")
-                        .font(.title2)
-                        .foregroundStyle(scheme == .light ? .white : .black)
-                        .padding(20)
+                    Button(action: action) {
+                        Image(systemName: "plus")
+                            .font(.title2)
+                            .foregroundStyle(scheme == .light ? .white : .black)
+                            .padding(20)
+                    }
+                    .tutorialIdentifier("PlusButton")
+                    .adaptiveTranslucent(color.plusButton(scheme))
+                    .clipShape(.circle)
+
+
+
+
                 }
-                .tutorialIdentifier("PlusButton")
-                .adaptiveTranslucent(color.plusButton(scheme))
-                .clipShape(.circle)
-
-
-
-
+                .padding(.trailing, 10)
             }
-            .padding(.trailing, 10)
         }
     }
 }
 
 extension View {
-    func floatingPlusButton(action: @escaping () -> Void) -> some View {
+    func floatingPlusButton(_ shouldAppear: Bool, action: @escaping () -> Void) -> some View {
         overlay(
-            FloatingPlusButton(action: action)
+            FloatingPlusButton(shouldAppear: shouldAppear, action: action)
         )
     }
 }

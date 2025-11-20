@@ -52,6 +52,9 @@ struct RefuseView: View {
     }
 }
 
-#Preview {
-    RefuseView(title: "Your Reminder is empty", description: "Add a Description, a Photo, a Video or a Link to create your Reminder")
+struct RefuseLoading: View {
+    var body: some View {
+        RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
+            .presentationDetents([.height(300)])
+    }
 }

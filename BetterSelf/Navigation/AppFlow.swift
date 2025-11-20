@@ -35,8 +35,7 @@ final class AppFlow: ObservableObject {
         contextProvider = provider
         isConfigured = true
         reminderService = ReminderService(provider: provider)
-        folderService = FolderService(ctx: provider())
-        // build services here using provider()
+        folderService = FolderService(provider: provider)
     }
 
 
@@ -56,10 +55,6 @@ final class AppFlow: ObservableObject {
         }
     }
 
-//    func openReminder(id: PersistentIdentifier) {
-//        push(.reminder(id: id))
-//    }
-
     func shareSheet(_ url: URL){
         sheet(.share(url))
 
@@ -70,18 +65,13 @@ final class AppFlow: ObservableObject {
     }
 
     func openReminder(_ reminder: Reminder){
-//        push(.reminder(id: reminder.persistentModelID))
         push(.reminder(reminder))
     }
 
     func openFolder(_ folder: Folder){
-//        push(.folder(id: folder?.persistentModelID))
         push(.folder(folder))
     }
 
-//    func openFolder(_ id: PersistentIdentifier?) {
-//        push(.folder(id: id))
-//    }
 
     func openAllReminders(){
         push(.allReminders)
@@ -130,8 +120,6 @@ final class AppFlow: ObservableObject {
     }
 
     func onDismiss() {
-        // Optional centralized cleanup for sheets that created temp models
-
         switch sheet {
         case .addReminder(let reminder):
             reminderService?.deleteEmptyReminder(reminder)

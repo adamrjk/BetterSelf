@@ -74,6 +74,7 @@ extension SheetDestination: NavigationDestination {
         switch self {
         case .addFolder(let folder):
             AddFolderView(folder: folder)
+                .presentationDetents([.medium, .large])
         case .addReminder(let reminder):
             AddReminderView(reminder: reminder)
         case .camera(let handler):

@@ -59,12 +59,12 @@ struct IPadFolderView: View {
                         color.overlayGradient(scheme)
                             .ignoresSafeArea()
 
-                        FolderListContent(
-                            searchText: $searchText,
-                            showAlert: $showAlert,
-                            refuseLoading: $refuseLoading,
-                            mode: .iPad
-                        )
+//                        FolderListContent(
+//                            searchText: $searchText,
+//                            showAlert: $showAlert,
+//                            refuseLoading: $refuseLoading,
+//                            mode: .iPad
+//                        )
                         .searchable(text: $searchText, placement: .navigationBarDrawer,  prompt: "Search")
                             .onChange(of: scenePhase){ oldPhase, newPhase in
                                 if newPhase == .background {

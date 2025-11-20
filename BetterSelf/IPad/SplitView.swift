@@ -196,6 +196,12 @@ struct SplitView: View {
     }
 }
 
+enum LayoutMode {
+    case phone
+    case iPad
+}
+
 #Preview {
     SplitView(notifReminder: .constant(nil))
 }
+

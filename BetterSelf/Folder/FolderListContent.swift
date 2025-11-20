@@ -5,95 +5,56 @@
 //  Created by AI on 24/10/2025.
 //
 
-import LocalAuthentication
+
 import SwiftData
 import SwiftUI
-import WidgetKit
 
-enum FolderListLayoutMode {
-    case phone
-    case iPad
-}
+
 
 struct FolderListContent: View {
     @EnvironmentObject var flow: AppFlow
-
-
     @Environment(\.modelContext) var modelContext
     @Environment(\.isSearching) var isSearching
     @Environment(\.colorScheme) var scheme
     @EnvironmentObject var color: ColorManager
-
     @Query(filter: #Predicate<Folder> { $0.isChecked == true},
            sort: \Folder.date) var folders: [Folder]
-
     @Query(filter: #Predicate<Reminder> { $0.isChecked == true },
            sort: \Reminder.date) var reminders: [Reminder]
 
-    @Binding var searchText: String
-    @Binding var showAlert: Bool
-    @Binding var refuseLoading: Bool
+    @Bindable var vm: FolderViewModel
+    private var unlockedReminders: [Reminder] { reminders.filter { $0.isLocked == false } }
+    private var filteredReminders: [Reminder] { vm.filter(unlockedReminders) }
+    private var pinned: [Reminder] { vm.getPinned(unlockedReminders) }
 
-    let mode: FolderListLayoutMode
-
-    @State private var deleteAlert = false
-    @State private var folderToDelete: Folder?
-
-    private var unlockedReminders: [Reminder] {
-        reminders.filter { $0.isLocked == false }
+    private var reminderService: ReminderService {
+        ReminderService(provider: { modelContext })
+    }
+    
+    private var folderService: FolderService {
+        FolderService(provider: { modelContext })
     }
 
-    private var filteredReminders: [Reminder] {
-        if searchText.isEmpty { return unlockedReminders }
-        return unlockedReminders.filter { $0.title.localizedStandardContains(searchText) }
+    init(vm: FolderViewModel) {
+        _vm = Bindable(vm)
     }
-
-    private var pinned: [Reminder] {
-        var pinned = unlockedReminders.filter { $0.pinned }
-        pinned = pinned.sorted { $0.datePinned < $1.datePinned }
-        while pinned.count > 3 {
-            if let first = pinned.first {
-                first.pinned = false
-                pinned.removeFirst()
-            }
-        }
-        return pinned
-    }
-
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                if isSearching || !searchText.isEmpty {
-                    searchResultsView
-                } else {
-                    pinnedSectionView
-                    foldersSectionView
-                }
+        Group {
+            if isSearching || !vm.searchText.isEmpty {
+                searchResultsView
+            } else {
+                pinnedSectionView
+                foldersSectionView
             }
         }
-        .defaultScrollAnchor(.center)
         .animation(.smooth, value: pinned)
-        .alert("Are you Sure?", isPresented: $deleteAlert) {
-            Button("Delete", role: .destructive) {
-                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                    "button": "delete_folder_confirm",
-                    "view": "FolderListContent",
-                    "folder": folderToDelete?.name ?? ""
-                ])
-                if let folder = folderToDelete { deleteFolder(folder) }
-            }
-        } message: {
-            Text("This will delete all the Reminders in this Folder")
-        }
         .onChange(of: pinned) { _, _ in
-            storePinnedReminders(pinned)
+            vm.storePinnedReminders(pinned)
             if let last = pinned.last {
-                addNotification(for: last)
+                vm.addNotification(for: last)
             }
         }
     }
-
-    // MARK: - Subviews
 
     @ViewBuilder
     private var searchResultsView: some View {
@@ -105,10 +66,9 @@ struct FolderListContent: View {
                     "id": reminder.id.uuidString
                 ])
                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
-                    refuseLoading.toggle()
+                    vm.refuseLoading.toggle()
                 } else {
                     flow.openReminder(reminder)
-
                 }
             } label: {
                 ReminderRowView(reminder: reminder, isPreview: true)
@@ -140,27 +100,27 @@ struct FolderListContent: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 20)
                 } else {
-                    if mode == .iPad {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 480), spacing: 16)], spacing: 12) {
-                            ForEach(pinned) { reminder in
-                                Button {
-                                    AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                        "button": "pinned_open",
-                                        "view": "FolderListContent",
-                                        "id": reminder.id.uuidString
-                                    ])
-                                    if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
-                                        refuseLoading.toggle()
-                                    } else {
-                                        flow.openReminder(reminder)
-                                    }
-                                } label: {
-                                    ReminderRowView(reminder: reminder, isPreview: true)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                    } else {
+//                    if mode == .iPad {
+//                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 480), spacing: 16)], spacing: 12) {
+//                            ForEach(pinned) { reminder in
+//                                Button {
+//                                    AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+//                                        "button": "pinned_open",
+//                                        "view": "FolderListContent",
+//                                        "id": reminder.id.uuidString
+//                                    ])
+//                                    if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
+//                                        vm.refuseLoading.toggle()
+//                                    } else {
+//                                        flow.openReminder(reminder)
+//                                    }
+//                                } label: {
+//                                    ReminderRowView(reminder: reminder, isPreview: true)
+//                                }
+//                            }
+//                        }
+//                        .padding(.horizontal, 16)
+//                    } else {
                         ForEach(pinned) { reminder in
                             Button {
                                 AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
@@ -169,7 +129,7 @@ struct FolderListContent: View {
                                     "id": reminder.id.uuidString
                                 ])
                                 if reminder.type == .InstantInsight && reminder.firebaseVideoURL == nil && !reminder.isYoutube {
-                                    refuseLoading.toggle()
+                                    vm.refuseLoading.toggle()
                                 } else {
                                     flow.openReminder(reminder)
                                 }
@@ -178,7 +138,7 @@ struct FolderListContent: View {
                             }
                             .padding(.horizontal, 16)
                         }
-                    }
+//                    }
                 }
             }
             .padding(.bottom, 8)
@@ -220,7 +180,7 @@ struct FolderListContent: View {
 
                             flow.openAllReminders()
                         } label: {
-                            FolderRowView(folder: nil, count: getCount())
+                            FolderRowView(folder: nil, count: folderService.getCount(nil, unlockedReminders))
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .opacity(1)
@@ -258,8 +218,8 @@ struct FolderListContent: View {
                         "button": "authenticate_folder",
                         "view": "FolderListContent",
                         "folder": folder.name
-                    ]); authenticate(folder) } label: {
-                        FolderRowView(folder: folder, count: getCount(folder))
+                    ]); vm.authenticate(folder) } label: {
+                        FolderRowView(folder: folder, count: folderService.getCount(folder, unlockedReminders))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                         if folder != folders.last { Divider() }
@@ -273,7 +233,7 @@ struct FolderListContent: View {
                         ]);
                         flow.openFolder(folder)
                     } label: {
-                        FolderRowView(folder: folder, count: getCount(folder))
+                        FolderRowView(folder: folder, count: folderService.getCount(folder, unlockedReminders))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                         if folder != folders.last { Divider() }
@@ -285,8 +245,8 @@ struct FolderListContent: View {
                                 "view": "FolderListContent",
                                 "folder": folder.name
                             ])
-                            folderToDelete = folder
-                            deleteAlert.toggle()
+                            vm.requestDelete(folder)
+
                         }
                         .tint(.red)
                     }
@@ -301,89 +261,8 @@ struct FolderListContent: View {
         .listStyle(.plain)
     }
 
-    // MARK: - Functions
 
-    private func deleteFolder(_ folder: Folder) {
-        let videoURLs = folder.reminders.compactMap { $0.firebaseVideoURL }
-        modelContext.delete(folder)
-        Task {
-            for url in videoURLs { await deleteVideo(url) }
-        }
-    }
-
-    private func deleteVideo(_ url: String) async {
-        FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { _ in }
-    }
-
-    private func getCount(_ folder: Folder? = nil) -> Int {
-        if let folder = folder {
-            let id = folder.persistentModelID
-            return unlockedReminders.filter { $0.folder?.persistentModelID == id }.count
-        } else {
-            return unlockedReminders.count
-        }
-    }
-
-    private func authenticate(_ folder: Folder) {
-        let context = LAContext()
-        var error: NSError?
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            let reason = "Please authenticate yourself to unlock your reminders."
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, _ in
-                if success {
-                    folder.isLocked = false
-                } else {
-                    context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "Enter your device passcode to unlock your reminders.") { success, _ in
-                        if success { folder.isLocked = false }
-                    }
-                }
-            }
-        } else {
-            showAlert = true
-        }
-    }
-
-    private func storePinnedReminders(_ newValue: [Reminder]) {
-        UserDefaults(suiteName: "group.adam.betterself")?.removeObject(forKey: "PinnedReminders")
-        var pinnedReminders: [ReminderSnapShot] = []
-        pinned.forEach { reminder in
-            if !reminder.isLocked {
-                var photoURL: String? = nil
-                if let photo = reminder.photo {
-                    photoURL = storePhotoForWidget(data: photo, id: UUID())
-                }
-                let snapShot = ReminderSnapShot(id: reminder.id, title: reminder.title, text: reminder.text, photoURL: photoURL, link: reminder.link, isFront: reminder.isFront, isYoutube: reminder.isYoutube)
-                pinnedReminders.append(snapShot)
-            }
-        }
-        if let data = try? JSONEncoder().encode(pinnedReminders) {
-            UserDefaults(suiteName: "group.adam.betterself")?.set(data, forKey: "PinnedReminders")
-            WidgetCenter.shared.reloadAllTimelines()
-        }
-    }
-
-    private func storePhotoForWidget(data: Data, id: UUID) -> String? {
-        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.adam.betterself") else { return nil }
-        let fileURL = containerURL.appendingPathComponent("\(id).png")
-        if let uiImage = UIImage(data: data),
-           let resizedData = resizeImage(uiImage, targetSize: CGSize(width: 50, height: 50)) {
-            try? resizedData.write(to: fileURL)
-            return fileURL.absoluteString
-        }
-        return nil
-    }
-
-    private func resizeImage(_ image: UIImage, targetSize: CGSize) -> Data? {
-        let renderer = UIGraphicsImageRenderer(size: targetSize)
-        let resized = renderer.image { _ in
-            image.draw(in: CGRect(origin: .zero, size: targetSize))
-        }
-        return resized.pngData()
-    }
-
-    private func addNotification(for reminder: Reminder) {
-        // Reserved for future use
-    }
 }
+
 
 

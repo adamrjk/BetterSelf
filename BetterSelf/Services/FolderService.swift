@@ -10,11 +10,11 @@ import SwiftData
 
 @MainActor
 final class FolderService {
-    let ctx: ModelContext
+    let provider: () -> ModelContext
 
 
-    init(ctx: ModelContext) {
-        self.ctx = ctx
+    init(provider: @escaping () -> ModelContext) {
+        self.provider = provider
     }
 
     func deleteEmptyFolder(_ folder: Folder) {
@@ -22,13 +22,35 @@ final class FolderService {
 
         #warning("Handle Identical folder name")
         if folder.name.isEmpty{
-            ctx.delete(folder)
+            provider().delete(folder)
         }
         else {
             folder.isChecked = true
             AnalyticsService.log(AnalyticsService.EventName.folderCreated, params: [
                 "name": folder.name
             ])
+        }
+    }
+
+
+    func deleteFolder(_ folder: Folder) {
+        let videoURLs = folder.reminders.compactMap { $0.firebaseVideoURL }
+        provider().delete(folder)
+        Task {
+            for url in videoURLs { await deleteVideo(url) }
+        }
+    }
+
+    func deleteVideo(_ url: String) async {
+        FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { _ in }
+    }
+
+    func getCount(_ folder: Folder? = nil, _ unlockedReminders: [Reminder]) -> Int {
+        if let folder = folder {
+            let id = folder.persistentModelID
+            return unlockedReminders.filter { $0.folder?.persistentModelID == id }.count
+        } else {
+            return unlockedReminders.count
         }
     }
 
