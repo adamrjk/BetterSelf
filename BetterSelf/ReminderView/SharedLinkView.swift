@@ -24,6 +24,8 @@ struct SharedLinkView: View {
 
     var isSheet: Bool
 
+    let isInFeed: Bool
+
     var body: some View {
 
 
@@ -188,12 +190,13 @@ struct SharedLinkView: View {
         return nil
     }
 
-    init(link: String, time: Binding<Int>, text: String, isSheet: Bool? = nil) {
-        
+    init(link: String, time: Binding<Int>, text: String, isSheet: Bool = false, isInFeed: Bool = false) {
+
         self.link = link
         self.text = text
         _time = time
-        self.isSheet = isSheet ?? false
+        self.isSheet = isSheet
+        self.isInFeed = isInFeed
 
         if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
 //            if link.localizedStandardContains("shorts") {

@@ -19,7 +19,9 @@ struct YoutubeView: View {
     @State var videoURL: String
     let text: String
 
-    init(videoURL: String, time: Binding<Int>, text: String){
+    let isInFeed: Bool
+
+    init(videoURL: String, time: Binding<Int>, text: String, isInFeed: Bool = false){
         _videoURL = State(initialValue: videoURL)
         self.player = .init(
             source: .init(urlString: videoURL),
@@ -29,6 +31,7 @@ struct YoutubeView: View {
         )
         _time = time
         self.text = text
+        self.isInFeed = isInFeed
 
     }
     var body: some View {
@@ -71,6 +74,8 @@ struct YoutubeView: View {
 
                 }
                 .defaultScrollAnchor(.center)
+                .scrollDisabled(isInFeed)
+//                .allowsHitTesting(isInFeed)
 
                 VStack {
                     Spacer()

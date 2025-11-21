@@ -14,6 +14,7 @@
 		6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68C2E5453DB00C80E8F /* FirebaseAnalytics */; };
 		6678C68F2E5454D200C80E8F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C68E2E5454D200C80E8F /* FirebaseStorage */; };
 		6678C6992E545CDB00C80E8F /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6678C6982E545CDB00C80E8F /* FirebaseCore */; };
+		667E5B502ED054D300425067 /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = 667E5B4F2ED054D300425067 /* FSRS */; };
 		668A864A2E811B23003D8DE7 /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 668A86492E811B23003D8DE7 /* YouTubePlayerKit */; };
 		66A705112E79C5750007E1FE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 66A705102E79C5750007E1FE /* FirebaseAuth */; };
 		66B80EE82EA78CC700118A46 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 66B80EE72EA78CC700118A46 /* FirebaseFirestore */; };
@@ -154,6 +155,7 @@
 			files = (
 				668A864A2E811B23003D8DE7 /* YouTubePlayerKit in Frameworks */,
 				66C587B32EB600AE0023B4CF /* FirebaseFunctions in Frameworks */,
+				667E5B502ED054D300425067 /* FSRS in Frameworks */,
 				6678C68D2E5453DB00C80E8F /* FirebaseAnalytics in Frameworks */,
 				6678C6992E545CDB00C80E8F /* FirebaseCore in Frameworks */,
 				6678C68F2E5454D200C80E8F /* FirebaseStorage in Frameworks */,
@@ -270,6 +272,7 @@
 				668A86492E811B23003D8DE7 /* YouTubePlayerKit */,
 				66B80EE72EA78CC700118A46 /* FirebaseFirestore */,
 				66C587B22EB600AE0023B4CF /* FirebaseFunctions */,
+				667E5B4F2ED054D300425067 /* FSRS */,
 			);
 			productName = BetterSelf;
 			productReference = 666F96C02E4F775D007AE674 /* BetterSelf.app */;
@@ -308,6 +311,7 @@
 			packageReferences = (
 				6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				668A86482E811B23003D8DE7 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
+				667E5B4E2ED054D300425067 /* XCRemoteSwiftPackageReference "swift-fsrs" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 666F96C12E4F775D007AE674 /* Products */;
@@ -788,6 +792,14 @@
 				minimumVersion = 12.1.0;
 			};
 		};
+		667E5B4E2ED054D300425067 /* XCRemoteSwiftPackageReference "swift-fsrs" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/open-spaced-repetition/swift-fsrs";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		668A86482E811B23003D8DE7 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SvenTiigi/YouTubePlayerKit";
@@ -813,6 +825,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
+		};
+		667E5B4F2ED054D300425067 /* FSRS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 667E5B4E2ED054D300425067 /* XCRemoteSwiftPackageReference "swift-fsrs" */;
+			productName = FSRS;
 		};
 		668A86492E811B23003D8DE7 /* YouTubePlayerKit */ = {
 			isa = XCSwiftPackageProductDependency;

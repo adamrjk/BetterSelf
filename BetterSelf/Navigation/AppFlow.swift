@@ -13,6 +13,7 @@ final class AppFlow: ObservableObject {
     enum Tab: Hashable {
         case reminders
         case solver
+        case feed
     }
 
     @Published var selectedTab: Tab = .reminders

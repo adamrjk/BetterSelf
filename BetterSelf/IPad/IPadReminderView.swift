@@ -51,11 +51,11 @@ struct IPadReminderView: View {
             else {
                 switch reminder.type {
                 case .InstantInsight:
-                    InstantInsightView(reminder: reminder)
+                    InstantInsightView(reminder: reminder, isInFeed: false)
                 case .EchoSnap:
-                    EchoSnapView(reminder: reminder)
+                    EchoSnapView(reminder: reminder, isInFeed: false)
                 default:
-                    TimeLessLetterView(reminder: reminder)
+                    TimeLessLetterView(reminder: reminder, isInFeed: false)
                 }
             }
         }
@@ -272,7 +272,7 @@ struct IPadReminderView: View {
             .sheet(isPresented: $detailSheet){
                 if reminder.type == .InstantInsight {
                     NavigationView{
-                        TimeLessLetterView(isSheet: true, reminder: reminder)
+                        TimeLessLetterView(isSheet: true, reminder: reminder, isInFeed: false)
                             .navigationTitle(reminder.title)
                             .navigationBarTitleDisplayMode(.inline)
                             .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)

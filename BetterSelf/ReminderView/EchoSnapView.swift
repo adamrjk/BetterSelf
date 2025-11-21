@@ -10,10 +10,12 @@ import SwiftUI
 struct EchoSnapView: View {
     @State var reminder: Reminder
 
+
     @Environment(\.colorScheme) var scheme
     @EnvironmentObject var color: ColorManager
 
-    
+    let isInFeed: Bool
+
 
     var body: some View {
 
@@ -23,10 +25,53 @@ struct EchoSnapView: View {
 
                 color.overlayGradient(scheme)
                     .ignoresSafeArea()
-                ScrollView {
+                if isInFeed {
+                    VStack(spacing: 16) {
+                        if let image = loadImage(reminder.photo) {
+                            VStack(alignment: .leading, spacing: 8){
+                                Text("Photo")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .clipped()
+                                    .cornerRadius(14)
+                            }
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(color.cardBackground(scheme))
+                            )
+                            .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
+                        }
+                        Spacer()
+                            .frame(height: 20)
+                        if !reminder.text.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Description")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                
+                                Text(reminder.text)
+                                    .font(.subheadline)
+                                    .multilineTextAlignment(.leading)
+                                
+                            }
+                            .padding()
+                            .frame(minWidth: 350)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(color.cardBackground(scheme))
+                                
+                            )
+                            .shadow(color: .black.opacity(0.05), radius: 6, y: 2)
+                        }
+                    }
+                    .padding(.horizontal)
+                } else {
+                    ScrollView {
                         VStack(spacing: 16) {
-
-
                             if let image = loadImage(reminder.photo) {
                                 VStack(alignment: .leading, spacing: 8){
                                     Text("Photo")
@@ -72,9 +117,9 @@ struct EchoSnapView: View {
                             }
                         }
                         .padding(.horizontal)
-                    
+                    }
+                    .defaultScrollAnchor(.center)
                 }
-                .defaultScrollAnchor(.center)
 
 
             }
@@ -92,6 +137,6 @@ struct EchoSnapView: View {
 
 }
 
-#Preview {
-    EchoSnapView(reminder: .example)
-}
+//#Preview {
+//    EchoSnapView(reminder: .example)
+//}

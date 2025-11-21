@@ -9,6 +9,7 @@ import SwiftUI
 
 struct InstantInsightView: View {
     @State var reminder: Reminder
+    let isInFeed: Bool
 
     var body: some View {
         GeometryReader { proxy in
@@ -28,9 +29,9 @@ struct InstantInsightView: View {
     }
 }
 
-#Preview {
-    InstantInsightView(reminder: .example)
-}
+//#Preview {
+//    InstantInsightView(reminder: .example)
+//}
 
 
 

@@ -17,6 +17,7 @@ struct ReminderView: View {
     @EnvironmentObject var color: ColorManager
 
     let onExpandDetail: (() -> Void)?
+    let isInFeed: Bool
 
     @State private var edit = false
     @State private var detailSheet = false
@@ -29,19 +30,19 @@ struct ReminderView: View {
     var body: some View {
         Group {
             if reminder.isYoutube {
-                SharedLinkView(link: reminder.link, time: $reminder.time, text: reminder.text)
+                SharedLinkView(link: reminder.link, time: $reminder.time, text: reminder.text, isInFeed: isInFeed)
             }
             else if reminder.onlyLink && reminder.isArticle {
-                SharedLinkView(link: reminder.link, time: $reminder.time, text: "")
+                SharedLinkView(link: reminder.link, time: $reminder.time, text: "", isInFeed: isInFeed)
             }
             else {
                 switch reminder.type {
                 case .InstantInsight:
-                    InstantInsightView(reminder: reminder)
+                    InstantInsightView(reminder: reminder, isInFeed: isInFeed)
                 case .EchoSnap:
-                    EchoSnapView(reminder: reminder)
+                    EchoSnapView(reminder: reminder, isInFeed: isInFeed)
                 default:
-                    TimeLessLetterView(reminder: reminder)
+                    TimeLessLetterView(isSheet: false, reminder: reminder, isInFeed: isInFeed)
                 }
             }
         }
@@ -195,7 +196,7 @@ struct ReminderView: View {
         .sheet(isPresented: $detailSheet){
             if reminder.type == .InstantInsight {
                 NavigationView{
-                    TimeLessLetterView(isSheet: true, reminder: reminder)
+                    TimeLessLetterView(isSheet: true, reminder: reminder, isInFeed: isInFeed)
                         .navigationTitle(reminder.title)
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
@@ -213,11 +214,12 @@ struct ReminderView: View {
 
     }
 
-    init(reminder: Reminder, onExpandDetail: (() -> Void)? = nil) {
+    init(reminder: Reminder, onExpandDetail: (() -> Void)? = nil, isInFeed: Bool = false) {
         _reminder = State(initialValue: reminder)
 
         print("Successfully initialising ReminderView")
         self.onExpandDetail = onExpandDetail
+        self.isInFeed = isInFeed
     }
 
 
