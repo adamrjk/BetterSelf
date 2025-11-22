@@ -20,18 +20,26 @@ struct YoutubeView: View {
     let text: String
 
     let isInFeed: Bool
+    @Binding var currentIndex: Int
+    var index: Int
 
-    init(videoURL: String, time: Binding<Int>, text: String, isInFeed: Bool = false){
+    var shouldPlay: Bool { currentIndex == index }
+
+    @State var testPlay = true
+
+    init(videoURL: String, time: Binding<Int>, text: String, isInFeed: Bool = false, currentIndex: Binding<Int> = .constant(0), index: Int = 0){
         _videoURL = State(initialValue: videoURL)
         self.player = .init(
             source: .init(urlString: videoURL),
-            parameters: .init(autoPlay: true, loopEnabled: false, startTime: Measurement(value: Double(time.wrappedValue), unit: UnitDuration.seconds) ,showControls: true, showFullscreenButton: true, progressBarColor: YouTubePlayer.Parameters.ProgressBarColor.white , keyboardControlsDisabled: false, showCaptions: false),
+            parameters: .init(autoPlay: currentIndex.wrappedValue == index, loopEnabled: false, startTime: Measurement(value: Double(time.wrappedValue), unit: UnitDuration.seconds) ,showControls: true, showFullscreenButton: true, progressBarColor: YouTubePlayer.Parameters.ProgressBarColor.white , keyboardControlsDisabled: false, showCaptions: false),
             configuration: .init(fullscreenMode: .web, allowsInlineMediaPlayback: true, allowsAirPlayForMediaPlayback: true, allowsPictureInPictureMediaPlayback: true),
             isLoggingEnabled: false
         )
         _time = time
         self.text = text
         self.isInFeed = isInFeed
+        _currentIndex = currentIndex
+        self.index = index
 
     }
     var body: some View {
@@ -43,67 +51,73 @@ struct YoutubeView: View {
 //                .ignoresSafeArea()
             ZStack {
                 ScrollView {
-
-                    YouTubePlayerView(player)
-                        .id(time)
-                        .frame(maxWidth: .infinity)
-                        .aspectRatio(16.0/9.0, contentMode: .fit)
-                        .scaledToFit()
-                        .cornerRadius(30)
-                        .background(
-                            RoundedRectangle(cornerRadius: 30)
-                                .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
-                        )
-                        .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
-                        .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                        .padding(.bottom, 8)
-
-                    if !text.isEmpty {
-                        DescriptionView(text: text, isYoutube: true)
+                    if shouldPlay {
+                        YouTubePlayerView(player)
+                            .id(time)
+                            .frame(maxWidth: .infinity)
+                            .aspectRatio(16.0/9.0, contentMode: .fit)
+                            .scaledToFit()
+                            .cornerRadius(30)
                             .background(
                                 RoundedRectangle(cornerRadius: 30)
                                     .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
-                                    .frame(maxWidth: .infinity)
                             )
                             .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
                             .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                            .padding(.vertical, 20)
+                            .padding(.bottom, 8)
 
+                        if !text.isEmpty {
+                            DescriptionView(text: text, isYoutube: true)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 30)
+                                        .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
+                                        .frame(maxWidth: .infinity)
+                                )
+                                .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+                                .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
+                                .padding(.vertical, 20)
+
+                        }
                     }
+                    else {
+                        EmptyView()
+                    }
+
 
 
                 }
                 .defaultScrollAnchor(.center)
                 .scrollDisabled(isInFeed)
 //                .allowsHitTesting(isInFeed)
-
-                VStack {
-                    Spacer()
-                    HStack {
+                if !isInFeed {
+                    VStack {
                         Spacer()
-                        Button {
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "open_start_time",
-                                "view": "YoutubeView"
-                            ])
-                            startTime.toggle()
-
-                        } label: {
-                            Image(systemName: "timer")
-                                .foregroundColor(.primary)
-                                .font(.title2)
-                                .padding(12)
-                                .frame(minWidth: 44, minHeight: 44)
-                                .adaptiveGlass(scheme)
+                        HStack {
+                            Spacer()
+                            Button {
+                                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                    "button": "open_start_time",
+                                    "view": "YoutubeView"
+                                ])
+                                startTime.toggle()
+                                
+                            } label: {
+                                Image(systemName: "timer")
+                                    .foregroundColor(.primary)
+                                    .font(.title2)
+                                    .padding(12)
+                                    .frame(minWidth: 44, minHeight: 44)
+                                    .adaptiveGlass(scheme)
+                            }
+                            .contentShape(Rectangle())
+                            .zIndex(2)
+                            .buttonStyle(.plain)
+                            
                         }
-                        .contentShape(Rectangle())
-                        .zIndex(2)
-                        .buttonStyle(.plain)
-
+                        .padding(.trailing)
+                        .padding(.bottom, 4)
+                        
                     }
-                    .padding(.trailing)
-                    .padding(.bottom, 4)
-
                 }
 
 
@@ -113,12 +127,21 @@ struct YoutubeView: View {
 
 
         }
-//        .sheet(isPresented: $startTime){
-//            StartTimeView(time: $time){ newTime in
-//                player.parameters.startTime = Measurement(value: Double(newTime), unit: UnitDuration.seconds)
-//            }
-//            .presentationDetents([.height(300)])
-//        }
+        .onChange(of: shouldPlay) { _, newValue in
+            Task {
+                if newValue {
+                    try await player.play()
+                } else {
+                    try await player.pause()
+                }
+            }
+        }
+        .sheet(isPresented: $startTime){
+            StartTimeView(time: $time){ newTime in
+                player.parameters.startTime = Measurement(value: Double(newTime), unit: UnitDuration.seconds)
+            }
+            .presentationDetents([.height(300)])
+        }
     }
 }
 

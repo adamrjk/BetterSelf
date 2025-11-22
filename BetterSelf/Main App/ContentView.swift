@@ -46,20 +46,22 @@ struct ContentView: View {
 
     var body: some View {
             TabView(selection: $flow.selectedTab) {
+                NavigationStack(path: $flow.feedPath){
+                    FeedView()
 
-                FeedView(reminders: Array(reminders.prefix(5)))
-                    .tag(AppFlow.Tab.feed)
-                    .tabItem{
-                        Label("Feed", systemImage: "lightbulb.fill")
-                    }
-                    .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
+                }
+                .tag(AppFlow.Tab.feed)
+                .tabItem{
+                    Label("The Lab", systemImage: "flask.fill")
+                }
+                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
 
 
                 if sizeClass == .regular {
                     SplitView(notifReminder: $notifReminder)
                         .tag(AppFlow.Tab.reminders)
                         .tabItem{
-                            Label("Reminders", systemImage: "list.bullet")
+                            Label("Insights", systemImage: "lightbulb.fill")
 
                         }
                         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
@@ -71,7 +73,7 @@ struct ContentView: View {
                     }
                     .tag(AppFlow.Tab.reminders)
                     .tabItem{
-                        Label("Insights", systemImage: "list.bullet")
+                        Label("Insights", systemImage: "lightbulb.fill")
 
                     }
                     .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)

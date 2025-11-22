@@ -16,11 +16,11 @@ final class AppFlow: ObservableObject {
         case feed
     }
 
-    @Published var selectedTab: Tab = .reminders
+    @Published var selectedTab: Tab = .feed
 
     // Per-tab navigation paths
     @Published var insightsPath = NavigationPath()
-    @Published var solverPath = NavigationPath()
+    @Published var feedPath = NavigationPath()
     @Published var activeSheet: SheetDestination?
     private var sheet: SheetDestination = .settings
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FSRS
 import SwiftData
 
 
@@ -32,6 +33,8 @@ class Reminder {
 
     var shareID: String?
 
+    var card: Card?
+
 
     init(title: String, type: ReminderType = .InstantInsight,  text: String, photo: Data? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
         self.id = UUID()
@@ -51,6 +54,7 @@ class Reminder {
         self.isLoading = false
         self.isFront = false
         self.shareID = generateShortID()
+        self.card = Card(due: .now)
     }
 
     static let example =  Reminder(title: "The One Thing", text: "You can only pursue one goal at a time", firebaseVideoURL: "https://firebasestorage.googleapis.com:443/v0/b/betterself-29f7e.firebasestorage.app/o/videos%2FC29D7FD5-3EEF-417D-BB11-14448E115FFE.mov?alt=media&token=877e7031-36c1-4af0-9941-f85650676519", link: "https://", folder: .example)

@@ -64,6 +64,11 @@ struct CustomVideoPlayer: UIViewControllerRepresentable {
 struct FullScreenVideoPlayer: View {
     let videoURL: URL
     let isFront: Bool
+
+    @Binding var currentIndex: Int
+    var index: Int
+
+    var shouldPlay: Bool { currentIndex == index }
     @Environment(\.dismiss) var dismiss
     @State private var player: AVPlayer?
     @State private var isLoading = true
@@ -116,6 +121,14 @@ struct FullScreenVideoPlayer: View {
             .onDisappear {
                 cleanupPlayer()
             }
+            .onChange(of: shouldPlay) { _, newValue in
+                guard let player else { return }
+                if newValue {
+                    player.play()
+                } else {
+                    player.pause()
+                }
+            }
         }
     }
 
@@ -136,8 +149,10 @@ struct FullScreenVideoPlayer: View {
 
                         self.isLoading = false
 
-                        // Start playing
-                        self.player?.play()
+                        // Start playing only if requested
+                        if shouldPlay {
+                            self.player?.play()
+                        }
 
                     }
                 }

@@ -42,22 +42,23 @@ struct IPadReminderView: View {
 
     var body: some View {
         Group {
-            if reminder.isYoutube {
-                SharedLinkView(link: reminder.link, time: $reminder.time, text: reminder.text)
-            }
-            else if reminder.onlyLink {
-                SharedLinkView(link: reminder.link, time: $reminder.time, text: "")
-            }
-            else {
+//            if reminder.isYoutube {
+////                SharedLinkView(link: reminder.link, time: $reminder.time, text: reminder.text, isInFeed: false, currentIndex: .constant(0), index: 0)
+//                Text("hello")
+//            }
+//            else if reminder.onlyLink {
+//                SharedLinkView(link: reminder.link, time: $reminder.time, text: "")
+//            }
+//            else {
                 switch reminder.type {
                 case .InstantInsight:
-                    InstantInsightView(reminder: reminder, isInFeed: false)
+                    InstantInsightView(reminder: reminder, isInFeed: false, currentIndex: .constant(0), index: 0)
                 case .EchoSnap:
                     EchoSnapView(reminder: reminder, isInFeed: false)
                 default:
                     TimeLessLetterView(reminder: reminder, isInFeed: false)
                 }
-            }
+//            }
         }
         .overlay(
             VStack {

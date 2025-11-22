@@ -5,44 +5,66 @@
 //  Created by Adam Damou on 20/11/2025.
 //
 
+import SwiftData
 import SwiftUI
 
 struct FeedView: View {
-    let reminders: [Reminder]           // pass your 5 chosen items
-    @State private var currentIndex = 0
+
+    @Query(filter: #Predicate<Reminder> { $0.isChecked == true },
+           sort: \Reminder.date) var all: [Reminder]
+    var unlocked: [Reminder] {
+        all.filter{ !$0.isLocked}
+    }
+    @State private var currentIndex: Int = 0
+
+    let manager = FeedManager.shared
+
+
+    var reminders: [Reminder]{
+        manager.dailyInsights(reminders: unlocked)
+    }
+
+
+
 
     var body: some View {
         ScrollViewReader { scroller in
             ScrollView(.vertical) {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(reminders.prefix(5).enumerated()), id: \.offset) { index, reminder in
-                        ReminderView(reminder: reminder, isInFeed: true)
-                            .containerRelativeFrame([.horizontal, .vertical])
+                    ForEach(Array(reminders.enumerated()), id: \.offset) { index, reminder in
+                        ReminderContent(reminder: reminder, isInFeed: true, currentIndex: $currentIndex, index: index)
+                            .containerRelativeFrame(.vertical)
                             .id(index)
-                            .onAppear {
-                                currentIndex = index
-                                // start video for this index
-                            }
-                            .onDisappear {
-                                // pause/stop video for this index
-                            }
+                            .ignoresSafeArea(.all)
                     }
                 }
+                .scrollTargetLayout()                    // enable snap-to-item sizing on items
             }
             .scrollIndicators(.never)
-            .scrollTargetLayout()                    // enable snap-to-item
             .scrollTargetBehavior(.paging)           // page one full view at a time
+            .scrollPosition(
+                id: Binding<Int?>(
+                    get: { currentIndex },
+                    set: { newValue in
+                        if let value = newValue {
+                            currentIndex = value
+                        }
+                    }
+                )
+            )
             .ignoresSafeArea(.all)
             // Optional programmatic jump:
             // .onChange(of: currentIndex) { _, i in scroller.scrollTo(i, anchor: .center) }
         }
-        // Track index for analytics, preload, etc.
-        // .onChange(of: currentIndex) { _, i in ... }
+        .onChange(of: currentIndex) { _, i in
+            print("Current index is \(i)")
+         }
     }
-    init(reminders: [Reminder]) {
-        self.reminders = reminders
+    init() {
         self.currentIndex = 0
     }
+
+
 }
 
 //#Preview {

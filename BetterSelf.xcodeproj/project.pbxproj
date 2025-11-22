@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66288D052ED19AEC0079581A /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = 66288D042ED19AEC0079581A /* FSRS */; };
 		6633FB4A2E81431A00720B21 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6633FB492E81431A00720B21 /* WidgetKit.framework */; };
 		6633FB4C2E81431A00720B21 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6633FB4B2E81431A00720B21 /* SwiftUI.framework */; };
 		6633FB5D2E81431B00720B21 /* BetterSelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6633FB472E81431A00720B21 /* BetterSelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -138,6 +139,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6633FB4C2E81431A00720B21 /* SwiftUI.framework in Frameworks */,
+				66288D052ED19AEC0079581A /* FSRS in Frameworks */,
 				6633FB4A2E81431A00720B21 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -218,6 +220,7 @@
 			);
 			name = BetterSelfWidgetExtension;
 			packageProductDependencies = (
+				66288D042ED19AEC0079581A /* FSRS */,
 			);
 			productName = BetterSelfWidgetExtension;
 			productReference = 6633FB472E81431A00720B21 /* BetterSelfWidgetExtension.appex */;
@@ -811,6 +814,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		66288D042ED19AEC0079581A /* FSRS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 667E5B4E2ED054D300425067 /* XCRemoteSwiftPackageReference "swift-fsrs" */;
+			productName = FSRS;
+		};
 		6678C68C2E5453DB00C80E8F /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6678C68B2E5453DB00C80E8F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
