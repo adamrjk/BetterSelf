@@ -67,16 +67,24 @@ struct ContentView: View {
                         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
                 }
                 else  {
-                    NavigationStack(path: $flow.insightsPath) {
-                        FolderView()
-                            .navigationDestination(InsightsDestination.self)
-                    }
-                    .tag(AppFlow.Tab.reminders)
-                    .tabItem{
-                        Label("Insights", systemImage: "lightbulb.fill")
 
-                    }
-                    .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
+                    NavigationStack(path: $flow.insightsPath) {
+//                            HomeView(folder: flow.folder)
+                            FolderView()
+                                .navigationDestination(InsightsDestination.self)
+                        }
+                        .tag(AppFlow.Tab.reminders)
+                        .tabItem{
+                            Label("Insights", systemImage: "lightbulb.fill")
+
+                        }
+                        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
+
+
+//                    NavigationStack(path: $flow.insightsPath) {
+//                        FolderView()
+//                            .navigationDestination(InsightsDestination.self)
+//                    }
 
                 }
 
@@ -144,6 +152,7 @@ struct ContentView: View {
                 }
             }
             .onAppear {
+                flow.openAllReminders()
                 flow.configure(with: { modelContext })
                 checkIfWelcome()
                 getSchemeAndTheme()

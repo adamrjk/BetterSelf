@@ -10,6 +10,9 @@ import SwiftUI
 
 struct FeedView: View {
 
+    @Environment(\.colorScheme) var scheme
+    @EnvironmentObject var color: ColorManager
+
     @Query(filter: #Predicate<Reminder> { $0.isChecked == true },
            sort: \Reminder.date) var all: [Reminder]
     var unlocked: [Reminder] {
@@ -26,45 +29,62 @@ struct FeedView: View {
 
 
 
-
     var body: some View {
-        ScrollViewReader { scroller in
-            ScrollView(.vertical) {
-                LazyVStack(spacing: 0) {
-                    ForEach(Array(reminders.enumerated()), id: \.offset) { index, reminder in
-                        ReminderContent(reminder: reminder, isInFeed: true, currentIndex: $currentIndex, index: index)
-                            .containerRelativeFrame(.vertical)
-                            .id(index)
-                            .ignoresSafeArea(.all)
-                    }
-                }
-                .scrollTargetLayout()                    // enable snap-to-item sizing on items
-            }
-            .scrollIndicators(.never)
-            .scrollTargetBehavior(.paging)           // page one full view at a time
-            .scrollPosition(
-                id: Binding<Int?>(
-                    get: { currentIndex },
-                    set: { newValue in
-                        if let value = newValue {
-                            currentIndex = value
+        ZStack {
+            color.background(scheme)
+            ScrollViewReader { scroller in
+                ScrollView(.vertical) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(reminders.enumerated()), id: \.offset) { index, reminder in
+                            ReminderContent(reminder: reminder, isInFeed: true, currentIndex: $currentIndex, index: index)
+                                .containerRelativeFrame(.vertical)
+                                .id(index)
+                                .ignoresSafeArea(.all)
                         }
                     }
+                    .scrollTargetLayout()                    // enable snap-to-item sizing on items
+                }
+                .scrollIndicators(.never)
+                .scrollTargetBehavior(.paging)           // page one full view at a time
+                .scrollPosition(
+                    id: Binding<Int?>(
+                        get: { currentIndex },
+                        set: { newValue in
+                            if let value = newValue {
+                                currentIndex = value
+                            }
+                        }
+                    )
                 )
-            )
-            .ignoresSafeArea(.all)
-            // Optional programmatic jump:
-            // .onChange(of: currentIndex) { _, i in scroller.scrollTo(i, anchor: .center) }
+                .ignoresSafeArea(.all)
+                // Optional programmatic jump:
+                // .onChange(of: currentIndex) { _, i in scroller.scrollTo(i, anchor: .center) }
+            }
+            .onChange(of: currentIndex) { _, i in
+                preheatAround(index: i)
+            }
         }
-        .onChange(of: currentIndex) { _, i in
-            print("Current index is \(i)")
-         }
     }
     init() {
         self.currentIndex = 0
     }
 
 
+}
+
+extension FeedView {
+    private func preheatAround(index: Int) {
+        let candidates = [index, index + 1].compactMap { idx in
+            idx < reminders.count ? reminders[idx] : nil
+        }
+        for reminder in candidates {
+            if reminder.type == ReminderType.InstantInsight,
+               let link = reminder.firebaseVideoURL,
+               let url = URL(string: link) {
+                VideoPreheater.shared.preheat(url)
+            }
+        }
+    }
 }
 
 //#Preview {

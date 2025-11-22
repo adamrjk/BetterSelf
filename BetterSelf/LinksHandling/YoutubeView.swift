@@ -25,16 +25,12 @@ struct YoutubeView: View {
 
     var shouldPlay: Bool { currentIndex == index }
 
-    @State var testPlay = true
-
     init(videoURL: String, time: Binding<Int>, text: String, isInFeed: Bool = false, currentIndex: Binding<Int> = .constant(0), index: Int = 0){
         _videoURL = State(initialValue: videoURL)
-        self.player = .init(
-            source: .init(urlString: videoURL),
-            parameters: .init(autoPlay: currentIndex.wrappedValue == index, loopEnabled: false, startTime: Measurement(value: Double(time.wrappedValue), unit: UnitDuration.seconds) ,showControls: true, showFullscreenButton: true, progressBarColor: YouTubePlayer.Parameters.ProgressBarColor.white , keyboardControlsDisabled: false, showCaptions: false),
-            configuration: .init(fullscreenMode: .web, allowsInlineMediaPlayback: true, allowsAirPlayForMediaPlayback: true, allowsPictureInPictureMediaPlayback: true),
-            isLoggingEnabled: false
-        )
+        // Reuse a preheated player if available (created by an offscreen cell), or create and cache one
+        let candidate = YouTubePreheater.shared.player(for: videoURL)
+            ?? YouTubePreheater.shared.ensurePlayer(for: videoURL, startTimeSeconds: time.wrappedValue)
+        self.player = candidate
         _time = time
         self.text = text
         self.isInFeed = isInFeed
@@ -51,40 +47,33 @@ struct YoutubeView: View {
 //                .ignoresSafeArea()
             ZStack {
                 ScrollView {
-                    if shouldPlay {
-                        YouTubePlayerView(player)
-                            .id(time)
-                            .frame(maxWidth: .infinity)
-                            .aspectRatio(16.0/9.0, contentMode: .fit)
-                            .scaledToFit()
-                            .cornerRadius(30)
+
+                    YouTubePlayerView(player)
+                        .id(time)
+                        .frame(maxWidth: .infinity)
+                        .aspectRatio(16.0/9.0, contentMode: .fit)
+                        .scaledToFit()
+                        .cornerRadius(30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 30)
+                                .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
+                        )
+                        .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
+                        .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
+                        .padding(.bottom, 8)
+
+                    if !text.isEmpty {
+                        DescriptionView(text: text, isYoutube: true)
                             .background(
                                 RoundedRectangle(cornerRadius: 30)
                                     .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
+                                    .frame(maxWidth: .infinity)
                             )
                             .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
                             .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                            .padding(.bottom, 8)
+                            .padding(.vertical, 20)
 
-                        if !text.isEmpty {
-                            DescriptionView(text: text, isYoutube: true)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 30)
-                                        .stroke(color.shadow(scheme).opacity(0.2), lineWidth: 1)
-                                        .frame(maxWidth: .infinity)
-                                )
-                                .shadow(color: color.shadow(scheme).opacity(0.15), radius: 8, x: 0, y: 4)
-                                .shadow(color: color.shadow(scheme).opacity(0.1), radius: 16, x: 0, y: 8)
-                                .padding(.vertical, 20)
-
-                        }
                     }
-                    else {
-                        EmptyView()
-                    }
-
-
-
                 }
                 .defaultScrollAnchor(.center)
                 .scrollDisabled(isInFeed)
@@ -99,8 +88,11 @@ struct YoutubeView: View {
                                     "button": "open_start_time",
                                     "view": "YoutubeView"
                                 ])
-                                startTime.toggle()
-                                
+//                                startTime.toggle()
+
+                                Task {
+                                    await togglePlayPause(true)
+                                }
                             } label: {
                                 Image(systemName: "timer")
                                     .foregroundColor(.primary)
@@ -129,11 +121,13 @@ struct YoutubeView: View {
         }
         .onChange(of: shouldPlay) { _, newValue in
             Task {
-                if newValue {
-                    try await player.play()
-                } else {
-                    try await player.pause()
-                }
+                await togglePlayPause(newValue)
+            }
+        }
+        .onAppear {
+            // Hint preheater for upcoming items when inside feed
+            if isInFeed {
+                _ = YouTubePreheater.shared.ensurePlayer(for: videoURL, startTimeSeconds: time)
             }
         }
         .sheet(isPresented: $startTime){
@@ -141,6 +135,18 @@ struct YoutubeView: View {
                 player.parameters.startTime = Measurement(value: Double(newTime), unit: UnitDuration.seconds)
             }
             .presentationDetents([.height(300)])
+        }
+    }
+
+    func togglePlayPause(_ shouldPlay: Bool) async {
+        Task {
+            if !shouldPlay {
+                try await player.pause()
+            }
+            else {
+                try await player.play()
+            }
+
         }
     }
 }

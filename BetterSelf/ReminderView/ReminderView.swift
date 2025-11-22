@@ -29,7 +29,12 @@ struct ReminderView: View {
 
 
     var body: some View {
-        ReminderContent(reminder: reminder, isInFeed: false)
+        ZStack {
+            color.background(scheme)
+            
+            ReminderContent(reminder: reminder, isInFeed: false)
+                .ignoresSafeArea()
+        }
         .onAppear{
             AnalyticsService.logScreenView(screenName: "Reminder", screenClass: "ReminderView")
             if TutorialManager.shared.inTutorial {

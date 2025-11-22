@@ -104,4 +104,3 @@ struct RecordingHandler: Hashable, Equatable {
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
     static func ==(lhs: RecordingHandler, rhs: RecordingHandler) -> Bool { lhs.id == rhs.id}
 }
-

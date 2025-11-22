@@ -72,7 +72,7 @@ struct HomeView: View {
                 .buttonStyle(.plain)
             }
             ToolbarItem(placement: .topBarLeading){
-                Button("Go Back", systemImage: "chevron.left"){
+                Button("Go Back", systemImage: "folder.fill"){
                     AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
                         "button": "back",
                         "view": "HomeView"

@@ -24,11 +24,6 @@ struct TimeLessLetterView: View {
     var body: some View {
 
         ZStack{
-            color.mainGradient(scheme)
-                .ignoresSafeArea()
-            color.overlayGradient(scheme)
-                .ignoresSafeArea()
-
             if isInFeed {
                 DescriptionView(text: reminder.text)
             } else {

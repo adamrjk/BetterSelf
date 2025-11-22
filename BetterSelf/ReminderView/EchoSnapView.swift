@@ -20,11 +20,6 @@ struct EchoSnapView: View {
     var body: some View {
 
             ZStack {
-                color.mainGradient(scheme)
-                    .ignoresSafeArea()
-
-                color.overlayGradient(scheme)
-                    .ignoresSafeArea()
                 if isInFeed {
                     VStack(spacing: 16) {
                         if let image = loadImage(reminder.photo) {

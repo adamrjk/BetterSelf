@@ -19,7 +19,7 @@ struct InstantInsightView: View {
             if let firebaseURL = reminder.firebaseVideoURL, let url = URL(string: firebaseURL) {
                 ZStack {
 
-                    FullScreenVideoPlayer(videoURL: url, isFront: reminder.isFront, currentIndex: $currentIndex, index: index)
+                    FullScreenVideoPlayer(videoURL: url, isFront: reminder.isFront, currentIndex: $currentIndex, index: index, isInFeed: isInFeed)
                         .ignoresSafeArea(.all, edges: .top)
 //                        .scaledToFill()
                         .frame(width: proxy.size.width)

@@ -24,7 +24,7 @@ final class AppFlow: ObservableObject {
     @Published var activeSheet: SheetDestination?
     private var sheet: SheetDestination = .settings
 
-
+    
 
     private var camStuff: (URL, Bool)?
 
@@ -147,4 +147,3 @@ final class AppFlow: ObservableObject {
         // This method exists for future centralization.
     }
 }
-

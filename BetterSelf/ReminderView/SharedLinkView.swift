@@ -35,11 +35,6 @@ struct SharedLinkView: View {
 
 
             ZStack {
-                color.mainGradient(scheme)
-                    .ignoresSafeArea()
-                color.overlayGradient(scheme)
-                    .ignoresSafeArea()
-
                 switch type {
                 case .youtube:
                     //                YoutubeView(isPlayable: true, youtubeId: getYoutubeId() ?? "", time: $time)
