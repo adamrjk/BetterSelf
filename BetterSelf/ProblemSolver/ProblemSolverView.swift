@@ -27,11 +27,6 @@ struct ProblemSolverView: View {
     @State private var solvingProblem = false
 
 
-
-
-
-
-
     @StateObject var solver: ProblemSolverManager = ProblemSolverManager.shared
 
     var body: some View {
