@@ -42,10 +42,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 struct BetterSelfApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @Environment(\.modelContext) var modelContext
+    @StateObject var flow = AppFlow()
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .tutorialOverlay()
+                .environmentObject(flow)
                 .environmentObject(NotificationManager.shared)
                 .environmentObject(ColorManager.shared)
                 .onOpenURL { url in

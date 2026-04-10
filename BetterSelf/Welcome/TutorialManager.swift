@@ -181,6 +181,15 @@ class TutorialManager: ObservableObject {
         }
     }
 
+    func checkIfWelcome(){
+        if UserDefaults().bool(forKey: "Tutorial \(NotificationManager.shared.version)") {
+        }
+        else {
+            getStarted()
+            UserDefaults().set(true, forKey: "Tutorial \(NotificationManager.shared.version)")
+        }
+    }
+
 
     func startTutorialForSheet(_ viewId: String){
         if currentDone {

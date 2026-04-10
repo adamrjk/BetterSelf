@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ReminderRowView: View {
-    @State var reminder: Reminder
+    let reminder: Reminder
     
     @State var isPreview: Bool
     @EnvironmentObject var color: ColorManager
@@ -20,26 +20,16 @@ struct ReminderRowView: View {
 
 
         HStack(spacing: 16) {
-            // Left thumbnail with improved design
-            if let image = loadImage(reminder) {
-                image
-                    .resizable()
-                    .rotation3DEffect(.degrees(reminder.isFront ? 180 : 0), axis: (x: 0, y: 1, z: 0))
-                    .scaledToFill()
-                    .frame(width: isPreview ? 40 : 80, height: isPreview ? 40 : 80)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                    )
-                    .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-            }
-            else if reminder.isYoutube {
-
+            if let urlString = reminder.photoURL, let url = URL(string: urlString) {
+                AsyncImage(url: url) { image in
+                    thumbnailImage(image)
+                } placeholder: {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(width: isPreview ? 40 : 80, height: isPreview ? 40 : 80)
+                }
+            } else if reminder.isYoutube {
                 YouTubeThumbnailView(videoURL: reminder.link, type: isPreview ? .preview : .reminderRow)
-
-
-
             }
 
             // Content section with improved typography
@@ -74,7 +64,7 @@ struct ReminderRowView: View {
                     if !reminder.text.isEmpty { ElementIndicatorView(systemName: "text.quote")}
 
                     if reminder.firebaseVideoURL != nil { ElementIndicatorView(systemName: "video.fill")}
-                    else if reminder.type == .EchoSnap && reminder.photo != nil { ElementIndicatorView(systemName: "photo.fill") }
+                    else if reminder.type == .EchoSnap && reminder.photoURL != nil { ElementIndicatorView(systemName: "photo.fill") }
 
                     if !reminder.link.isEmpty { ElementIndicatorView(systemName: "link.circle.fill")}
                 }
@@ -101,13 +91,21 @@ struct ReminderRowView: View {
 
     }
 
-    func loadImage(_ reminder: Reminder) -> Image? {
-
-        guard let data = reminder.photo, let uiImage = UIImage(data: data) else {
-            return nil
-        }
-        return Image(uiImage: uiImage)
+    @ViewBuilder
+    private func thumbnailImage(_ image: Image) -> some View {
+        image
+            .resizable()
+            .rotation3DEffect(.degrees(reminder.isFront ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+            .scaledToFill()
+            .frame(width: isPreview ? 40 : 80, height: isPreview ? 40 : 80)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
     }
+
     func getId(_ link: String) -> String? {
         let patterns = [
               "youtube\\.com/watch\\?v=([a-zA-Z0-9_-]{11})",

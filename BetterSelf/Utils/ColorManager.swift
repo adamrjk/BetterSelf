@@ -27,8 +27,16 @@ class ColorManager: ObservableObject {
         self.theme = theme
     }
 
+    @ViewBuilder
+    func background(_ scheme: ColorScheme) -> some View {
+        mainGradient(scheme)
+            .ignoresSafeArea()
+
+        overlayGradient(scheme)
+            .ignoresSafeArea()
 
 
+    }
 
 
 

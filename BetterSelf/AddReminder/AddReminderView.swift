@@ -282,11 +282,11 @@ struct AddReminderView: View {
 
 
                 } else {
-                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnail: $reminder.photo, isLoading: $reminder.isLoading)
+                    AddingVideoView(firebaseVideoURL: $reminder.firebaseVideoURL, thumbnailURL: $reminder.photoURL, isLoading: $reminder.isLoading)
 
                 }
             case .EchoSnap:
-                AddingPhotoView(photo: $reminder.photo)
+                AddingPhotoView(photoURL: $reminder.photoURL)
             default:
                 AddingDescriptionView(text: $reminder.text, keyboard: $keyboard)
             }

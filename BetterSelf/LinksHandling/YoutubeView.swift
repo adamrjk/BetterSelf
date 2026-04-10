@@ -19,16 +19,23 @@ struct YoutubeView: View {
     @State var videoURL: String
     let text: String
 
-    init(videoURL: String, time: Binding<Int>, text: String){
+    let isInFeed: Bool
+    @Binding var currentIndex: Int
+    var index: Int
+
+    var shouldPlay: Bool { currentIndex == index }
+
+    init(videoURL: String, time: Binding<Int>, text: String, isInFeed: Bool = false, currentIndex: Binding<Int> = .constant(0), index: Int = 0){
         _videoURL = State(initialValue: videoURL)
-        self.player = .init(
-            source: .init(urlString: videoURL),
-            parameters: .init(autoPlay: true, loopEnabled: false, startTime: Measurement(value: Double(time.wrappedValue), unit: UnitDuration.seconds) ,showControls: true, showFullscreenButton: true, progressBarColor: YouTubePlayer.Parameters.ProgressBarColor.white , keyboardControlsDisabled: false, showCaptions: false),
-            configuration: .init(fullscreenMode: .web, allowsInlineMediaPlayback: true, allowsAirPlayForMediaPlayback: true, allowsPictureInPictureMediaPlayback: true),
-            isLoggingEnabled: false
-        )
+        // Reuse a preheated player if available (created by an offscreen cell), or create and cache one
+        let candidate = YouTubePreheater.shared.player(for: videoURL)
+            ?? YouTubePreheater.shared.ensurePlayer(for: videoURL, startTimeSeconds: time.wrappedValue)
+        self.player = candidate
         _time = time
         self.text = text
+        self.isInFeed = isInFeed
+        _currentIndex = currentIndex
+        self.index = index
 
     }
     var body: some View {
@@ -67,38 +74,42 @@ struct YoutubeView: View {
                             .padding(.vertical, 20)
 
                     }
-
-
                 }
                 .defaultScrollAnchor(.center)
-
-                VStack {
-                    Spacer()
-                    HStack {
+                .scrollDisabled(isInFeed)
+//                .allowsHitTesting(isInFeed)
+                if !isInFeed {
+                    VStack {
                         Spacer()
-                        Button {
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "open_start_time",
-                                "view": "YoutubeView"
-                            ])
-                            startTime.toggle()
+                        HStack {
+                            Spacer()
+                            Button {
+                                AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                                    "button": "open_start_time",
+                                    "view": "YoutubeView"
+                                ])
+//                                startTime.toggle()
 
-                        } label: {
-                            Image(systemName: "timer")
-                                .foregroundColor(.primary)
-                                .font(.title2)
-                                .padding(12)
-                                .frame(minWidth: 44, minHeight: 44)
-                                .adaptiveGlass(scheme)
+                                Task {
+                                    await togglePlayPause(true)
+                                }
+                            } label: {
+                                Image(systemName: "timer")
+                                    .foregroundColor(.primary)
+                                    .font(.title2)
+                                    .padding(12)
+                                    .frame(minWidth: 44, minHeight: 44)
+                                    .adaptiveGlass(scheme)
+                            }
+                            .contentShape(Rectangle())
+                            .zIndex(2)
+                            .buttonStyle(.plain)
+                            
                         }
-                        .contentShape(Rectangle())
-                        .zIndex(2)
-                        .buttonStyle(.plain)
-
+                        .padding(.trailing)
+                        .padding(.bottom, 4)
+                        
                     }
-                    .padding(.trailing)
-                    .padding(.bottom, 4)
-
                 }
 
 
@@ -108,11 +119,34 @@ struct YoutubeView: View {
 
 
         }
+        .onChange(of: shouldPlay) { _, newValue in
+            Task {
+                await togglePlayPause(newValue)
+            }
+        }
+        .onAppear {
+            // Hint preheater for upcoming items when inside feed
+            if isInFeed {
+                _ = YouTubePreheater.shared.ensurePlayer(for: videoURL, startTimeSeconds: time)
+            }
+        }
         .sheet(isPresented: $startTime){
             StartTimeView(time: $time){ newTime in
                 player.parameters.startTime = Measurement(value: Double(newTime), unit: UnitDuration.seconds)
             }
             .presentationDetents([.height(300)])
+        }
+    }
+
+    func togglePlayPause(_ shouldPlay: Bool) async {
+        Task {
+            if !shouldPlay {
+                try await player.pause()
+            }
+            else {
+                try await player.play()
+            }
+
         }
     }
 }

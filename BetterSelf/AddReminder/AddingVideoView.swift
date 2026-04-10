@@ -23,7 +23,7 @@ struct AddingVideoView: View {
     @State private var selectedItem: PhotosPickerItem?
 
     @Binding private var firebaseVideoURL: String?
-    @Binding private var thumbnail: Data?  
+    @Binding private var thumbnailURL: String?
     @Binding private var isLoading: Bool
 
 
@@ -61,10 +61,8 @@ struct AddingVideoView: View {
                             isLoading = false
                             thumbnailImage = nil
                             selectedItem = nil
-                            //delete video
                             firebaseVideoURL = nil
-                            thumbnail = nil
-
+                            thumbnailURL = nil
                             viewState = .idle
 
                         } label: {
@@ -114,9 +112,8 @@ struct AddingVideoView: View {
                                 isLoading = false
                                 thumbnailImage = nil
                                 selectedItem = nil
-                                //delete video
                                 firebaseVideoURL = nil
-                                thumbnail = nil
+                                thumbnailURL = nil
                                 viewState = .idle
 
                             } label: {
@@ -150,9 +147,14 @@ struct AddingVideoView: View {
     }
 
     func videoEditing() {
-        if let data = thumbnail {
+        if let urlString = thumbnailURL, let url = URL(string: urlString) {
             viewState = .showingThumbnail
-            thumbnailImage = Image(uiImage: UIImage(data: data)!)
+            Task {
+                if let (data, _) = try? await URLSession.shared.data(from: url),
+                   let uiImage = UIImage(data: data) {
+                    thumbnailImage = Image(uiImage: uiImage)
+                }
+            }
         }
     }
     struct Video {
@@ -170,10 +172,15 @@ struct AddingVideoView: View {
                 do {
                     if let videoData = try await selectedItem?.loadTransferable(type: Data.self) {
                         if let uIImage = await generateThumbnail(from: videoData) {
-
-                            thumbnail = uIImage.jpegData(compressionQuality: 0.8)
                             self.thumbnailImage = Image(uiImage: uIImage)
                             self.viewState = .showingThumbnail
+                            if let data = uIImage.jpegData(compressionQuality: 0.8) {
+                                uploadManager.startUpload(imageData: data) { result in
+                                    if case .success(let url) = result {
+                                        self.thumbnailURL = url
+                                    }
+                                }
+                            }
                         }
 
 
@@ -238,9 +245,9 @@ struct AddingVideoView: View {
             }
         }
     }
-    init(firebaseVideoURL: Binding<String?>, thumbnail: Binding<Data?>, isLoading: Binding<Bool>) {
+    init(firebaseVideoURL: Binding<String?>, thumbnailURL: Binding<String?>, isLoading: Binding<Bool>) {
         _firebaseVideoURL = firebaseVideoURL
-        _thumbnail = thumbnail
+        _thumbnailURL = thumbnailURL
         _isLoading = isLoading
     }
 
@@ -274,6 +281,6 @@ struct AddingVideoView: View {
 
 
 #Preview {
-    AddingVideoView(firebaseVideoURL: .constant(nil), thumbnail: .constant(nil), isLoading: .constant(false))
+    AddingVideoView(firebaseVideoURL: .constant(nil), thumbnailURL: .constant(nil), isLoading: .constant(false))
 }
 

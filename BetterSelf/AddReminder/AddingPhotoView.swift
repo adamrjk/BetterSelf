@@ -11,32 +11,38 @@ import SwiftUI
 
 struct AddingPhotoView: View {
 
-    
     @Environment(\.colorScheme) var scheme
-
     @EnvironmentObject var color: ColorManager
-    @State private var image: Image?
-    @Binding private var photo: Data?
+
+    @State private var displayImage: Image?
+    @Binding private var photoURL: String?
 
     @State private var selectedPhoto: PhotosPickerItem?
-
+    @State private var isUploading = false
 
     var body: some View {
         VStack{
             PhotosPicker(selection: $selectedPhoto, matching: .images) {
                 ZStack {
-                    if let image {
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .cornerRadius(14)
-                            .padding(15)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(color.cardBackground(scheme))
-                            )
+                    if let displayImage {
+                        ZStack(alignment: .topTrailing) {
+                            displayImage
+                                .resizable()
+                                .scaledToFit()
+                                .cornerRadius(14)
+                                .padding(15)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .fill(color.cardBackground(scheme))
+                                )
+                            if isUploading {
+                                ProgressView()
+                                    .padding(10)
+                                    .background(.ultraThinMaterial, in: Circle())
+                                    .padding(8)
+                            }
+                        }
                     } else {
-                        // Default state with fixed background
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
                             .fill(color.cardBackground(scheme))
 
@@ -52,10 +58,7 @@ struct AddingPhotoView: View {
                         }
                         .frame(maxWidth: .infinity, minHeight: 300)
                         .padding()
-
-
                     }
-
                 }
                 .frame(minHeight: 300)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -63,28 +66,43 @@ struct AddingPhotoView: View {
             .padding(.horizontal, 20)
             .buttonStyle(.plain)
             .onChange(of: selectedPhoto, loadImage)
-            .onAppear(perform: imageEditing)
-        }
-    }
-    func imageEditing() {
-        if let data = photo {
-            image = Image(uiImage: UIImage(data: data)!)
+            .onAppear(perform: loadExisting)
         }
     }
 
+    func loadExisting() {
+        guard let urlString = photoURL, let url = URL(string: urlString) else { return }
+        Task {
+            if let (data, _) = try? await URLSession.shared.data(from: url),
+               let uiImage = UIImage(data: data) {
+                displayImage = Image(uiImage: uiImage)
+            }
+        }
+    }
 
     func loadImage() {
         Task {
-            guard let data = try await selectedPhoto?.loadTransferable(type: Data.self) else { return }
-            photo = data
-            image = Image(uiImage: UIImage(data: data)!)
+            guard let data = try await selectedPhoto?.loadTransferable(type: Data.self),
+                  let uiImage = UIImage(data: data) else { return }
+            displayImage = Image(uiImage: uiImage)
+            isUploading = true
+            UploadManager.shared.startUpload(imageData: data) { result in
+                isUploading = false
+                switch result {
+                case .success(let url):
+                    photoURL = url
+                case .failure(let error):
+                    print("Photo upload failed: \(error.localizedDescription)")
+                }
+            }
         }
     }
-    init(photo: Binding<Data?>){
-        _photo = photo
+
+    init(photoURL: Binding<String?>) {
+        _photoURL = photoURL
     }
 }
 
 #Preview {
-    AddingPhotoView(photo: .constant(nil))
+    AddingPhotoView(photoURL: .constant(nil))
 }

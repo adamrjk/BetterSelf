@@ -9,10 +9,14 @@ import SwiftUI
 
 struct TimeLessLetterView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var color: ColorManager
     @State var isSheet = false
 
+
     @State var reminder: Reminder
-    @EnvironmentObject var color: ColorManager
+
+    let isInFeed: Bool
+
 
 
     @Environment(\.colorScheme) var scheme
@@ -20,33 +24,31 @@ struct TimeLessLetterView: View {
     var body: some View {
 
         ZStack{
-            color.mainGradient(scheme)
-                .ignoresSafeArea()
-            color.overlayGradient(scheme)
-                .ignoresSafeArea()
-
-            ScrollView {
-
+            if isInFeed {
                 DescriptionView(text: reminder.text)
-
-            }
-            .defaultScrollAnchor(.center)
-            .toolbar{
-                if isSheet {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("Back"){
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "back",
-                                "view": "TimeLessLetterView"
-                            ])
-                            dismiss()
-                        }
-                    }
-
+            } else {
+                ScrollView {
+                    DescriptionView(text: reminder.text)
                 }
+                .defaultScrollAnchor(.center)
             }
-
         }
+        .toolbar{
+            if isSheet {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Back"){
+                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
+                            "button": "back",
+                            "view": "TimeLessLetterView"
+                        ])
+                        dismiss()
+                    }
+                }
+
+            }
+        }
+
+
     }
 }
 
@@ -107,6 +109,6 @@ struct DescriptionView: View {
     }
 }
 
-#Preview {
-    TimeLessLetterView(reminder: .example)
-}
+//#Preview {
+//    TimeLessLetterView(reminder: .example)
+//}

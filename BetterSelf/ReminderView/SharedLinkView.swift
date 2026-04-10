@@ -10,6 +10,7 @@ import SwiftUI
 struct SharedLinkView: View {
 
     @Environment(\.dismiss) var dismiss
+    
     @State private var reel = true
     let link: String
 
@@ -24,19 +25,20 @@ struct SharedLinkView: View {
 
     var isSheet: Bool
 
+    let isInFeed: Bool
+
+
+    @Binding var currentIndex: Int
+    var index: Int
+
     var body: some View {
-        NavigationStack {
+
 
             ZStack {
-                color.mainGradient(scheme)
-                    .ignoresSafeArea()
-                color.overlayGradient(scheme)
-                    .ignoresSafeArea()
-
                 switch type {
                 case .youtube:
                     //                YoutubeView(isPlayable: true, youtubeId: getYoutubeId() ?? "", time: $time)
-                    YoutubeView(videoURL: link,  time: $time, text: text)
+                    YoutubeView(videoURL: link,  time: $time, text: text, isInFeed: isInFeed, currentIndex: $currentIndex, index: index)
 
 
                 case .shortForm:
@@ -77,7 +79,7 @@ struct SharedLinkView: View {
                     }
                 }
             }
-        }
+        
     }
 
     func getYoutubeId() -> String? {
@@ -188,12 +190,15 @@ struct SharedLinkView: View {
         return nil
     }
 
-    init(link: String, time: Binding<Int>, text: String, isSheet: Bool? = nil) {
-        
+    init(link: String, time: Binding<Int>, text: String, isSheet: Bool = false, isInFeed: Bool = false,  currentIndex: Binding<Int> = .constant(0), index: Int = 0) {
+
         self.link = link
         self.text = text
         _time = time
-        self.isSheet = isSheet ?? false
+        self.isSheet = isSheet
+        self.isInFeed = isInFeed
+        _currentIndex = currentIndex
+        self.index = index
 
         if link.localizedStandardContains("youtube.com") || link.localizedStandardContains("youtu.be") {
 //            if link.localizedStandardContains("shorts") {

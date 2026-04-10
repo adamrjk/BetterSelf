@@ -1,5 +1,5 @@
 {
-  "originHash" : "3fc9b19c5b1058562a451928af6d4e92853c4cb54d09666c779a93b940b07b61",
+  "originHash" : "88bfaa0a758be3fef297e20a9977aea25f5ba970ae05b6dff13075ec4e01be26",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -116,6 +116,15 @@
       "state" : {
         "revision" : "540318ecedd63d883069ae7f1ed811a2df00b6ac",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "swift-fsrs",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/open-spaced-repetition/swift-fsrs",
+      "state" : {
+        "branch" : "main",
+        "revision" : "d078b64bdfc745954293abad65fadc69b033643f"
       }
     },
     {

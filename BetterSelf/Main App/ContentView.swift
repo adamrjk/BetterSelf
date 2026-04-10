@@ -12,9 +12,8 @@ import SwiftUI
 
 
 struct ContentView: View {
+    @EnvironmentObject var flow: AppFlow
     @EnvironmentObject var notificationManager: NotificationManager
-    @State private var notifReminder: NavigableReminder?
-
     @StateObject var firestore = FirestoreService.shared
 
     @Environment(\.modelContext) var modelContext
@@ -30,7 +29,6 @@ struct ContentView: View {
         unlockedReminders.filter{ $0.pinned }
     }
     
-    @State private var tabPage: Int = 0
 
     @Environment(\.colorScheme) var scheme
     @EnvironmentObject var color: ColorManager
@@ -42,41 +40,41 @@ struct ContentView: View {
 
     @State private var preferredScheme: ColorScheme?
 
-    @Environment(\.horizontalSizeClass) var sizeClass
-
     var body: some View {
-            TabView(selection: $tabPage) {
-                if sizeClass == .regular {
-                    SplitView(notifReminder: $notifReminder)
-                        .tag(0)
-                        .tabItem{
-                            Label("Reminders", systemImage: "list.bullet")
-
-                        }
-                        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
-                }
-                else  {
-                    FolderView(notifReminder: $notifReminder)
-                        .tag(0)
-                        .tabItem{
-                            Label("Reminders", systemImage: "list.bullet")
-
-                        }
-                        .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
+            TabView(selection: $flow.selectedTab) {
+                NavigationStack(path: $flow.feedPath){
+                    FeedView()
 
                 }
+                .tag(AppFlow.Tab.feed)
+                .tabItem{
+                    Label("The Lab", systemImage: "flask.fill")
+                }
+                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
 
-                
-                
-                ProblemSolverView()
-                    .tag(1)
-                    .tabItem{
-                        Label("ProblemSolver", systemImage: "lightbulb.fill")
-                            .imageScale(.small)
-                        
+
+                NavigationStack(path: $flow.insightsPath) {
+                        FolderView()
+                            .navigationDestination(InsightsDestination.self)
                     }
-                    .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
-                
+                    .tag(AppFlow.Tab.reminders)
+                    .tabItem{
+                        Label("Insights", systemImage: "lightbulb.fill")
+                    }
+                    .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar)
+
+
+
+//                NavigationStack(path: $flow.solverPath) {
+//                    ProblemSolverView()
+//                }
+//                    .tag(AppFlow.Tab.solver)
+//                    .tabItem{
+//                        Label("ProblemSolver", systemImage: "lightbulb.fill")
+//                            .imageScale(.small)
+//                        
+//                    }
+//                    .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
                 //            ExploreView()
                 //                .tabItem{
                 //                    Label("Explore", systemImage: "magnifyingglass")
@@ -88,6 +86,9 @@ struct ContentView: View {
                 //                    Label("Settings", systemImage: "gear")
                 //                }
                 //                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
+            }
+            .sheet(item: $flow.activeSheet, onDismiss: flow.onDismiss){ sheet in
+                sheet
             }
             .tint(color.button(scheme))
             .sheet(isPresented: $welcome){
@@ -126,13 +127,15 @@ struct ContentView: View {
                 }
             }
             .onAppear {
+                flow.openAllReminders()
+                flow.configure(with: { modelContext })
                 checkIfWelcome()
                 getSchemeAndTheme()
                 signInAnonymously()
                 scheduleBulkNotifications()
             }
-            .onChange(of: tabPage) { _, newValue in
-                let tabName = (newValue == 0) ? "reminders" : "problem_solver"
+            .onChange(of: flow.selectedTab) { _, newValue in
+                let tabName = (newValue == .reminders) ? "reminders" : "problem_solver"
                 AnalyticsService.log("tab_selected", params: [
                     "tab": tabName
                 ])
@@ -181,14 +184,8 @@ struct ContentView: View {
             reminder.id.uuidString == reminderID
         }) else { return }
         
-        tabPage = 0
-        notifReminder = nil  // Dismiss current
-        
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-            notifReminder = NavigableReminder(reminder: reminder)  // New wrapper = new navigation
-            notificationManager.shouldNavigateToReminder = false
-        }
+        flow.openReminder(reminder)
+        notificationManager.shouldNavigateToReminder = false
     }
 
 
@@ -198,14 +195,8 @@ struct ContentView: View {
 
             modelContext.insert(reminder)
             reminder.isChecked = true
-            tabPage = 0
-            notifReminder = nil
-
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-                notifReminder = NavigableReminder(reminder: reminder)
-                notificationManager.sharedReminder = false
-            }
+            flow.openReminder(reminder)
+            notificationManager.sharedReminder = false
 
         }
 
@@ -229,16 +220,10 @@ struct ContentView: View {
         reminder.type = .TimeLessLetter
         reminder.isShared = true
         
-        tabPage = 0
-        notifReminder = nil
-        
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-            notifReminder = NavigableReminder(reminder: reminder)
-            notificationManager.sharedReminder = false
-        }
+        flow.openReminder(reminder)
+        notificationManager.sharedReminder = false
     }
-    
+
     private func handleWidgetNavigation() {
         guard let id = notificationManager.widgetReminderId else {
             notificationManager.widgetReminder = false
@@ -249,14 +234,8 @@ struct ContentView: View {
             reminder.id.uuidString == id
         }) else { return }
         
-        tabPage = 0
-        notifReminder = nil
-        
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-            notifReminder = NavigableReminder(reminder: reminder)
-            notificationManager.widgetReminder = false
-        }
+        flow.openReminder(reminder)
+        notificationManager.widgetReminder = false
     }
     
     // Schedules 7 days of notifications every time the app launches (starting from tomorrow)
@@ -284,6 +263,20 @@ struct ContentView: View {
         }
     }
 
+}
+extension ContentView {
+    func fetchFolder(_ id: PersistentIdentifier) -> Folder? {
+        let descriptor = FetchDescriptor<Folder>(predicate: #Predicate<Folder> { $0.persistentModelID == id })
+        print("Trying to Fetch")
+        return try? modelContext.fetch(descriptor).first
+    }
+
+    func fetchReminder(_ id: PersistentIdentifier) -> Reminder? {
+        let descriptor = FetchDescriptor<Reminder>(predicate: #Predicate<Reminder> { $0.persistentModelID == id })
+        let reminder = try? modelContext.fetch(descriptor).first
+        print("REMINDER: \(reminder?.title ?? "")")
+        return reminder
+    }
 }
 
 extension View {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FSRS
 import SwiftData
 
 
@@ -15,8 +16,8 @@ class Reminder {
     var title: String
     var type: ReminderType
     var text: String
-    var photo: Data?
-    var firebaseVideoURL: String? // Store Firebase Storage URL
+    var photoURL: String?  // Firebase Storage URL for image
+    var firebaseVideoURL: String? // Firebase Storage URL for video
     var link: String
     var date: Date
     var isChecked: Bool
@@ -32,13 +33,15 @@ class Reminder {
 
     var shareID: String?
 
+    var card: Card?
 
-    init(title: String, type: ReminderType = .InstantInsight,  text: String, photo: Data? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
+
+    init(title: String, type: ReminderType = .InstantInsight, text: String, photoURL: String? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
         self.id = UUID()
         self.title = title
         self.type = type
         self.text = text
-        self.photo = photo
+        self.photoURL = photoURL
         self.firebaseVideoURL = firebaseVideoURL
         self.link = link
         self.isChecked = false
@@ -51,6 +54,7 @@ class Reminder {
         self.isLoading = false
         self.isFront = false
         self.shareID = generateShortID()
+        self.card = Card(due: .now)
     }
 
     static let example =  Reminder(title: "The One Thing", text: "You can only pursue one goal at a time", firebaseVideoURL: "https://firebasestorage.googleapis.com:443/v0/b/betterself-29f7e.firebasestorage.app/o/videos%2FC29D7FD5-3EEF-417D-BB11-14448E115FFE.mov?alt=media&token=877e7031-36c1-4af0-9941-f85650676519", link: "https://", folder: .example)
@@ -67,7 +71,7 @@ class Reminder {
 
 
     var isEmpty: Bool {
-        text.isEmpty && photo == nil && firebaseVideoURL == nil && link.isEmpty && !isLoading
+        text.isEmpty && photoURL == nil && firebaseVideoURL == nil && link.isEmpty && !isLoading
     }
 
     var isLocked: Bool{
@@ -81,7 +85,7 @@ class Reminder {
     }
 
     var onlyLink: Bool {
-        text.isEmpty && photo == nil && firebaseVideoURL == nil
+        text.isEmpty && photoURL == nil && firebaseVideoURL == nil
     }
 
     var isYoutube: Bool {
@@ -141,15 +145,6 @@ enum SimpleReminderType: String, Codable, CaseIterable {
 }
 
 
-
-struct NavigableReminder: Identifiable, Equatable, Hashable {
-    let id = UUID()  // Always unique
-    let reminder: Reminder
-
-    static func == (lhs: NavigableReminder, rhs: NavigableReminder) -> Bool {
-        lhs.id == rhs.id
-    }
-}
 
 
 

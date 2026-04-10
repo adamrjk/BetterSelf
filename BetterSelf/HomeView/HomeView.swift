@@ -12,169 +12,28 @@ import SwiftData
 
 
 struct HomeView: View {
-    @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
     @Environment(\.editMode) var editMode
-
-
+    @EnvironmentObject var flow: AppFlow
     @Environment(\.colorScheme) var scheme
     @EnvironmentObject var color: ColorManager
 
-    let folder: Folder?
-    let onSelectReminder: ((Reminder) -> Void)?
-    let onToggleSidebar: (() -> Void)?
-
     @Query var reminders: [Reminder]
+    let folder: Folder?
 
     @StateObject private var uploadManager = UploadManager.shared
+    @StateObject private var vm = HomeViewModel()
 
-    @State private var searchText = ""
-    @State private var addReminder = false
-    @State private var selectedReminder: Reminder?
-    @State private var remindersToMove: [Reminder]?
-    @State private var newReminder: Reminder?
-    @State private var videoRecorder = false
-    @State private var refuseLoading = false
-    @State private var moveToFolder = false
-
-    @State private var deleteAlert = false
-    @State private var reminderToDelete: Reminder?
-
-    
-    var unlockedReminders: [Reminder]{
-        reminders.filter{
-            $0.isLocked == false
-        }
+    private var reminderService: ReminderService {
+        ReminderService(provider: { modelContext })
     }
-
-
-    var filteredReminders: [Reminder] {
-        if searchText.isEmpty {
-            unlockedReminders
-        } else {
-            unlockedReminders.filter { $0.title.localizedStandardContains(searchText) }
-        }
-    }
-
-    var sortedReminders: [Reminder]{
-        switch sorting {
-        case .dateOld:
-            filteredReminders.sorted{ $0.date < $1.date}
-        case .dateNew:
-            filteredReminders.sorted{ $0.date > $1.date}
-        case .name:
-            filteredReminders.sorted{ $0.title < $1.title}
-        }
-    }
-    @State private var sorting: Sorting
-
-
-    @State private var selection = Set<Reminder.ID>()
-    @State private var recordedVideoURL: URL?
-    @State private var isFront: Bool?
-    @State private var videoRecorded = false
-    @State private var title = ""
-    @State private var isPresentingShare = false
-    @State private var pendingShareURL: URL?
-
 
     var body: some View {
-
         ZStack {
-            color.mainGradient(scheme)
-                .ignoresSafeArea()
+            color.background(scheme)
+            HomeListContent(folder, vm)
 
-            color.overlayGradient(scheme)
-                .ignoresSafeArea()
-            Group {
-                if reminders.isEmpty {
-                    VStack {
-                        Text("Looks like you have no Reminders")
-                            .font(.headline)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                        CleanText("Click the plus on the top right corner to add a new Reminder")
-                            .multilineTextAlignment(.center)
-                    }
-                }
-                else {
-                    HomeListContent(
-                        folder: folder,
-                        mode: .phone,
-                        searchText: $searchText,
-                        refuseLoading: $refuseLoading,
-                        selection: $selection,
-                        sorting: sorting,
-                        onSelectReminder: { reminder in
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.handleTargetViewClick(target: isFirstId(reminder))
-                            }
-                            if let handler = onSelectReminder, UIDevice.current.userInterfaceIdiom == .pad {
-                                handler(reminder)
-                            } else {
-                                selectedReminder = reminder
-                            }
-                        },
-                        onRequestDelete: { reminder in
-                            reminderToDelete = reminder
-                            deleteAlert.toggle()
-                        },
-                        onRequestMove: { reminder in
-                            remindersToMove = [reminder]
-                            moveToFolder.toggle()
-                        },
-                        onShare: { reminder in
-                            AnalyticsService.log(AnalyticsService.EventName.shareTapped, params: [
-                                "id": reminder.id.uuidString,
-                                "type": reminder.type.rawValue
-                            ])
-                            Task {
-                                do {
-                                    pendingShareURL = getLink(reminder)
-                                    isPresentingShare = true
-                                    _ = try await FirestoreService.shared.storeReminder(reminder)
-                                } catch {
-                                    print("Share prepare failed: \(error)")
-                                }
-                            }
-                        }
-                    )
-
-                }
-            }
-
-            if !selection.isEmpty {
-                VStack {
-                    Spacer()
-                    HStack {
-                        Button("Delete"){
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "delete_overlay",
-                                "view": "HomeView"
-                            ])
-                            deleteAlert.toggle()
-                        }
-                        .adaptiveGlass(scheme)
-                        .buttonStyle(.plain)
-
-                        Spacer()
-
-
-                        Button("Move"){
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "move_overlay",
-                                "view": "HomeView"
-                            ])
-                            move()
-                        }
-                            .adaptiveGlass(scheme)
-                            .buttonStyle(.plain)
-                    }
-                    .padding(.horizontal, 5)
-                }
-
-
-            }
+            if !vm.selection.isEmpty { EditModeButtons(deleteAlert: $vm.deleteAlert, move: { vm.moveSelected(from: reminders) }) }
         }
         .onAppear{
             AnalyticsService.logScreenView(screenName: "Home", screenClass: "HomeView")
@@ -184,88 +43,19 @@ struct HomeView: View {
                 TutorialManager.shared.startTutorial("Home")
             }
 
+            vm.sorting = folder?.sorting ?? ReminderService.loadData()
+
+            // Configure ViewModel with environment-provided services
+            vm.configure(reminderService: reminderService, flow: flow, folder: folder)
+
         }
-        .onChange(of: TutorialManager.shared.currentDone){
-            if TutorialManager.shared.inTutorial && TutorialManager.shared.currentDone {
-                TutorialManager.shared.viewId("Home")
-                TutorialManager.shared.startTutorial("Home")
-            }
-        }
-        .onChange(of: TutorialManager.shared.currentStepIndex){
-            if TutorialManager.shared.inTutorial && TutorialManager.shared.currentViewId == "Home" && TutorialManager.shared.currentStepIndex == 2 {
-                sorting = .dateNew
-            }
-        }
-        .overlay(
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-
-                    if editMode?.wrappedValue == .inactive {
-                        Button{
-                            AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                                "button": "plus_overlay",
-                                "view": "HomeView"
-                            ])
-                            let reminder = Reminder(title: "", text: "", link: "", folder: folder)
-                            modelContext.insert(reminder)
-                            newReminder = reminder
-                            addReminder.toggle()
-                            if TutorialManager.shared.inTutorial {
-                                TutorialManager.shared.handleTargetViewClick(target: "PlusButton")
-                            }
-                        }label: {
-
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .foregroundStyle(scheme == .light
-                                                 ? .white
-                                                 : .black)
-                                .padding(20)
-                        }
-                        .tutorialIdentifier("PlusButton")
-                        .adaptiveTranslucent(color.plusButton(scheme))
-                        .clipShape(.circle)
-                    }
-
-
-
-
-
-
-
-                }
-                .padding(.trailing, 10)
-            }
-        )
+        .floatingPlusButton(editMode?.wrappedValue == .inactive, action: {
+                flow.addReminderSheet(folder)
+        })
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Menu {
-
-                        Picker("Sort", selection: $sorting) {
-                            Text("Newest First")
-                                .tag( Sorting.dateNew)
-
-                            Text("Oldest First")
-                                .tag(Sorting.dateOld)
-                            Text("Title")
-                                .tag(Sorting.name)
-
-                        }
-                    }label: {
-                        HStack {
-                            Image(systemName: "arrow.up.arrow.down")
-                                .font(.subheadline)
-                                .foregroundStyle(color.button(scheme))
-                                .padding(7)
-
-                            Text("Sort By")
-
-                        }
-                    }
-
+                    SortingToolbarButton(sorting: $vm.sorting)
                     Button{
                         AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
                             "button": "select_reminders_toggle",
@@ -276,346 +66,77 @@ struct HomeView: View {
                         } else {
                             editMode?.wrappedValue = .inactive
                         }
-                    } label: {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.subheadline)
-                                .buttonStyle(.plain)
-                                .foregroundStyle(color.button(scheme))
-                                .padding(8)
+                    } label: { SelectToolbarButton() }
 
-                            Text("Select Reminders")
-                        }
-
-
-                    }
-
-
-
-
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.subheadline)
-                        .foregroundStyle(color.button(scheme))
-                        .padding(8)
-                }
+                } label: { EllipsisToolbarButton() }
                 .buttonStyle(.plain)
             }
-
-                ToolbarItem(placement: .topBarLeading){
-                    Button("Go Back", systemImage: "chevron.left"){
-                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                            "button": "back",
-                            "view": "HomeView"
-                        ])
-                        dismiss()
-
-                    }
-                    .foregroundStyle(color.button(scheme))
-                    .padding(8)
-                    .font(.headline)
-                    .buttonStyle(.plain)
-
-                }
-            
             ToolbarItem(placement: .topBarLeading){
-                Button("Quick Add", systemImage: "video.fill.badge.plus"){
+                Button("Go Back", systemImage: "folder.fill"){
                     AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                        "button": "quick_add",
+                        "button": "back",
                         "view": "HomeView"
                     ])
-                    videoRecorder.toggle()
+                    flow.popInsights()
+
                 }
-                .buttonStyle(.plain)
                 .foregroundStyle(color.button(scheme))
                 .padding(8)
+                .font(.headline)
+                .buttonStyle(.plain)
             }
-
-
+            
+            ToolbarItem(placement: .topBarLeading){
+                VideoRecorderToolBarButton(flow: flow, color: color.button(scheme))
+            }
         }
-        .onChange(of: sorting){ oldSorting, newSorting in
+        .onChange(of: vm.sorting){ oldSorting, newSorting in
             if let folder = folder {
                 folder.sorting = newSorting
             }
             else {
-                saveData(newSorting)
+                ReminderService.saveData(newSorting)
             }
         }
-        .onAppear{
-            sorting = folder?.sorting ?? loadData()
-
-
-
+        .onChange(of: vm.selection) { _, newSelection in
+            vm.selection = newSelection
         }
-        .alert("Are you Sure?", isPresented: $deleteAlert){
+        .alert("Are you Sure?", isPresented: $vm.deleteAlert){
             Button("Delete", role: .destructive){
                 AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
                     "button": "delete_confirm",
                     "view": "HomeView"
                 ])
-                delete()
+                vm.confirmDelete(from: reminders)
+                editMode?.wrappedValue = .inactive
+                vm.selection = []
             }
         } message: {
             Text("You won't be able to restore this Reminder")
         }
-        .sheet(item: $newReminder, onDismiss: deleteEmptyReminder){ reminder in
-            AddReminderView(reminder: reminder)
-                .onDisappear{
-                    if TutorialManager.shared.inTutorial {
-                        sorting = .dateNew
-                        TutorialManager.shared.viewId("Home")
-                        TutorialManager.shared.startTutorial("Home")
-                    }
-                }
-        }
-        .sheet(item: $pendingShareURL){ url in
-            ShareSheet(activityItems: [url])
-
-        }
-        .sheet(isPresented: $refuseLoading){
-            RefuseView(title: "You cannot access this Reminder yet", description: "The Video is still loading, wait a few seconds. Wait for the camera icon to appear")
-                .presentationDetents([.height(300)])
-        }
-
-        .sheet(isPresented: $videoRecorder) {
-            CustomCameraView(
-                isPresented: $videoRecorder,
-                onVideoRecorded: { url, _ in
-                    recordedVideoURL = url
-                    self.isFront = false
-                    videoRecorded.toggle()
-                }
-            )
-            .ignoresSafeArea()
-
-        }
-        .sheet(isPresented: $videoRecorded, onDismiss: saveReminder){
-            AddTitleSheet(title: $title)
-                .presentationDetents([.height(300)])
-        }
-        .sheet(isPresented: $moveToFolder, onDismiss: {
-            selection = []
+        .sheet(isPresented: $vm.refuseLoading){ RefuseLoading() }
+        .sheet(isPresented: $vm.moveToFolder, onDismiss: {
+            vm.selection = []
             editMode?.wrappedValue = .inactive
         }){
-            if let reminders = remindersToMove {
-                MoveToFolder(reminders: reminders)
-
-            }
+            MoveToFolder(reminders: vm.remindersToMove)
         }
         .navigationTitle(folder?.name ?? "All Reminders")
-
         .toolbarBackground(color.overlayGradient(scheme), for: .bottomBar, .navigationBar, .tabBar)
-        .navigationDestination(item: $selectedReminder) { reminder in
-            ReminderView(reminder: reminder)
-                .onDisappear{
-                    TutorialManager.shared.viewId("Home")
-                    TutorialManager.shared.startTutorial("Home")
-
-                }
-        }
-
         .navigationBarBackButtonHidden()
     }
 
-    func getLink(_ reminder: Reminder) -> URL {
-        if reminder.shareID != nil {
-            return reminder.shareLink
-        }
-        else {
-            reminder.shareID = generateShortID()
-            return reminder.shareLink
-        }
-
-
-    }
-    func generateShortID(length: Int = 6) -> String {
-        let chars = Array("abcdefghijklmnopqrstuvwxyz0123456789")
-        var result = ""
-        for _ in 0..<length {
-            result.append(chars.randomElement()!)
-        }
-        return result
-    }
-
-
-    func saveReminder() {
-        let reminder = Reminder(
-            title: title,
-            text: "",
-            link: ""
-        )
-        if let front = self.isFront {
-            reminder.isFront = front
-        }
-        reminder.isChecked = true
-        modelContext.insert(reminder)
-
-        uploadManager.loadVideo(reminder, recordedVideoURL: recordedVideoURL)
-
-        AnalyticsService.log(AnalyticsService.EventName.reminderCreated, params: [
-            "id": reminder.id.uuidString,
-            "type": reminder.type.rawValue,
-            "has_video": (recordedVideoURL != nil) ? "true" : "false",
-            "has_photo": (reminder.photo != nil) ? "true" : "false",
-            "has_link": reminder.link.isEmpty ? "false" : "true",
-            "source": "video_quick_add"
-        ])
-
-    }
-
-    func move() {
-        remindersToMove = reminders.filter { selection.contains($0.id) }
-        moveToFolder.toggle()
-
-    }
-
-    func delete() {
-        if selection.isEmpty {
-            if let reminder = reminderToDelete {
-                deleteReminder(reminder)
-            }
-
-        } else {
-            // Extract URLs before deletion
-            let selectedReminders = reminders.filter { selection.contains($0.id) }
-            let videoURLs = selectedReminders.compactMap { $0.firebaseVideoURL }
-
-            selectedReminders.forEach { reminder in
-                AnalyticsService.log(AnalyticsService.EventName.reminderDeleted, params: [
-                    "id": reminder.id.uuidString,
-                    "type": reminder.type.rawValue
-                ])
-                modelContext.delete(reminder)
-            }
-
-            editMode?.wrappedValue = .inactive
-
-            Task {
-                for url in videoURLs {
-                    await deleteVideo(url)
-                }
-            }
-        }
-
-
-    }
-
-    func deleteEmptyReminder() {
-        if let reminder = newReminder{
-            guard reminder.isChecked == false else { return }
-            if reminder.isEmpty {
-                modelContext.delete(reminder)
-            }
-            if (reminder.type != .TimeLessLetter && reminder.photo == nil && !reminder.isLoading) {
-                reminder.type = .TimeLessLetter
-            }
-            reminder.isChecked = true
-        }
-
-    }
-
-
-    func deleteReminder(at offsets: IndexSet) {
-        for offset in offsets {
-            let reminder = reminders[offset]
-
-            if let url = reminder.firebaseVideoURL {
-                Task {
-                    await deleteVideo(url)
-                }
-            }
-
-            AnalyticsService.log(AnalyticsService.EventName.reminderDeleted, params: [
-                "id": reminder.id.uuidString,
-                "type": reminder.type.rawValue
-            ])
-            modelContext.delete(reminder)
-        }
-    }
-
-    func deleteReminder(_ reminder: Reminder) {
-        if let url = reminder.firebaseVideoURL {
-            Task {
-                await deleteVideo(url)
-            }
-        }
-        AnalyticsService.log(AnalyticsService.EventName.reminderDeleted, params: [
-            "id": reminder.id.uuidString,
-            "type": reminder.type.rawValue
-        ])
-        modelContext.delete(reminder)
-    }
-
-
-
-    func deleteVideo(_ url: String) async {
-        FirebaseStorageService.shared.deleteVideo(firebaseURL: url) { _ in }
-    }
-
-
-
     init(folder: Folder? = nil, onSelectReminder: ((Reminder) -> Void)? = nil, onToggleSidebar: (() -> Void)? = nil) {
         self.folder = folder
-        self.onSelectReminder = onSelectReminder
-        self.onToggleSidebar = onToggleSidebar
-
-        var AllRemindersSorting = Sorting.dateOld
-        if self.folder == nil {
-            if let data = UserDefaults.standard.data(forKey: "AllRemindersSorting") {
-                if let decoded = try? JSONDecoder().decode(Sorting.self, from: data) {
-                    AllRemindersSorting = decoded
-                }
-            }
-        }
-
-        _sorting = State(initialValue: folder?.sorting ?? AllRemindersSorting)
-
         if let folder = folder {
             // Filter reminders for this folder
             let id = folder.persistentModelID
-
-            _reminders = Query(filter: #Predicate<Reminder> {
-                $0.folder?.persistentModelID == id
-            })
+            _reminders = Query(filter: #Predicate<Reminder> { $0.folder?.persistentModelID == id })
         } else {
-            // All reminders (no folder)
-            _reminders =  Query(filter: #Predicate<Reminder> { $0.isChecked == true
-            })
+            _reminders = Query(filter: #Predicate<Reminder> { $0.isChecked == true })
         }
     }
 
-    func loadData() -> Sorting {
-        if let data = UserDefaults.standard.data(forKey: "AllRemindersSorting") {
-            if let decoded = try? JSONDecoder().decode(Sorting.self, from: data) {
-                return decoded
-            }
-        }
-        return .dateOld
-    }
-    func saveData(_ newSorting: Sorting) {
-        if let data = try? JSONEncoder().encode(newSorting) {
-            UserDefaults.standard.set(data, forKey: "AllRemindersSorting")
-        }
-    }
-
-    
-
-    
-
-    func isFirstId(_ reminder: Reminder) -> String {
-        if let first = sortedReminders.first {
-            reminder.id == first.id  ? "FirstReminderButton" : "RemindersButton"
-        }
-        else {
-            "RemindersButton"
-        }
-
-
-
-
-
-
-    }
 
 }
 
