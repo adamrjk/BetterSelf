@@ -35,33 +35,22 @@ class UploadManager: ObservableObject {
     }
 
     func loadVideo(_ reminder: Reminder, recordedVideoURL: URL?) {
-            Task {
-                if let url = recordedVideoURL {
-                    // Generate thumbnail immediately
-                    if let thumbnail = await generateThumbnail(from: url) {
-                        reminder.photo = thumbnail.jpegData(compressionQuality: 0.8)
+        Task {
+            if let url = recordedVideoURL {
+                if let thumbnail = await generateThumbnail(from: url) {
+                    let data = thumbnail.jpegData(compressionQuality: 0.8)!
+                    startUpload(imageData: data) { result in
+                        if case .success(let firebaseURL) = result {
+                            reminder.photoURL = firebaseURL
+                        }
                     }
-
-                    // Upload video in background
-                    await uploadVideoToFirebase(videoURL: url, reminder: reminder)
                 }
+                await uploadVideoToFirebase(videoURL: url, reminder: reminder)
             }
         }
-
-
-    func uploadImage(_ data: Data, _ shared: SharedReminder) async {
-        Task { @MainActor in
-            UploadManager.shared.startUpload(imageData: data, completion: { result in
-                switch result {
-                case .success(let url):
-                    print(url)
-                    shared.photo = url
-                case .failure(let err):
-                    print("Upload failed:", err)
-                }
-            })
-        }
     }
+
+
 
 
 
@@ -222,57 +211,6 @@ class UploadManager: ObservableObject {
         }
     }
 
-    // Fetch image bytes for a Firebase photo URL (supports https and gs://)
-    func fetchImageData(
-        from firebaseURL: String,
-        completion: @escaping (Result<Data, Error>) -> Void
-    ) {
-        guard let url = URL(string: firebaseURL) else {
-            completion(.failure(NSError(domain: "UploadManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL string"])))
-            return
-        }
-
-        if url.scheme == "gs" {
-            // Use Firebase Storage reference for gs:// URLs
-            let ref = Storage.storage().reference(forURL: firebaseURL)
-            // 20 MB limit by default; adjust as needed
-            ref.getData(maxSize: 20 * 1024 * 1024) { data, error in
-                DispatchQueue.main.async {
-                    if let error = error {
-                        completion(.failure(error))
-                    } else if let data = data {
-                        completion(.success(data))
-                    } else {
-                        completion(.failure(NSError(domain: "UploadManager", code: -2, userInfo: [NSLocalizedDescriptionKey: "No data received"])) )
-                    }
-                }
-            }
-            return
-        }
-
-        // For https download URLs, fetch via URLSession
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-
-                if let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) == false {
-                    completion(.failure(NSError(domain: "UploadManager", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: "HTTP \(http.statusCode)"])) )
-                    return
-                }
-
-                guard let data = data else {
-                    completion(.failure(NSError(domain: "UploadManager", code: -3, userInfo: [NSLocalizedDescriptionKey: "Empty response body"])) )
-                    return
-                }
-
-                completion(.success(data))
-            }
-        }
-        task.resume()
-    }
 
 
     func getUploadStatus(for id: String) -> UploadStatus? {

@@ -16,8 +16,8 @@ class Reminder {
     var title: String
     var type: ReminderType
     var text: String
-    var photo: Data?
-    var firebaseVideoURL: String? // Store Firebase Storage URL
+    var photoURL: String?  // Firebase Storage URL for image
+    var firebaseVideoURL: String? // Firebase Storage URL for video
     var link: String
     var date: Date
     var isChecked: Bool
@@ -36,12 +36,12 @@ class Reminder {
     var card: Card?
 
 
-    init(title: String, type: ReminderType = .InstantInsight,  text: String, photo: Data? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
+    init(title: String, type: ReminderType = .InstantInsight, text: String, photoURL: String? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
         self.id = UUID()
         self.title = title
         self.type = type
         self.text = text
-        self.photo = photo
+        self.photoURL = photoURL
         self.firebaseVideoURL = firebaseVideoURL
         self.link = link
         self.isChecked = false
@@ -71,7 +71,7 @@ class Reminder {
 
 
     var isEmpty: Bool {
-        text.isEmpty && photo == nil && firebaseVideoURL == nil && link.isEmpty && !isLoading
+        text.isEmpty && photoURL == nil && firebaseVideoURL == nil && link.isEmpty && !isLoading
     }
 
     var isLocked: Bool{
@@ -85,7 +85,7 @@ class Reminder {
     }
 
     var onlyLink: Bool {
-        text.isEmpty && photo == nil && firebaseVideoURL == nil
+        text.isEmpty && photoURL == nil && firebaseVideoURL == nil
     }
 
     var isYoutube: Bool {
@@ -145,15 +145,6 @@ enum SimpleReminderType: String, Codable, CaseIterable {
 }
 
 
-
-struct NavigableReminder: Identifiable, Equatable, Hashable {
-    let id = UUID()  // Always unique
-    let reminder: Reminder
-
-    static func == (lhs: NavigableReminder, rhs: NavigableReminder) -> Bool {
-        lhs.id == rhs.id
-    }
-}
 
 
 

@@ -16,7 +16,6 @@ struct ReminderView: View {
     @Environment(\.colorScheme) var scheme
     @EnvironmentObject var color: ColorManager
 
-    let onExpandDetail: (() -> Void)?
 
 
 
@@ -51,18 +50,14 @@ struct ReminderView: View {
             ToolbarItem(placement: .topBarLeading) {
                 Button{
                     AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                        "button": UIDevice.current.userInterfaceIdiom == .pad ? "expand_detail" : "back",
+                        "button": "back",
                         "view": "ReminderView",
                         "id": reminder.id.uuidString
                     ])
-                    if UIDevice.current.userInterfaceIdiom == .pad, let expand = onExpandDetail {
-                        expand()
-                    } else {
-                        flow.popInsights()
-                    }
+                    flow.popInsights()
                 } label: {
                     HStack {
-                        Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "arrow.down.right.and.arrow.up.left" : "chevron.left")
+                        Image(systemName: "chevron.left")
                     }
                     .bold()
                     .foregroundStyle(color.button(scheme))
@@ -203,11 +198,9 @@ struct ReminderView: View {
 
     }
 
-    init(reminder: Reminder, onExpandDetail: (() -> Void)? = nil) {
+    init(reminder: Reminder) {
         _reminder = State(initialValue: reminder)
-
         print("Successfully initialising ReminderView")
-        self.onExpandDetail = onExpandDetail
     }
 
 

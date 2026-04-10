@@ -18,7 +18,11 @@ The app surfaces your insights back to you daily using the **FSRS spaced repetit
 
 ## Screenshots
 
-> *Add your App Store screenshots here*
+<div align="center">
+  <img src="assets/All Reminders.png" width="250" alt="All Reminders" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="assets/Organize and Pin.png" width="250" alt="Organize and Pin" />
+</div>
 
 ---
 

@@ -355,11 +355,7 @@ struct FoldersList: View {
         var pinnedReminders: [ReminderSnapShot] = []
         pinned.forEach{ reminder in
             if !reminder.isLocked {
-                var photoURL: String? = nil
-                if let photo = reminder.photo {
-                    photoURL = storePhotoForWidget(data: photo, id: UUID())
-                }
-                let snapShot = ReminderSnapShot(id: reminder.id, title: reminder.title, text: reminder.text, photoURL: photoURL, link: reminder.link, isFront: reminder.isFront, isYoutube: reminder.isYoutube)
+                let snapShot = ReminderSnapShot(id: reminder.id, title: reminder.title, text: reminder.text, photoURL: reminder.photoURL, link: reminder.link, isFront: reminder.isFront, isYoutube: reminder.isYoutube)
                 pinnedReminders.append(snapShot)
             }
         }

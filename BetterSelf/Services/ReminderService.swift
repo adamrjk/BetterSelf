@@ -26,7 +26,7 @@ final class ReminderService {
         if reminder.isEmpty {
             modelContext.delete(reminder)
         }
-        if (reminder.type != .TimeLessLetter && reminder.photo == nil && !reminder.isLoading) {
+        if (reminder.type != .TimeLessLetter && reminder.photoURL == nil && !reminder.isLoading) {
             reminder.type = .TimeLessLetter
         }
         reminder.isChecked = true
@@ -62,7 +62,7 @@ final class ReminderService {
             "id": reminder.id.uuidString,
             "type": reminder.type.rawValue,
             "has_video":  "true",
-            "has_photo": (reminder.photo != nil) ? "true" : "false",
+            "has_photo": (reminder.photoURL != nil) ? "true" : "false",
             "has_link": reminder.link.isEmpty ? "false" : "true",
             "source": "video_quick_add"
         ])
