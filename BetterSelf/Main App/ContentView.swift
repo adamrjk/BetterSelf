@@ -37,6 +37,7 @@ struct ContentView: View {
     @StateObject var tutorialManager = TutorialManager.shared
 
     @State private var welcome = false
+    @State private var showShareError = false
 
     @State private var preferredScheme: ColorScheme?
 
@@ -65,27 +66,14 @@ struct ContentView: View {
 
 
 
-//                NavigationStack(path: $flow.solverPath) {
-//                    ProblemSolverView()
-//                }
-//                    .tag(AppFlow.Tab.solver)
-//                    .tabItem{
-//                        Label("ProblemSolver", systemImage: "lightbulb.fill")
-//                            .imageScale(.small)
-//                        
-//                    }
-//                    .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
-                //            ExploreView()
-                //                .tabItem{
-                //                    Label("Explore", systemImage: "magnifyingglass")
-                //                }
-                //                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
-                //
-                //            SettingsView()
-                //                .tabItem{
-                //                    Label("Settings", systemImage: "gear")
-                //                }
-                //                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
+                NavigationStack {
+                    SettingsView()
+                }
+                .tag(AppFlow.Tab.settings)
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
+                .toolbarBackground(color.overlayGradient(scheme), for: .tabBar, .bottomBar, .navigationBar)
             }
             .sheet(item: $flow.activeSheet, onDismiss: flow.onDismiss){ sheet in
                 sheet
@@ -125,6 +113,11 @@ struct ContentView: View {
                 if notificationManager.widgetReminder {
                     handleWidgetNavigation()
                 }
+            }
+            .alert("Couldn't load shared content", isPresented: $showShareError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("This link may have expired or is no longer available.")
             }
             .onAppear {
                 flow.openAllReminders()
@@ -172,6 +165,46 @@ struct ContentView: View {
             welcome = true
             UserDefaults.standard.set(true, forKey: "Welcome \(notificationManager.version)")
             UserDefaults.standard.set("AlternateIconSet1", forKey: "CurrentAppIcon")
+            seedInitialData()
+        }
+    }
+
+    private func seedInitialData() {
+        let mindset  = Folder(name: "Mindset")
+        let podcasts = Folder(name: "Podcasts")
+        let journal  = Folder(name: "Journal")
+        modelContext.insert(mindset)
+        modelContext.insert(podcasts)
+        modelContext.insert(journal)
+
+        let video = Reminder(
+            title: "The One Thing",
+            type: .InstantInsight,
+            text: "",
+            firebaseVideoURL: "https://firebasestorage.googleapis.com:443/v0/b/betterself-29f7e.firebasestorage.app/o/videos%2FC29D7FD5-3EEF-417D-BB11-14448E115FFE.mov?alt=media&token=877e7031-36c1-4af0-9941-f85650676519",
+            link: "https://",
+            folder: mindset
+        )
+
+        let goggins = Reminder(
+            title: "I know what I did",
+            type: .InstantInsight,
+            text: "I know what I did\nI have a resume full of motivation\nThere was no one there. It was you\nHaving proof of who you are allows you to never doubt yourself again",
+            link: "https://www.youtube.com/watch?v=nDLb8_wgX50",
+            folder: mindset
+        )
+
+        let quote = Reminder(
+            title: "Pursue the Impossible",
+            type: .TimeLessLetter,
+            text: "Nietzsche said:\nI know of no better life purpose than to perish in attempting the great and impossible. The fact that something seems impossible shouldn't be a reason to not pursue it. That's exactly what makes it worth pursuing — where would the courage and greatness be if success was certain and there was no risk?",
+            link: "",
+            folder: mindset
+        )
+
+        for reminder in [video, goggins, quote] {
+            reminder.isChecked = true
+            modelContext.insert(reminder)
         }
     }
     
@@ -190,17 +223,19 @@ struct ContentView: View {
 
 
     private func handleSharedReminderCreation() async {
-        if let docId = notificationManager.reminderID,
-           let reminder = try? await firestore.receiveReminder(docId) {
-
+        defer { notificationManager.sharedReminder = false }
+        guard let docId = notificationManager.reminderID else { return }
+        do {
+            guard let reminder = try await firestore.receiveReminder(docId) else {
+                showShareError = true
+                return
+            }
             modelContext.insert(reminder)
             reminder.isChecked = true
             flow.openReminder(reminder)
-            notificationManager.sharedReminder = false
-
+        } catch {
+            showShareError = true
         }
-
-
     }
 
 

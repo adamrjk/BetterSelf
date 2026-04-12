@@ -14,6 +14,7 @@ final class AppFlow: ObservableObject {
         case reminders
         case solver
         case feed
+        case settings
     }
 
     @Published var selectedTab: Tab = .feed

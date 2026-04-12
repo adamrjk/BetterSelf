@@ -35,7 +35,7 @@ class UploadManager: ObservableObject {
     }
 
     func loadVideo(_ reminder: Reminder, recordedVideoURL: URL?) {
-        Task {
+        Task { @MainActor in
             if let url = recordedVideoURL {
                 if let thumbnail = await generateThumbnail(from: url) {
                     let data = thumbnail.jpegData(compressionQuality: 0.8)!

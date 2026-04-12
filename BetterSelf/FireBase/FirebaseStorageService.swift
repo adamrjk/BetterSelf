@@ -14,38 +14,29 @@ class FirebaseStorageService: ObservableObject {
         let fileName = "\(UUID().uuidString).mov"
         let videoRef = storage.reference().child("videos/\(fileName)")
 
-        // Convert video to Data
-        do {
-            let videoData = try Data(contentsOf: videoURL)
+        let metadata = StorageMetadata()
+        metadata.contentType = "video/quicktime"
 
-            // Upload video data
-            let metadata = StorageMetadata()
-            metadata.contentType = "video/quicktime"
+        videoRef.putFile(from: videoURL, metadata: metadata) { _, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
 
-            videoRef.putData(videoData, metadata: nil) { _, error in
+            videoRef.downloadURL { url, error in
                 if let error = error {
                     completion(.failure(error))
                     return
                 }
 
-                // Get download URL
-                videoRef.downloadURL { url, error in
-                    if let error = error {
-                        completion(.failure(error))
-                        return
-                    }
-
-                    if let downloadURL = url {
-                        completion(.success(downloadURL.absoluteString))
-                    } else {
-                        completion(.failure(NSError(domain: "FirebaseStorage", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get download URL"])))
-                    }
+                if let downloadURL = url {
+                    try? FileManager.default.removeItem(at: videoURL)
+                    completion(.success(downloadURL.absoluteString))
+                } else {
+                    completion(.failure(NSError(domain: "FirebaseStorage", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get download URL"])))
                 }
             }
-        } catch {
-            completion(.failure(error))
         }
-
     }
 
     func uploadVideo(videoData: Data, completion: @escaping (Result<String, Error>) -> Void) {

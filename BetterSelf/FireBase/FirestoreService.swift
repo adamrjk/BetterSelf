@@ -5,9 +5,13 @@ final class FirestoreService: ObservableObject {
     static let shared = FirestoreService()
     private let db = Firestore.firestore()
 
-    private init() {}
-    
-    
+    private init() {
+        let settings = FirestoreSettings()
+        settings.cacheSettings = MemoryCacheSettings()
+        db.settings = settings
+    }
+
+
     @discardableResult
     func storeReminder(_ reminder: Reminder) async throws -> String {
         guard let jsonString = encode(reminder) else {

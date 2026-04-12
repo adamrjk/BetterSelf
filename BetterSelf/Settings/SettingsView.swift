@@ -8,145 +8,145 @@
 import SwiftUI
 
 struct SettingsView: View {
-
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var color: ColorManager
     @Environment(\.colorScheme) var scheme
+    @EnvironmentObject var color: ColorManager
 
-    @State private var name = ""
-
-    @State private var mode: AppearanceMode = .system
-
-    @State private var tutorial = false
     var body: some View {
-        NavigationStack {
-            ZStack {
-                color.mainGradient(scheme)
-                    .ignoresSafeArea()
-                color.overlayGradient(scheme)
-                    .ignoresSafeArea()
-                ScrollView {
-                    VStack(spacing: 16){
-                        Spacer()
-                            .frame(maxHeight: 20)
+        ZStack {
+            color.mainGradient(scheme).ignoresSafeArea()
+            color.overlayGradient(scheme).ignoresSafeArea()
 
+            ScrollView {
+                VStack(spacing: 24) {
+                    // MARK: - Header
+                    VStack(spacing: 8) {
+                        Image("AlternateIconSet1")
+                            .resizable()
+                            .frame(width: 72, height: 72)
+                            .cornerRadius(16)
+                            .shadow(color: .black.opacity(0.15), radius: 10, y: 4)
 
-                        NavigationLink {
-                            ThemeView()
+                        Text("BetterSelf")
+                            .font(.title2.weight(.bold))
 
-                        } label: {
-                            HStack {
-                                Image(systemName: "paintpalette")
-                                    .font(.title)
-                                    .foregroundStyle(color.itemColor(scheme))
-                                    .padding()
-                                Text("Theme")
-                                    .font(.headline)
-                                Spacer()
-                            }
-                            .padding(.horizontal, 20)
-                            //                            .padding(.vertical, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(color.cardBackground(scheme))
-                                    .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+                        if let name = UserDefaults().value(forKey: "UserName") as? String, !name.isEmpty {
+                            Text("Hey, \(name)")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.top, 16)
+
+                    // MARK: - Customise
+                    SettingsSection(title: "Customise") {
+                        NavigationLink(destination: ThemeView()) {
+                            SettingsRow(
+                                icon: "paintpalette.fill",
+                                iconColor: .purple,
+                                title: "Theme"
                             )
                         }
                         .buttonStyle(.plain)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom)
 
+                        Divider().padding(.leading, 56)
 
-                        NavigationLink {
-                            AppIconView()
-
-                        } label: {
-                            HStack {
-                                Image(systemName: "app.badge")
-                                    .font(.title)
-                                    .foregroundStyle(color.itemColor(scheme))
-                                    .padding()
-                                Text("App Icon")
-                                    .font(.headline)
-                                Spacer()
-                            }
-                            .padding(.horizontal, 20)
-                            //                            .padding(.vertical, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(color.cardBackground(scheme))
-                                    .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+                        NavigationLink(destination: AppIconView()) {
+                            SettingsRow(
+                                icon: "app.badge.fill",
+                                iconColor: color.button(scheme),
+                                title: "App Icon"
                             )
                         }
                         .buttonStyle(.plain)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom)
-
-
-
-
-//                        HStack(spacing: 16 ) {
-//                            Toggle("Start Tutorial Again", isOn: $tutorial)
-//                                .tint(color.toggleColor(scheme)
-//                                .foregroundStyle(.secondary)
-//                                .font(.subheadline)
-//
-//                        }
-//                        .padding(.horizontal, 20)
-//                        .padding(.vertical, 16)
-//                        .background(
-//                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-//                                .fill(color.cardBackground(scheme))
-//                                .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-//                        )
-//                        .padding(.horizontal, 16)
-
                     }
-                }
-                .defaultScrollAnchor(.center)
-            }
-            .onAppear{
-                if let name = UserDefaults().value(forKey: "UserName") as? String{
-                    self.name = name
-                }
-            }
 
-
-            .navigationTitle("Settings")
-            .onChange(of: tutorial, launchTutorial)
-            .toolbar{
-                ToolbarItem(placement: .topBarTrailing){
-                    Button{
-                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                            "button": "settings_close",
-                            "view": "SettingsView"
-                        ])
-                        dismiss()
-                    }label: {
-                        Image(systemName: "arrow.down")
-                            .foregroundStyle(color.button(scheme))
+                    // MARK: - App info
+                    SettingsSection(title: "About") {
+                        SettingsRow(
+                            icon: "info.circle.fill",
+                            iconColor: .blue,
+                            title: "Version",
+                            value: appVersion
+                        )
                     }
-                    .padding(8)
-                    .buttonStyle(.plain)
+
+                    Spacer(minLength: 40)
                 }
+                .padding(.horizontal, 20)
             }
         }
-
-
-
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(color.overlayGradient(scheme), for: .navigationBar)
     }
-    func launchTutorial(){
-        if tutorial {
-            if TutorialManager.shared.inTutorial {
-                TutorialManager.shared.tutorialIsDone()
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
+}
+
+// MARK: - Reusable components
+
+private struct SettingsSection<Content: View>: View {
+    let title: String
+    @ViewBuilder let content: Content
+    @Environment(\.colorScheme) var scheme
+    @EnvironmentObject var color: ColorManager
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(title.uppercased())
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .padding(.leading, 4)
+                .padding(.bottom, 6)
+
+            VStack(spacing: 0) {
+                content
             }
-            UserDefaults().set(false, forKey: "Tutorial \(NotificationManager.shared.version)")
-            dismiss()
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(color.cardBackground(scheme))
+                    .shadow(color: .black.opacity(0.06), radius: 8, y: 3)
+            )
         }
+    }
+}
 
+private struct SettingsRow: View {
+    let icon: String
+    let iconColor: Color
+    let title: String
+    var value: String? = nil
 
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(iconColor)
+                    .frame(width: 32, height: 32)
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(.white)
+            }
 
+            Text(title)
+                .font(.body)
 
+            Spacer()
+
+            if let value {
+                Text(value)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 13)
     }
 }
 
@@ -164,120 +164,9 @@ enum AppearanceMode: String, CaseIterable {
     }
 }
 
-
-struct AppearancePicker: View {
-    @Binding var selectedMode: AppearanceMode
-    @Environment(\.colorScheme) var scheme
-    @EnvironmentObject var color: ColorManager
-
-
-    var body: some View {
-        VStack(spacing: 12) {
-            CleanText("Appearance")
-
-            HStack(spacing: 12) {
-                ForEach(AppearanceMode.allCases, id: \.self) { mode in
-                    Button {
-                        selectedMode = mode
-                    } label: {
-                        VStack(spacing: 8) {
-                            Image(systemName: mode.icon)
-                                .font(.system(size: 28))
-//                                .foregroundStyle(selectedMode == mode ? color.text(scheme) : .secondary)
-
-                            Text(mode.rawValue)
-                                .font(.subheadline)
-                                .fontWeight(selectedMode == mode ? .semibold : .regular)
-                                .foregroundStyle(selectedMode == mode ? .primary : .secondary)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(selectedMode == mode ?
-                                      Color.primary.opacity(scheme == .dark ? 0.15 : 0.08) :
-                                      Color.primary.opacity(scheme == .dark ? 0.05 : 0.03))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(selectedMode == mode ?
-                                        color.text(scheme) :
-                                       Color.clear,
-                                       lineWidth: 2)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
+#Preview {
+    NavigationStack {
+        SettingsView()
+            .environmentObject(ColorManager.shared)
     }
 }
-
-#Preview {
-    SettingsView()
-}
-
-
-
-// MARK: - May be useful
-//                    Text("Hey \(name)")
-//                        .font(.headline)
-//                        .padding()
-//                        .frame(maxWidth: 320)
-//                        .padding(.vertical, 16)
-//                        .padding(.horizontal, 40)
-//                        .background(
-//                            RoundedRectangle(cornerRadius: 12)
-//                                .fill(color.cardBackground(scheme))
-//                                .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
-//                        )
-//                        .overlay(
-//                            RoundedRectangle(cornerRadius: 12)
-//                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-//                        )
-//                        .padding(20)
-
-
-//                    AppearancePicker(selectedMode: $mode)
-
-//                    VStack(alignment: .leading, spacing: 12) {
-//
-//
-//
-//                        CleanText("LightTheme")
-//                            .foregroundColor(.primary)
-//                        ScrollView(.horizontal){
-//                            Button{
-//                                print("Hello")
-//                            }label: {
-//                                Color.creamyYellow
-//                                    .frame(width: 30, height: 30)
-//                                    .clipShape(.circle)
-//                                    .overlay(
-//                                        RoundedRectangle(cornerRadius: 12)
-//                                            .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-//                                            .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
-//                                    )
-//                            }
-//
-//
-//                        }
-//                        .padding(12)
-//                        .background(
-//                            RoundedRectangle(cornerRadius: 12)
-//                                .fill(color.cardBackground(scheme))
-//                                .shadow(color: color.shadow(scheme).opacity(0.06), radius: 2, y: 1)
-//                        )
-//                        .overlay(
-//                            RoundedRectangle(cornerRadius: 12)
-//                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-//                        )
-//                    }
-//                    .padding(.horizontal, 20)
-//                    .padding(.vertical, 16)
-//                    .background(
-//                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-//                            .fill(color.cardBackground(scheme))
-//                            .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-//                    )
-//                    .padding(.horizontal, 16)

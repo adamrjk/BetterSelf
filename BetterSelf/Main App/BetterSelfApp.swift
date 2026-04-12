@@ -14,8 +14,18 @@ import UIKit
 
 // Updated AppDelegate
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    private func cleanupLocalVideoFiles() {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        guard let files = try? FileManager.default.contentsOfDirectory(at: docs, includingPropertiesForKeys: nil) else { return }
+        for file in files where file.pathExtension == "mov" {
+            try? FileManager.default.removeItem(at: file)
+        }
+    }
+
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        URLCache.shared = URLCache(memoryCapacity: 50 * 1024 * 1024, diskCapacity: 200 * 1024 * 1024)
+        cleanupLocalVideoFiles()
         FirebaseApp.configure()
         // Configure Analytics with anonymous defaults; identifiable tracking opt-in later
         AnalyticsService.configure(consentedToIdentifiableTracking: false)

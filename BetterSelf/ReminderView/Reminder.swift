@@ -36,7 +36,7 @@ class Reminder {
     var card: Card?
 
 
-    init(title: String, type: ReminderType = .InstantInsight, text: String, photoURL: String? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil) {
+    init(title: String, type: ReminderType = .InstantInsight, text: String, photoURL: String? = nil, firebaseVideoURL: String? = nil, link: String, folder: Folder? = nil, time: Int? = 0) {
         self.id = UUID()
         self.title = title
         self.type = type
@@ -49,7 +49,7 @@ class Reminder {
         self.date = .now
         self.pinned = false
         self.datePinned = .distantPast
-        self.time = 0
+        self.time = time ?? 0
         self.isShared = false
         self.isLoading = false
         self.isFront = false
@@ -57,10 +57,10 @@ class Reminder {
         self.card = Card(due: .now)
     }
 
-    static let example =  Reminder(title: "The One Thing", text: "You can only pursue one goal at a time", firebaseVideoURL: "https://firebasestorage.googleapis.com:443/v0/b/betterself-29f7e.firebasestorage.app/o/videos%2FC29D7FD5-3EEF-417D-BB11-14448E115FFE.mov?alt=media&token=877e7031-36c1-4af0-9941-f85650676519", link: "https://", folder: .example)
+    static let example =  Reminder(title: "The One Thing", text: "You can only pursue one goal at a time", firebaseVideoURL: "https://firebasestorage.googleapis.com:443/v0/b/betterself-29f7e.firebasestorage.app/o/videos%2FC29D7FD5-3EEF-417D-BB11-14448E115FFE.mov?alt=media&token=877e7031-36c1-4af0-9941-f85650676519", link: "https://", folder: .example, time: 3600)
 
 
-    static let goggins = Reminder(title: "I know what I did", type: .InstantInsight, text: "I know what I did\nI have a resume full of motivation\nThere was no one there. It was you\nHaving proof of who you are allows you to never doubt yourself again", link: "https://www.youtube.com/watch?v=nDLb8_wgX50", folder: .mindset)
+    static let goggins = Reminder(title: "I know what I did", type: .InstantInsight, text: "I know what I did\nI have a resume full of motivation\nThere was no one there. It was you\nHaving proof of who you are allows you to never doubt yourself again", link: "https://www.youtube.com/watch?v=nDLb8_wgX50", folder: .mindset, time: 7200)
 
     static let quote = Reminder(title: "Pursue the Impossible", type: .TimeLessLetter, text: "Nietzsche said:\nI know of no better life purpose than to perish in attempting the great and impossible. The fact that something seems impossible shouldn't be a reason to not pursue it. That's exactly what makes it worth pursuing. where would the courage and greatness be if success was certain and there was no risk?", link: "", folder: .mindset)
 

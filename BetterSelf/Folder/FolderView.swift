@@ -98,19 +98,6 @@ struct FolderView: View {
                 }
 
                 ToolbarItem(placement: .topBarLeading){
-                    Button("Settings", systemImage: "gear"){
-                        AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
-                            "button": "settings_open",
-                            "view": "FolderView"
-                        ])
-                        flow.settingSheet()
-                    }
-                    .foregroundStyle(color.button(scheme))
-                    .padding(8)
-                    .buttonStyle(.plain)
-                }
-
-                ToolbarItem(placement: .topBarLeading){
                     Button("Quick Add", systemImage: "video.fill.badge.plus"){
                         AnalyticsService.log(AnalyticsService.EventName.buttonTapped, params: [
                             "button": "quick_add",
