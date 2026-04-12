@@ -8,6 +8,8 @@
   [![Swift](https://img.shields.io/badge/Swift-6-orange?style=flat&logo=swift)](https://swift.org/)
 </div>
 
+App's landing page: https://bettermyself.app/
+
 ---
 
 **BetterSelf** is an iOS app that helps you capture, organize, and revisit the lessons, insights, and ideas that shape who you are. Keep your reminders private, pinned, and easily accessible anytime. Never forget the moments that matter — have your ideas, memories, and inspirations all in one place.
